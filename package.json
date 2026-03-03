@@ -1,0 +1,53 @@
+{
+  "name": "management-score-pad",
+  "description": "Score tracking app for the Management (Judgement) card game — track bids, results, and cumulative scores across rounds.",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "biome check --write .",
+    "lint:check": "biome check .",
+    "format": "biome format --write .",
+    "preview": "vite preview",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:functional": "playwright test --project=functional",
+    "e2e:visual": "playwright test --project=visual-desktop --project=visual-tablet --project=visual-mobile",
+    "e2e:update-snapshots": "playwright test --project=visual-desktop --project=visual-tablet --project=visual-mobile --update-snapshots",
+    "test": "vitest run",
+    "test:smoke": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "verify": "biome check . && biome format . && vitest run && playwright test",
+    "setup-hooks": "sh ./scripts/setup-hooks.sh all"
+  },
+  "dependencies": {
+    "@dicebear/collection": "^9.4.0",
+    "@dicebear/core": "^9.4.0",
+    "@hookform/resolvers": "^5.0.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.57.0",
+    "react-router-dom": "^7.13.1",
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.4",
+    "@playwright/test": "^1.58.2",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react-swc": "^4.2.3",
+    "@vitest/coverage-v8": "^4.0.18",
+    "semantic-release": "^25.0.3",
+    "tailwindcss": "^4.2.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

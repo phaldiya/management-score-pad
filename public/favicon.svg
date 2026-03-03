@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Card background -->
+  <rect x="6" y="2" width="52" height="60" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <!-- Inner border -->
+  <rect x="10" y="6" width="44" height="52" rx="3" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Large spade - upper left (suit-spades.svg path, scaled ~0.22) -->
+  <g transform="translate(11, 10) scale(0.22)" fill="#111827">
+    <path d="M32 4C32 4 8 28 8 40c0 7.2 5.4 12 12 12 3.6 0 6.8-1.6 9-4.2C28 52 26 56 22 60h20c-4-4-6-8-7-12.2C37.2 50.4 40.4 52 44 52c6.6 0 12-4.8 12-12C56 28 32 4 32 4z"/>
+  </g>
+
+  <!-- Small heart - top right (suit-hearts.svg path, scaled ~0.14) -->
+  <g transform="translate(41, 13) scale(0.14)" fill="#DC2626">
+    <path d="M32 58L6.8 30.4C2.4 25.2 2 18 5.6 12.8 9.6 7.2 16.4 4 22 4c4.8 0 8.4 2 10 3.6L32 8l0-.4C33.6 6 37.2 4 42 4c5.6 0 12.4 3.2 16.4 8.8C62 18 61.6 25.2 57.2 30.4L32 58z"/>
+  </g>
+
+  <!-- Tiny club - upper center (suit-clubs.svg paths, scaled ~0.12) -->
+  <g transform="translate(27, 10) scale(0.12)" fill="#111827">
+    <circle cx="32" cy="18" r="12"/>
+    <circle cx="16" cy="36" r="12"/>
+    <circle cx="48" cy="36" r="12"/>
+    <rect x="28" y="36" width="8" height="20" rx="1"/>
+    <path d="M22 60h20l-2-6H24z"/>
+  </g>
+
+  <!-- Medium diamond - center right (suit-diamonds.svg path, scaled ~0.17) -->
+  <g transform="translate(40, 27) scale(0.17)" fill="#DC2626">
+    <path d="M32 2L4 32l28 30 28-30L32 2z"/>
+  </g>
+
+  <!-- Medium heart - lower left (suit-hearts.svg path, scaled ~0.16) -->
+  <g transform="translate(12, 36) scale(0.16)" fill="#DC2626">
+    <path d="M32 58L6.8 30.4C2.4 25.2 2 18 5.6 12.8 9.6 7.2 16.4 4 22 4c4.8 0 8.4 2 10 3.6L32 8l0-.4C33.6 6 37.2 4 42 4c5.6 0 12.4 3.2 16.4 8.8C62 18 61.6 25.2 57.2 30.4L32 58z"/>
+  </g>
+
+  <!-- Large club - bottom center (suit-clubs.svg paths, scaled ~0.17) -->
+  <g transform="translate(27, 36) scale(0.17)" fill="#111827">
+    <circle cx="32" cy="18" r="12"/>
+    <circle cx="16" cy="36" r="12"/>
+    <circle cx="48" cy="36" r="12"/>
+    <rect x="28" y="36" width="8" height="20" rx="1"/>
+    <path d="M22 60h20l-2-6H24z"/>
+  </g>
+
+  <!-- Small spade - right mid (suit-spades.svg path, scaled ~0.13) -->
+  <g transform="translate(43, 36) scale(0.13)" fill="#111827">
+    <path d="M32 4C32 4 8 28 8 40c0 7.2 5.4 12 12 12 3.6 0 6.8-1.6 9-4.2C28 52 26 56 22 60h20c-4-4-6-8-7-12.2C37.2 50.4 40.4 52 44 52c6.6 0 12-4.8 12-12C56 28 32 4 32 4z"/>
+  </g>
+
+  <!-- Tiny diamond - left mid (suit-diamonds.svg path, scaled ~0.1) -->
+  <g transform="translate(13, 28) scale(0.1)" fill="#DC2626">
+    <path d="M32 2L4 32l28 30 28-30L32 2z"/>
+  </g>
+
+  <!-- Score numbers -->
+  <text x="24" y="36" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#2563eb" opacity="0.7">10</text>
+  <text x="34" y="25" font-family="system-ui, sans-serif" font-weight="700" font-size="7" fill="#059669" opacity="0.6">30</text>
+  <text x="38" y="50" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#ea580c" opacity="0.6">20</text>
+  <text x="27" y="22" font-family="system-ui, sans-serif" font-weight="700" font-size="5" fill="#7c3aed" opacity="0.55">50</text>
+  <text x="18" y="50" font-family="system-ui, sans-serif" font-weight="700" font-size="6" fill="#0d9488" opacity="0.55">40</text>
+
+  <!-- Zeros scattered -->
+  <text x="18" y="31" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#dc2626" opacity="0.5">0</text>
+  <text x="26" y="54" font-family="system-ui, sans-serif" font-weight="700" font-size="7" fill="#d97706" opacity="0.45">0</text>
+  <text x="23" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="5" fill="#e11d48" opacity="0.4">0</text>
+  <text x="46" y="28" font-family="system-ui, sans-serif" font-weight="700" font-size="4" fill="#db2777" opacity="0.45">0</text>
+  <text x="35" y="14" font-family="system-ui, sans-serif" font-weight="700" font-size="6" fill="#64748b" opacity="0.4">0</text>
+</svg>

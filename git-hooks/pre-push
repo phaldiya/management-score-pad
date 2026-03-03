@@ -1,0 +1,34 @@
+#!/bin/sh
+
+trap 'echo "Push aborted by user"; exit 1' SIGINT
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+echo "==> pre-push: running full verify"
+bun run verify
+
+if [ $? -ne 0 ]; then
+  echo "Verification failed. Aborting push."
+  exit 1
+fi
+
+echo ""
+echo "==> pre-push: running security audit..."
+AUDIT_JSON=$(bun audit --json 2>/dev/null)
+AUDIT_EXIT=$?
+
+if [ $AUDIT_EXIT -eq 0 ]; then
+  echo "No vulnerabilities found."
+  echo "==> pre-push: all checks passed"
+  exit 0
+fi
+
+echo "$AUDIT_JSON" | node "$HOOK_DIR/audit-check.cjs"
+
+if [ $? -ne 0 ]; then
+  echo "Push blocked by security audit."
+  exit 1
+fi
+
+echo "==> pre-push: all checks passed"
+exit 0

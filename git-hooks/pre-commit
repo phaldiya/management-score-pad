@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+echo "==> pre-commit: installing deps"
+bun install --frozen-lockfile
+
+echo "==> pre-commit: lint check"
+bun run lint:check
+
+echo "==> pre-commit: smoke tests"
+bun run test:smoke
+
+echo "==> pre-commit: all checks passed"
