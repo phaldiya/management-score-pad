@@ -1,5 +1,5 @@
 import { bottts, croodles, lorelei, pixelArt } from '@dicebear/collection';
-import { createAvatar } from '@dicebear/core';
+import { createAvatar, type Style } from '@dicebear/core';
 
 const STYLES = { bottts, croodles, lorelei, pixelArt } as const;
 type StyleName = keyof typeof STYLES;
@@ -17,8 +17,11 @@ export function getAvatarDataUri(id: string): string {
   let uri = cache.get(id);
   if (uri) return uri;
   const { style, seed } = parse(id);
+  // Each DiceBear style has different option types; cast to Style<object> for uniform handling
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const styleDef = STYLES[style] ?? STYLES.bottts;
-  uri = createAvatar(styleDef, { seed, size: 64 }).toDataUri();
+  // biome-ignore lint/suspicious/noExplicitAny: DiceBear styles have incompatible option types
+  uri = createAvatar(styleDef as Style<any>, { seed, size: 64 }).toDataUri();
   cache.set(id, uri);
   return uri;
 }

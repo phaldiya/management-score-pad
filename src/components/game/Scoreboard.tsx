@@ -18,7 +18,6 @@ const Scoreboard = forwardRef<HTMLTableElement, ScoreboardProps>(function Scoreb
 ) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const _roundCount = rounds.length;
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
