@@ -14,7 +14,15 @@ export default function SeatingChart({ players }: SeatingChartProps) {
 
   return (
     <div className="mt-4 flex flex-col items-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="overflow-visible"
+        role="img"
+        aria-label="Seating arrangement showing clockwise player order"
+      >
+        <title>Seating arrangement showing clockwise player order</title>
         {/* Clockwise arrow circle */}
         <circle
           cx={center}
@@ -39,7 +47,7 @@ export default function SeatingChart({ players }: SeatingChartProps) {
         </defs>
 
         {/* Clockwise label */}
-        <text x={center} y={center} textAnchor="middle" dominantBaseline="middle" className="fill-gray-400 text-[10px]">
+        <text x={center} y={center} textAnchor="middle" dominantBaseline="middle" className="fill-gray-600 text-xs">
           clockwise
         </text>
 
@@ -65,17 +73,18 @@ export default function SeatingChart({ players }: SeatingChartProps) {
                 clipPath={`url(#avatar-clip-${i})`}
                 preserveAspectRatio="xMidYMid slice"
               />
-              <text
-                x={x}
-                y={y + 22}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="fill-gray-500 text-[10px]"
-              >
+              <text x={x} y={y + 22} textAnchor="middle" dominantBaseline="middle" className="fill-gray-700 text-xs">
                 {player.name}
               </text>
               {isFirst && (
-                <image href={`${import.meta.env.BASE_URL}dealer.png`} x={x + 8} y={y - 20} width={16} height={16} />
+                <image
+                  href={`${import.meta.env.BASE_URL}dealer.png`}
+                  x={x + 8}
+                  y={y - 20}
+                  width={16}
+                  height={16}
+                  aria-label="Dealer"
+                />
               )}
             </g>
           );

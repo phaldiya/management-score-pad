@@ -22,16 +22,21 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="game-rules-title"
+    >
       <div className="mx-4 w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-          <h2 className="flex items-center gap-1 font-bold text-gray-900">
+          <h2 id="game-rules-title" className="flex items-center gap-1 font-bold text-gray-900">
             Game Rules
             {SUITS.map((s) => (
               <SuitIcon key={s} suit={s} className="h-4 w-4" />
             ))}
           </h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
             <CloseIcon />
           </button>
         </div>
@@ -51,8 +56,8 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
             <h3 className="mb-1 font-semibold text-gray-900">Seating Order</h3>
             <p className="mb-2 text-gray-600">
               Before the first play, arrange players in <strong>clockwise seating order</strong> using the{' '}
-              <span className="inline-block rounded bg-gray-100 px-1 font-medium text-gray-500 text-xs">&larr;</span>{' '}
-              <span className="inline-block rounded bg-gray-100 px-1 font-medium text-gray-500 text-xs">&rarr;</span>{' '}
+              <span className="inline-block rounded bg-gray-100 px-1 font-medium text-gray-700 text-xs">&larr;</span>{' '}
+              <span className="inline-block rounded bg-gray-100 px-1 font-medium text-gray-700 text-xs">&rarr;</span>{' '}
               arrows.
             </p>
             <p className="text-gray-600">This matters because:</p>
@@ -61,7 +66,7 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
                 The <strong>dealer</strong>{' '}
                 <img
                   src={`${import.meta.env.BASE_URL}dealer.png`}
-                  alt="dealer"
+                  alt="Dealer badge"
                   className="inline-block h-4 w-4 align-text-bottom"
                 />{' '}
                 rotates clockwise each round
@@ -82,9 +87,15 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-gray-200 border-b">
-                  <th className="py-1 pr-2 font-medium text-gray-500">Players</th>
-                  <th className="py-1 pr-2 font-medium text-gray-500">Max Cards</th>
-                  <th className="py-1 font-medium text-gray-500">Total Rounds</th>
+                  <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
+                    Players
+                  </th>
+                  <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
+                    Max Cards
+                  </th>
+                  <th scope="col" className="py-1 font-medium text-gray-700">
+                    Total Rounds
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -124,7 +135,11 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
             <div className="flex items-center gap-2">
               {SUITS.map((suit, i) => (
                 <span key={suit} className="flex items-center gap-1">
-                  {i > 0 && <span className="text-gray-400">&rarr;</span>}
+                  {i > 0 && (
+                    <span className="text-gray-600" aria-hidden="true">
+                      &rarr;
+                    </span>
+                  )}
                   <span
                     className={`inline-flex items-center gap-1 rounded px-2 py-0.5 font-medium text-xs ${isSuitRed(suit) ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-900'}`}
                   >
@@ -133,7 +148,9 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
                   </span>
                 </span>
               ))}
-              <span className="text-gray-400">&rarr; repeat</span>
+              <span className="text-gray-600" aria-hidden="true">
+                &rarr; repeat
+              </span>
             </div>
           </section>
 
@@ -146,7 +163,7 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
                 Dealer{' '}
                 <img
                   src={`${import.meta.env.BASE_URL}dealer.png`}
-                  alt="dealer"
+                  alt="Dealer badge"
                   className="inline-block h-4 w-4 align-text-bottom"
                 />{' '}
                 bids last &mdash; total bids <strong>cannot</strong> equal the card count
@@ -160,9 +177,15 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-gray-200 border-b">
-                  <th className="py-1 pr-2 font-medium text-gray-500">Situation</th>
-                  <th className="py-1 pr-2 font-medium text-gray-500">Points</th>
-                  <th className="py-1 font-medium text-gray-500">Example</th>
+                  <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
+                    Situation
+                  </th>
+                  <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
+                    Points
+                  </th>
+                  <th scope="col" className="py-1 font-medium text-gray-700">
+                    Example
+                  </th>
                 </tr>
               </thead>
               <tbody>

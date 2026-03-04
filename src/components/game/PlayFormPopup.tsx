@@ -121,20 +121,30 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
   const Wrapper = mode !== 'details' ? 'form' : 'div';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="play-form-title"
+    >
       <div className="mx-4 w-full max-w-lg rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-          <h2 className="font-bold text-gray-900 text-lg">{title}</h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+          <div className="flex items-center gap-2">
+            <PlayCard cardCount={cardCount} trump={trump} size="xs" />
+            <h2 id="play-form-title" className="font-bold text-gray-900 text-lg">
+              {title}
+            </h2>
+          </div>
+          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
             <CloseIcon />
           </button>
         </div>
 
         <Wrapper onSubmit={onFormSubmit} className="p-4">
           <div className="flex gap-6">
-            <div className="flex flex-col items-center justify-center">
+            <div className="hidden flex-col items-center justify-center sm:flex">
               <PlayCard cardCount={cardCount} trump={trump} />
-              <p className="mt-2 text-gray-500 text-sm">{cardCount} cards</p>
+              <p className="mt-2 text-gray-700 text-sm">{cardCount} cards</p>
             </div>
 
             <div className="flex-1 space-y-3">
@@ -149,7 +159,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
               )}
 
               <div className="space-y-2">
-                <span className="block font-semibold text-gray-500 text-xs uppercase tracking-wider">
+                <span className="block font-semibold text-gray-700 text-xs uppercase tracking-wider">
                   {sectionLabel}
                 </span>
                 {ordered.map((p, idx) => {
@@ -178,6 +188,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                           type="number"
                           min={0}
                           max={cardCount}
+                          aria-label={`Bid for ${p.name}`}
                           ref={(el) => {
                             registerRef?.(el);
                             if (idx === 0 && !hasFocused.current && el) {
@@ -210,6 +221,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                               type="number"
                               min={0}
                               max={cardCount}
+                              aria-label={`Result for ${p.name}`}
                               ref={(el) => {
                                 registerRef?.(el);
                                 if (idx === 0 && el && !hasFocused.current) {
@@ -239,7 +251,11 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                   <div className={`font-medium text-sm ${total === cardCount ? 'text-red-600' : 'text-gray-600'}`}>
                     Total: {total} / {cardCount} {total === cardCount && '(cannot equal card count!)'}
                   </div>
-                  {rootError && <p className="text-red-600 text-sm">{rootError.message}</p>}
+                  {rootError && (
+                    <p className="text-red-600 text-sm" role="alert">
+                      {rootError.message}
+                    </p>
+                  )}
                 </>
               )}
 
@@ -248,7 +264,11 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                   <div className={`font-medium text-sm ${total === cardCount ? 'text-green-600' : 'text-red-600'}`}>
                     Total: {total} / {cardCount} {total !== cardCount && '(must equal card count!)'}
                   </div>
-                  {rootError && <p className="text-red-600 text-sm">{rootError.message}</p>}
+                  {rootError && (
+                    <p className="text-red-600 text-sm" role="alert">
+                      {rootError.message}
+                    </p>
+                  )}
                 </>
               )}
             </div>

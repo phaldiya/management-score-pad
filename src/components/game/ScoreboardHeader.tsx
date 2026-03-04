@@ -21,20 +21,23 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
   return (
     <thead>
       <tr className="sticky top-0 z-20 bg-gray-600">
-        <th className="sticky left-0 z-30 w-0 border border-gray-500 bg-gray-600 px-1 py-2 text-left font-semibold text-gray-300 text-xs uppercase tracking-wider">
+        <th
+          scope="col"
+          className="sticky left-0 z-30 w-0 border border-gray-500 bg-gray-600 px-1 py-2 text-left font-semibold text-gray-300 text-xs uppercase tracking-wider"
+        >
           Play
         </th>
         {players.map((player, index) => {
           const cumScore = scores[index] ?? 0;
           const isLeader = hasScores && cumScore === maxScore;
           return (
-            <th key={player.id} className="border border-gray-500 px-3 py-2 text-center">
+            <th key={player.id} scope="col" className="border border-gray-500 px-3 py-2 text-center">
               {canReorder ? (
                 <div className="flex items-center justify-center gap-1">
                   <button
                     type="button"
                     disabled={index === 0}
-                    className="text-gray-400 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
+                    className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
                     aria-label={`Move ${player.name} left`}
                     title={`Move ${player.name} to left`}
                     onClick={() =>
@@ -56,7 +59,7 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
                   <button
                     type="button"
                     disabled={index === players.length - 1}
-                    className="text-gray-400 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
+                    className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
                     aria-label={`Move ${player.name} right`}
                     title={`Move ${player.name} to right`}
                     onClick={() =>
@@ -73,15 +76,23 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
               ) : (
                 <div className="flex items-center justify-center gap-2.5">
                   {isLeader ? (
-                    <span className="text-4xl leading-none">&#x1F451;</span>
+                    <>
+                      <span className="hidden text-4xl leading-none sm:inline">&#x1F451;</span>
+                      <span className="hidden sm:inline">
+                        <PlayerAvatar avatar={player.avatar} name={player.name} size="md" />
+                      </span>
+                    </>
                   ) : (
                     <span className="hidden sm:inline">
                       <PlayerAvatar avatar={player.avatar} name={player.name} size="md" />
                     </span>
                   )}
                   <div>
-                    <div className="font-bold text-base text-white">{player.name}</div>
-                    <div className="font-medium text-blue-300 text-xs">{cumScore}</div>
+                    <div className="font-bold text-base text-white">
+                      {player.name}
+                      {isLeader && <span className="text-yellow-300 sm:hidden"> *</span>}
+                    </div>
+                    <div className="font-medium text-blue-200 text-xs">{cumScore}</div>
                   </div>
                 </div>
               )}

@@ -64,13 +64,18 @@ export default function Header() {
     <>
       <header className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
         <div className="flex items-center gap-2">
-          <AppIcon className="h-8 w-8" />
-          <h1 className="font-bold text-gray-900 text-lg">Management Score Pad</h1>
+          <div className="flex flex-col items-center sm:block">
+            <AppIcon className="h-8 w-8" />
+            <span className="block font-semibold text-[8px] text-gray-600 leading-tight sm:hidden">Management</span>
+          </div>
+          <h1 className="font-bold text-gray-900 text-lg">
+            <span className="hidden sm:inline">Management </span>Score Pad
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200"
+            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
             onClick={() => setShowRules(true)}
             title="Game rules"
             aria-label="Game rules"
@@ -79,7 +84,7 @@ export default function Header() {
           </button>
           <button
             type="button"
-            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200"
+            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
             onClick={() => setShowShortcuts(true)}
             title="Keyboard shortcuts (?)"
             aria-label="Keyboard shortcuts"
@@ -91,7 +96,7 @@ export default function Header() {
               {state.rounds.length > 0 && (
                 <button
                   type="button"
-                  className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200"
+                  className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
                   onClick={() => printScoreboard(state.players, state.rounds)}
                   title="Download scoreboard as PDF"
                   aria-label="Download scoreboard as PDF"
@@ -101,10 +106,12 @@ export default function Header() {
               )}
               <button
                 type="button"
-                className="rounded bg-red-500 px-3 py-1.5 font-medium text-sm text-white hover:bg-red-600"
+                className="flex h-7 items-center rounded bg-red-500 p-1.5 font-medium text-sm text-white hover:bg-red-600 sm:px-3"
                 onClick={handleNewGame}
+                aria-label="New game"
               >
-                New Game
+                <span className="hidden sm:inline">+ Game</span>
+                <span className="flex h-4 w-4 items-center justify-center sm:hidden">+</span>
               </button>
             </>
           )}
@@ -115,14 +122,21 @@ export default function Header() {
       {showShortcuts && <KeyboardShortcutsPopup onClose={() => setShowShortcuts(false)} />}
 
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="abandon-game-title"
+        >
           <div className="mx-4 w-full max-w-sm rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-              <h2 className="font-bold text-gray-900">Abandon Game?</h2>
+              <h2 id="abandon-game-title" className="font-bold text-gray-900">
+                Abandon Game?
+              </h2>
               <button
                 type="button"
                 onClick={() => setShowConfirm(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-900"
                 aria-label="Close"
               >
                 <CloseIcon />

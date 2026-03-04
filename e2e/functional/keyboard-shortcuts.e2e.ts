@@ -197,7 +197,7 @@ test.describe('Keyboard Shortcuts', () => {
     test('closes new game confirmation popup', async ({ page }) => {
       await setupGame(page);
       await placeBids(page, [5, 5, 5]);
-      await page.getByRole('button', { name: 'New Game' }).click();
+      await page.getByRole('button', { name: 'New game' }).click();
       await expect(page.getByText('Abandon Game?')).toBeVisible();
 
       await page.keyboard.press('Escape');

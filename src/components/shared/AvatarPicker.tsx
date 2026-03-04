@@ -50,32 +50,36 @@ export default function AvatarPicker({ selected, onSelect, onClose }: AvatarPick
       style={style}
       className="absolute top-full left-0 z-40 mt-1 w-[26rem] max-w-[calc(100vw-1rem)] rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
     >
-      {AVATAR_CATEGORIES.map((cat) => (
-        <div key={cat.label} className="mb-2 last:mb-0">
-          <span className="mb-1 block font-semibold text-[10px] text-gray-400 uppercase tracking-wider">
-            {cat.label}
-          </span>
-          <div className="grid grid-cols-10 gap-1.5">
-            {cat.avatars.map((avatar) => (
-              <button
-                key={avatar}
-                type="button"
-                onClick={() => {
-                  onSelect(avatar);
-                  onClose();
-                }}
-                className={`h-9 w-9 overflow-hidden rounded-full border-2 transition-all ${
-                  selected === avatar
-                    ? 'border-blue-500 ring-2 ring-blue-200'
-                    : 'border-transparent hover:border-gray-300'
-                }`}
-              >
-                <img src={getAvatarDataUri(avatar)} alt={avatar} className="h-full w-full object-cover" />
-              </button>
-            ))}
+      {AVATAR_CATEGORIES.map((cat) => {
+        const hideOnSmall = cat.label === 'Bots' || cat.label === 'Pixel Art';
+        return (
+          <div key={cat.label} className={`mb-2 last:mb-0 ${hideOnSmall ? 'hidden sm:block' : ''}`}>
+            <span className="mb-1 block font-semibold text-[10px] text-gray-600 uppercase tracking-wider">
+              {cat.label}
+            </span>
+            <div className="grid grid-cols-10 gap-1.5">
+              {cat.avatars.map((avatar) => (
+                <button
+                  key={avatar}
+                  type="button"
+                  aria-label={`Select ${avatar} avatar`}
+                  onClick={() => {
+                    onSelect(avatar);
+                    onClose();
+                  }}
+                  className={`h-9 w-9 overflow-hidden rounded-full border-2 transition-all ${
+                    selected === avatar
+                      ? 'border-blue-500 ring-2 ring-blue-200'
+                      : 'border-transparent hover:border-gray-300'
+                  }`}
+                >
+                  <img src={getAvatarDataUri(avatar)} alt={avatar} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

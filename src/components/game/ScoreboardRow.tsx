@@ -23,6 +23,7 @@ export default function ScoreboardRow({ round, players, onPlayCardClick }: Score
         }
         role={onPlayCardClick ? 'button' : undefined}
         tabIndex={onPlayCardClick ? 0 : undefined}
+        aria-label={onPlayCardClick ? `View play ${round.gameNumber} details` : undefined}
       >
         <PlayCard cardCount={round.cardCount} trump={round.trump} size="sm" highlight={round.phase === 'in_progress'} />
       </td>

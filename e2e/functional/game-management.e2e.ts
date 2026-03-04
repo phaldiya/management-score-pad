@@ -33,7 +33,7 @@ test.describe('Game Management', () => {
   test('new game shows confirmation popup when game in progress', async ({ page }) => {
     await setupGameWithOneRound(page);
 
-    await page.getByRole('button', { name: 'New Game' }).click();
+    await page.getByRole('button', { name: 'New game' }).click();
     await expect(page.getByText('Abandon Game?')).toBeVisible();
     await expect(page.getByText('You have a game in progress')).toBeVisible();
   });
@@ -41,7 +41,7 @@ test.describe('Game Management', () => {
   test('cancel keeps game intact', async ({ page }) => {
     await setupGameWithOneRound(page);
 
-    await page.getByRole('button', { name: 'New Game' }).click();
+    await page.getByRole('button', { name: 'New game' }).click();
     await expect(page.getByText('Abandon Game?')).toBeVisible();
 
     await page.getByRole('button', { name: 'Cancel' }).click();
@@ -55,12 +55,29 @@ test.describe('Game Management', () => {
   test('confirm resets to setup page', async ({ page }) => {
     await setupGameWithOneRound(page);
 
-    await page.getByRole('button', { name: 'New Game' }).click();
+    await page.getByRole('button', { name: 'New game' }).click();
     await page.getByRole('button', { name: 'Yes, New Game' }).click();
 
     // Should navigate back to setup
     await expect(page).toHaveURL(/#?\/?$/);
     await expect(page.getByPlaceholder('Player 1')).toBeVisible();
+  });
+
+  test('new game button is accessible at all viewports', async ({ page }) => {
+    await setupGameWithOneRound(page);
+
+    const btn = page.getByRole('button', { name: 'New game' });
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveAccessibleName('New game');
+
+    // Desktop: shows "+ Game" text
+    await expect(btn.locator('span.hidden.sm\\:inline')).toHaveText('+ Game');
+
+    // Mobile: shows "+" icon-sized button
+    await page.setViewportSize({ width: 375, height: 812 });
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveAccessibleName('New game');
+    await expect(btn.locator('span.sm\\:hidden')).toHaveText('+');
   });
 
   test('page reload shows restore popup', async ({ page }) => {

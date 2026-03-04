@@ -59,13 +59,20 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
 
   return (
     <>
-      <div ref={confettiRef} className="pointer-events-none fixed inset-0 z-[60] overflow-hidden" />
+      <div ref={confettiRef} className="pointer-events-none fixed inset-0 z-[60] overflow-hidden" aria-hidden="true" />
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="game-complete-title"
+      >
         <div className="mx-4 w-full max-w-md animate-fade-slide-up rounded-lg bg-white shadow-xl">
           <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-            <h2 className="font-bold text-gray-900 text-lg">Game Complete!</h2>
-            <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+            <h2 id="game-complete-title" className="font-bold text-gray-900 text-lg">
+              Game Complete!
+            </h2>
+            <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
               <CloseIcon />
             </button>
           </div>
@@ -73,16 +80,12 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
           <div className="p-4">
             <div className="mb-4 flex animate-winner-bounce flex-col items-center gap-1 py-2">
               <span className="animate-crown-float text-5xl">&#x1F451;</span>
-              <div className="flex items-center justify-center gap-2">
-                {winners.map((w) => (
-                  <PlayerAvatar key={w.player.id} avatar={w.player.avatar} name={w.player.name} size="lg" />
-                ))}
-              </div>
+              <span className="text-gray-500 text-sm">Congratulations</span>
               <span className="font-bold text-2xl text-gray-900">{winners.map((w) => w.player.name).join(' & ')}</span>
               <span className="font-bold text-amber-500 text-lg">{topScore} pts</span>
             </div>
 
-            <h3 className="mb-3 text-center font-semibold text-gray-500 text-sm uppercase tracking-wider">
+            <h3 className="mb-3 text-center font-semibold text-gray-700 text-sm uppercase tracking-wider">
               Final Standings
             </h3>
             <div className="space-y-2">

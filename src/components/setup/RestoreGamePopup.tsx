@@ -23,9 +23,16 @@ export default function RestoreGamePopup({ savedState, onRestore, onStartNew }: 
   }, [onStartNew]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="restore-game-title"
+    >
       <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 font-bold text-gray-900 text-xl">Unfinished Game Found</h2>
+        <h2 id="restore-game-title" className="mb-4 font-bold text-gray-900 text-xl">
+          Unfinished Game Found
+        </h2>
         <div className="mb-6 space-y-2 text-gray-600 text-sm">
           <p>
             <span className="font-medium text-gray-800">Players:</span> {playerNames}

@@ -28,11 +28,18 @@ export function KeyboardShortcutsPopup({ onClose }: KeyboardShortcutsPopupProps)
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="keyboard-shortcuts-title"
+    >
       <div className="mx-4 w-full max-w-sm rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-          <h2 className="font-bold text-gray-900">Keyboard Shortcuts</h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+          <h2 id="keyboard-shortcuts-title" className="font-bold text-gray-900">
+            Keyboard Shortcuts
+          </h2>
+          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
             <CloseIcon />
           </button>
         </div>
@@ -41,7 +48,7 @@ export function KeyboardShortcutsPopup({ onClose }: KeyboardShortcutsPopupProps)
             <li key={shortcut.label} className="flex items-center justify-between px-4 py-3">
               <div>
                 <div className="font-medium text-gray-900 text-sm">{shortcut.label}</div>
-                <div className="text-gray-500 text-xs">{shortcut.description}</div>
+                <div className="text-gray-700 text-xs">{shortcut.description}</div>
               </div>
               <div className="flex items-center gap-1">
                 {shortcut.keys.map((key) => (

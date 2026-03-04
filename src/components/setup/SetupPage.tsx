@@ -113,7 +113,7 @@ export default function SetupPage() {
           </div>
 
           <h2 className="mb-1 hidden text-center font-bold text-3xl text-gray-900 md:block">Management (Judgement)</h2>
-          <p className="mb-4 text-center text-gray-500 text-sm">Enter player names to start a new game</p>
+          <p className="mb-4 text-center text-gray-700 text-sm">Enter player names to start a new game</p>
 
           <div className="space-y-3">
             {players.map((player, index) => (
@@ -124,6 +124,7 @@ export default function SetupPage() {
                       type="button"
                       onClick={() => setPickerOpen(pickerOpen === index ? null : index)}
                       className="rounded-full border-2 border-transparent hover:border-blue-400"
+                      aria-label={`Change avatar for ${player.name || `Player ${index + 1}`}`}
                     >
                       <PlayerAvatar avatar={player.avatar} name={player.name || `Player ${index + 1}`} size="md" />
                     </button>
@@ -138,9 +139,12 @@ export default function SetupPage() {
                   <input
                     type="text"
                     placeholder={`Player ${index + 1}`}
+                    aria-label={`Player ${index + 1} name`}
+                    aria-invalid={duplicateIndices.has(index) || undefined}
+                    aria-describedby={duplicateIndices.has(index) ? `player-error-${index}` : undefined}
                     value={player.name}
                     onChange={(e) => updateName(index, e.target.value)}
-                    className={`flex-1 rounded-lg border px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 ${
+                    className={`flex-1 rounded-lg border px-3 py-2 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-1 ${
                       duplicateIndices.has(index)
                         ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
                         : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
@@ -150,14 +154,18 @@ export default function SetupPage() {
                     <button
                       type="button"
                       onClick={() => removePlayer(index)}
-                      className="rounded-lg border border-gray-300 p-2 text-gray-400 hover:border-red-300 hover:text-red-500"
+                      className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:border-red-300 hover:text-red-500"
                       aria-label={`Remove player ${index + 1}`}
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
                   )}
                 </div>
-                {duplicateIndices.has(index) && <p className="mt-1 text-red-500 text-xs">Duplicate player name</p>}
+                {duplicateIndices.has(index) && (
+                  <p id={`player-error-${index}`} className="mt-1 ml-12 text-red-600 text-xs" role="alert">
+                    Duplicate player name
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -166,7 +174,7 @@ export default function SetupPage() {
             type="button"
             onClick={addPlayer}
             disabled={!allFilled}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 border-dashed py-2 text-gray-500 text-sm hover:border-blue-400 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-500"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 border-dashed py-2 text-gray-700 text-sm hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700"
           >
             <PlusIcon className="h-4 w-4" />
             Add Player
