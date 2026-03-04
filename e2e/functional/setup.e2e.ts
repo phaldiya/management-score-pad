@@ -75,6 +75,30 @@ test.describe('Setup Page', () => {
     await expect(page.getByText('Duplicate player name').first()).toBeVisible();
   });
 
+  test('shows error for player name shorter than 2 characters', async ({ page }) => {
+    await page.getByPlaceholder('Player 1').fill('A');
+    await page.getByPlaceholder('Player 2').fill('Bob');
+    await page.getByPlaceholder('Player 3').fill('Charlie');
+
+    await expect(page.getByText('Name must be at least 2 characters')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start Game' })).toBeDisabled();
+  });
+
+  test('allows player name with exactly 2 characters', async ({ page }) => {
+    await page.getByPlaceholder('Player 1').fill('Al');
+    await page.getByPlaceholder('Player 2').fill('Bob');
+    await page.getByPlaceholder('Player 3').fill('Charlie');
+
+    await expect(page.getByText('Name must be at least 2 characters')).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start Game' })).toBeEnabled();
+  });
+
+  test('limits player name to 8 characters', async ({ page }) => {
+    const input = page.getByPlaceholder('Player 1');
+    await input.fill('Alexander');
+    await expect(input).toHaveValue('Alexande');
+  });
+
   test('requires minimum 3 filled names to start', async ({ page }) => {
     const startButton = page.getByRole('button', { name: 'Start Game' });
 

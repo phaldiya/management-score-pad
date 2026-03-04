@@ -81,8 +81,16 @@ export default function SetupPage() {
     }
   }
 
+  const tooShortIndices = new Set<number>();
+  for (let i = 0; i < trimmedNames.length; i++) {
+    if (trimmedNames[i].length > 0 && trimmedNames[i].length < 2) {
+      tooShortIndices.add(i);
+    }
+  }
+
   const hasDuplicates = duplicateIndices.size > 0;
-  const canStart = filledPlayers.length >= 3 && !hasDuplicates;
+  const hasTooShort = tooShortIndices.size > 0;
+  const canStart = filledPlayers.length >= 3 && !hasDuplicates && !hasTooShort;
 
   const handleStart = () => {
     const gamePlayers = filledPlayers.map((p) => ({
@@ -138,14 +146,17 @@ export default function SetupPage() {
                   </div>
                   <input
                     type="text"
+                    maxLength={8}
                     placeholder={`Player ${index + 1}`}
                     aria-label={`Player ${index + 1} name`}
-                    aria-invalid={duplicateIndices.has(index) || undefined}
-                    aria-describedby={duplicateIndices.has(index) ? `player-error-${index}` : undefined}
+                    aria-invalid={duplicateIndices.has(index) || tooShortIndices.has(index) || undefined}
+                    aria-describedby={
+                      duplicateIndices.has(index) || tooShortIndices.has(index) ? `player-error-${index}` : undefined
+                    }
                     value={player.name}
                     onChange={(e) => updateName(index, e.target.value)}
                     className={`flex-1 rounded-lg border px-3 py-2 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-1 ${
-                      duplicateIndices.has(index)
+                      duplicateIndices.has(index) || tooShortIndices.has(index)
                         ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
                         : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                     }`}
@@ -164,6 +175,11 @@ export default function SetupPage() {
                 {duplicateIndices.has(index) && (
                   <p id={`player-error-${index}`} className="mt-1 ml-12 text-red-600 text-xs" role="alert">
                     Duplicate player name
+                  </p>
+                )}
+                {!duplicateIndices.has(index) && tooShortIndices.has(index) && (
+                  <p id={`player-error-${index}`} className="mt-1 ml-12 text-red-600 text-xs" role="alert">
+                    Name must be at least 2 characters
                   </p>
                 )}
               </div>
