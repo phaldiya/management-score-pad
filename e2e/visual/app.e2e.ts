@@ -58,6 +58,20 @@ async function playFullGame(page: Page, players: string[]) {
   await expect(page.getByRole('button', { name: 'Game Complete!' })).toBeVisible();
 }
 
+test.describe('Avatar Picker', () => {
+  test('avatar picker open on setup page', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await page.getByPlaceholder('Player 1').fill('Alice');
+    await page.getByPlaceholder('Player 2').fill('Bob');
+    await page.getByPlaceholder('Player 3').fill('Charlie');
+    await page.getByRole('button', { name: 'Change avatar for Alice' }).click();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('avatar-picker-open.png');
+  });
+});
+
 test.describe('Visual Regression', () => {
   test('setup page default state', async ({ page }) => {
     await page.goto('/');
