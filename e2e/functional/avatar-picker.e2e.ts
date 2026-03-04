@@ -48,16 +48,45 @@ test.describe("Avatar Picker", () => {
     expect(src).toContain("data:image/svg+xml");
   });
 
-  test("clicking outside picker closes it", async ({ page }) => {
+  test("pressing Escape closes picker", async ({ page }) => {
     const avatarButtons = page.locator("button:has(img.rounded-full)");
     await avatarButtons.first().click();
     await expect(page.getByText("Bots")).toBeVisible();
 
-    // Click outside the picker
-    await page.locator("body").click({ position: { x: 0, y: 0 } });
+    await page.keyboard.press("Escape");
 
-    // Picker should close
     await expect(page.getByText("Bots")).not.toBeVisible();
+  });
+
+  test("close button closes picker", async ({ page }) => {
+    const avatarButtons = page.locator("button:has(img.rounded-full)");
+    await avatarButtons.first().click();
+    await expect(page.getByText("Bots")).toBeVisible();
+
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await expect(page.getByText("Bots")).not.toBeVisible();
+  });
+
+  test("picker title shows player name when filled", async ({ page }) => {
+    await page.getByPlaceholder("Player 1").fill("Alice");
+    const avatarButtons = page.locator("button:has(img.rounded-full)");
+    await avatarButtons.first().click();
+
+    await expect(
+      page.getByText("Pick an avatar for Alice"),
+    ).toBeVisible();
+  });
+
+  test("picker title shows generated name when name is empty", async ({
+    page,
+  }) => {
+    const avatarButtons = page.locator("button:has(img.rounded-full)");
+    await avatarButtons.first().click();
+
+    await expect(
+      page.getByText("Pick an avatar for Player 1"),
+    ).toBeVisible();
   });
 
   test("selected avatar has highlighted border", async ({ page }) => {

@@ -28,17 +28,22 @@ export default function AddPlayerInline() {
   return (
     <div className="mt-4 flex flex-col items-center">
       <div className="flex items-center gap-2">
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setPickerOpen(!pickerOpen)}
-            className="rounded-full border-2 border-transparent hover:border-blue-400"
-            aria-label="Change avatar for new player"
-          >
-            <PlayerAvatar avatar={avatar} name="New player" size="sm" />
-          </button>
-          {pickerOpen && <AvatarPicker selected={avatar} onSelect={setAvatar} onClose={() => setPickerOpen(false)} />}
-        </div>
+        <button
+          type="button"
+          onClick={() => setPickerOpen(!pickerOpen)}
+          className="rounded-full border-2 border-transparent hover:border-blue-400"
+          aria-label="Change avatar for new player"
+        >
+          <PlayerAvatar avatar={avatar} name="New player" size="sm" />
+        </button>
+        {pickerOpen && (
+          <AvatarPicker
+            selected={avatar}
+            onSelect={setAvatar}
+            onClose={() => setPickerOpen(false)}
+            playerName={name.trim() || `Player ${state.players.length + 1}`}
+          />
+        )}
         <input
           type="text"
           placeholder="New player name"

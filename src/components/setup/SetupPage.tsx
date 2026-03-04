@@ -127,23 +127,22 @@ export default function SetupPage() {
             {players.map((player, index) => (
               <div key={index}>
                 <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setPickerOpen(pickerOpen === index ? null : index)}
-                      className="rounded-full border-2 border-transparent hover:border-blue-400"
-                      aria-label={`Change avatar for ${player.name || `Player ${index + 1}`}`}
-                    >
-                      <PlayerAvatar avatar={player.avatar} name={player.name || `Player ${index + 1}`} size="md" />
-                    </button>
-                    {pickerOpen === index && (
-                      <AvatarPicker
-                        selected={player.avatar}
-                        onSelect={(avatar) => updateAvatar(index, avatar)}
-                        onClose={() => setPickerOpen(null)}
-                      />
-                    )}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen(pickerOpen === index ? null : index)}
+                    className="rounded-full border-2 border-transparent hover:border-blue-400"
+                    aria-label={`Change avatar for ${player.name || `Player ${index + 1}`}`}
+                  >
+                    <PlayerAvatar avatar={player.avatar} name={player.name || `Player ${index + 1}`} size="md" />
+                  </button>
+                  {pickerOpen === index && (
+                    <AvatarPicker
+                      selected={player.avatar}
+                      onSelect={(avatar) => updateAvatar(index, avatar)}
+                      onClose={() => setPickerOpen(null)}
+                      playerName={player.name.trim() || `Player ${index + 1}`}
+                    />
+                  )}
                   <input
                     type="text"
                     maxLength={8}

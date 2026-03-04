@@ -1,83 +1,73 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 
 import { AVATAR_CATEGORIES, getAvatarDataUri } from '../../lib/avatars.ts';
+import { CloseIcon } from './Icons.tsx';
 
 interface AvatarPickerProps {
   selected: string;
   onSelect: (avatar: string) => void;
   onClose: () => void;
+  playerName: string;
 }
 
-export default function AvatarPicker({ selected, onSelect, onClose }: AvatarPickerProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [style, setStyle] = useState<React.CSSProperties>({ visibility: 'hidden' });
-
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const s: React.CSSProperties = { visibility: 'visible' };
-
-    // Horizontal: keep within viewport
-    if (rect.right > vw) {
-      const overflow = rect.right - vw + 8;
-      s.left = `-${overflow}px`;
-    }
-    // Vertical: if overflows bottom, flip above trigger
-    if (rect.bottom > vh) {
-      s.bottom = '100%';
-      s.top = 'auto';
-      s.marginBottom = '4px';
-      s.marginTop = '0';
-    }
-    setStyle(s);
-  }, []);
-
+export default function AvatarPicker({ selected, onSelect, onClose, playerName }: AvatarPickerProps) {
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         onClose();
       }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
   return (
     <div
-      ref={ref}
-      style={style}
-      className="absolute top-full left-0 z-40 mt-1 w-[21rem] max-w-[calc(100vw-1rem)] rounded-lg border border-gray-200 bg-white p-3 shadow-lg sm:w-[26rem]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="avatar-picker-title"
     >
-      {AVATAR_CATEGORIES.map((cat) => (
-        <div key={cat.label} className="mb-2 last:mb-0">
-          <span className="mb-1 block font-semibold text-[10px] text-gray-600 uppercase tracking-wider">
-            {cat.label}
-          </span>
-          <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-10">
-            {cat.avatars.map((avatar, i) => (
-              <button
-                key={avatar}
-                type="button"
-                aria-label={`Select ${avatar} avatar`}
-                onClick={() => {
-                  onSelect(avatar);
-                  onClose();
-                }}
-                className={`h-9 w-9 overflow-hidden rounded-full border-2 transition-all ${i >= 8 ? 'hidden sm:block' : ''} ${
-                  selected === avatar
-                    ? 'border-blue-500 ring-2 ring-blue-200'
-                    : 'border-transparent hover:border-gray-300'
-                }`}
-              >
-                <img src={getAvatarDataUri(avatar)} alt={avatar} className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
+      <div className="mx-4 w-full max-w-md rounded-lg bg-white shadow-xl">
+        <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
+          <h2 id="avatar-picker-title" className="font-bold text-gray-900">
+            Pick an avatar for {playerName}
+          </h2>
+          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+            <CloseIcon />
+          </button>
         </div>
-      ))}
+        <div className="max-h-[70vh] overflow-y-auto p-4">
+          {AVATAR_CATEGORIES.map((cat) => (
+            <div key={cat.label} className="mb-3 last:mb-0">
+              <span className="mb-1 block font-semibold text-[10px] text-gray-600 uppercase tracking-wider">
+                {cat.label}
+              </span>
+              <div className="grid grid-cols-10 gap-1.5">
+                {cat.avatars.map((avatar) => (
+                  <button
+                    key={avatar}
+                    type="button"
+                    aria-label={`Select ${avatar} avatar`}
+                    onClick={() => {
+                      onSelect(avatar);
+                      onClose();
+                    }}
+                    className={`aspect-square w-full overflow-hidden rounded-full border-2 transition-all ${
+                      selected === avatar
+                        ? 'border-blue-500 ring-2 ring-blue-200'
+                        : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <img src={getAvatarDataUri(avatar)} alt={avatar} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
