@@ -117,7 +117,16 @@ export default function GamePage() {
       )}
 
       {popup === 'details' && currentRound && (
-        <PlayFormPopup mode="details" players={players} round={currentRound} onClose={() => setPopup('none')} />
+        <PlayFormPopup
+          mode="details"
+          players={players}
+          round={currentRound}
+          onClose={() => setPopup('none')}
+          onEditBids={(bids) => {
+            dispatch({ type: 'UPDATE_BIDS', bids });
+            setPopup('none');
+          }}
+        />
       )}
 
       {popup === 'complete' && (

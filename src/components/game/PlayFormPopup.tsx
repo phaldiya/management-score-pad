@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { GameRound, Player, Suit } from '../../types/index.ts';
-import { CloseIcon } from '../shared/Icons.tsx';
+import { CloseIcon, PencilIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import PlayCard from './PlayCard.tsx';
 
@@ -31,13 +31,14 @@ interface ResultMode extends Base {
 interface DetailsMode extends Base {
   mode: 'details';
   round: GameRound;
+  onEditBids?: (bids: { playerId: string; bid: number }[]) => void;
 }
 
 type PlayFormPopupProps = BidMode | ResultMode | DetailsMode;
 
 function createPlaySchema(players: Player[], cardCount: number, mode: 'bid' | 'result') {
   const prefix = mode === 'bid' ? 'bid' : 'result';
-  const playerFields: Record<string, z.ZodNumber> = {};
+  const playerFields: Record<string, z.ZodType<number>> = {};
   for (const p of players) {
     playerFields[`${prefix}_${p.id}`] = z.coerce.number().int().min(0).max(cardCount);
   }
@@ -60,14 +61,16 @@ function createPlaySchema(players: Player[], cardCount: number, mode: 'bid' | 'r
 
 export default function PlayFormPopup(props: PlayFormPopupProps) {
   const { players, onClose, mode } = props;
+  const [isEditingBids, setIsEditingBids] = useState(false);
 
   const cardCount = mode === 'bid' ? props.cardCount : props.round.cardCount;
   const trump = mode === 'bid' ? props.trump : props.round.trump;
   const gameNumber = mode === 'bid' ? props.gameNumber : props.round.gameNumber;
 
-  const schema = mode !== 'details' ? createPlaySchema(players, cardCount, mode) : undefined;
+  const activeMode = isEditingBids ? 'bid' : mode;
+  const schema = activeMode !== 'details' ? createPlaySchema(players, cardCount, activeMode) : undefined;
 
-  const prefix = mode === 'bid' ? 'bid' : 'result';
+  const prefix = activeMode === 'bid' ? 'bid' : 'result';
   const defaultValues: Record<string, number> = {};
   for (const p of players) {
     defaultValues[`${prefix}_${p.id}`] = 0;
@@ -78,6 +81,17 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
     resolver: schema ? (zodResolver(schema) as any) : undefined,
     defaultValues,
   });
+
+  useEffect(() => {
+    if (isEditingBids && mode === 'details') {
+      const editDefaults: Record<string, number> = {};
+      for (const pd of props.round.playerData) {
+        editDefaults[`bid_${pd.playerId}`] = pd.bid;
+      }
+      form.reset(editDefaults);
+      hasFocused.current = false;
+    }
+  }, [isEditingBids, mode, props, form]);
 
   const watchedValues = form.watch();
   const total = players.reduce((sum, p) => sum + (Number(watchedValues[`${prefix}_${p.id}`]) || 0), 0);
@@ -104,7 +118,15 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
             }));
             props.onSubmit(results);
           })
-        : undefined;
+        : isEditingBids && mode === 'details' && props.onEditBids
+          ? form.handleSubmit((data: Record<string, number>) => {
+              const bids = players.map((p) => ({
+                playerId: p.id,
+                bid: Number(data[`bid_${p.id}`]),
+              }));
+              props.onEditBids!(bids);
+            })
+          : undefined;
 
   const hasFocused = useRef(false);
   const rootError = (form.formState.errors as Record<string, { message?: string }>)[`${prefix}_${players[0].id}`];
@@ -114,11 +136,13 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
       ? `Play ${gameNumber} - Place Bids`
       : mode === 'result'
         ? `Play ${gameNumber} - Enter Results`
-        : `Play ${gameNumber} - Details`;
+        : isEditingBids
+          ? `Play ${gameNumber} - Edit Bids`
+          : `Play ${gameNumber} - Details`;
 
-  const sectionLabel = mode === 'bid' ? 'Bids' : mode === 'result' ? 'Results (hands won)' : 'Bids';
+  const sectionLabel = activeMode === 'bid' ? 'Bids' : mode === 'result' ? 'Results (hands won)' : 'Bids';
 
-  const Wrapper = mode !== 'details' ? 'form' : 'div';
+  const Wrapper = mode !== 'details' || isEditingBids ? 'form' : 'div';
 
   return (
     <div
@@ -148,7 +172,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
             </div>
 
             <div className="flex-1 space-y-3">
-              {mode === 'bid' && (
+              {(mode === 'bid' || isEditingBids) && (
                 <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
                   <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="h-8 w-8" />
                   <div className="flex flex-col">
@@ -159,14 +183,25 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
               )}
 
               <div className="space-y-2">
-                <span className="block font-semibold text-gray-700 text-xs uppercase tracking-wider">
-                  {sectionLabel}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-gray-700 text-xs uppercase tracking-wider">{sectionLabel}</span>
+                  {mode === 'details' && !isEditingBids && props.onEditBids && (
+                    <button
+                      type="button"
+                      aria-label="Edit bids"
+                      onClick={() => setIsEditingBids(true)}
+                      className="text-gray-400 hover:text-blue-600"
+                    >
+                      <PencilIcon />
+                    </button>
+                  )}
+                </div>
                 {ordered.map((p, idx) => {
                   const pd = mode !== 'bid' ? props.round.playerData.find((d) => d.playerId === p.id) : undefined;
                   const isDealer = mode === 'bid' ? p.id === dealerId : pd?.isDealer;
 
-                  const registration = mode !== 'details' ? form.register(`${prefix}_${p.id}`) : undefined;
+                  const needsRegistration = activeMode !== 'details';
+                  const registration = needsRegistration ? form.register(`${prefix}_${p.id}`) : undefined;
                   const { ref: registerRef, ...rest } = registration ?? { ref: undefined };
 
                   return (
@@ -183,7 +218,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                         )}
                       </span>
 
-                      {mode === 'bid' && (
+                      {(mode === 'bid' || isEditingBids) && (
                         <input
                           type="number"
                           min={0}
@@ -197,6 +232,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                             }
                           }}
                           {...rest}
+                          onFocus={(e) => e.currentTarget.select()}
                           onInput={(e) => {
                             const input = e.currentTarget;
                             const val = Number(input.value);
@@ -207,7 +243,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                         />
                       )}
 
-                      {mode !== 'bid' && (
+                      {mode !== 'bid' && !isEditingBids && (
                         <div className="flex items-stretch">
                           <span className="flex w-8 items-center justify-center rounded-l border border-blue-300 border-r-0 bg-blue-50 font-medium text-blue-700 text-xs">
                             {pd?.bid}
@@ -230,6 +266,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                                 }
                               }}
                               {...rest}
+                              onFocus={(e) => e.currentTarget.select()}
                               onInput={(e) => {
                                 const input = e.currentTarget;
                                 const val = Number(input.value);
@@ -246,7 +283,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                 })}
               </div>
 
-              {mode === 'bid' && (
+              {(mode === 'bid' || isEditingBids) && (
                 <>
                   <div className={`font-medium text-sm ${total === cardCount ? 'text-red-600' : 'text-gray-600'}`}>
                     Total: {total} / {cardCount} {total === cardCount && '(cannot equal card count!)'}
@@ -289,6 +326,15 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
               className="mt-4 w-full rounded-lg bg-green-600 py-2 font-medium text-white hover:bg-green-700"
             >
               Submit Results
+            </button>
+          )}
+
+          {isEditingBids && (
+            <button
+              type="submit"
+              className="mt-4 w-full rounded-lg bg-blue-600 py-2 font-medium text-white hover:bg-blue-700"
+            >
+              Update Bids
             </button>
           )}
         </Wrapper>
