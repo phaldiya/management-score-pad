@@ -254,6 +254,75 @@ test.describe('Game Play Flow', () => {
     await expect(inputs.nth(2)).toBeFocused();
   });
 
+  test('edit bids from details popup', async ({ page }) => {
+    await setupGame(page);
+    // Place bids: 5+5+5=15 (valid for 17 cards)
+    await placeBids(page, [5, 5, 5]);
+
+    // Open details popup (current round is in_progress)
+    await page.keyboard.press('p');
+    await expect(page.getByRole('heading', { name: /Details/ })).toBeVisible();
+
+    // Click pencil/edit icon
+    await page.getByRole('button', { name: 'Edit bids' }).click();
+
+    // Title should change to "Edit Bids"
+    await expect(page.getByRole('heading', { name: /Edit Bids/ })).toBeVisible();
+
+    // Should see bid inputs pre-filled with current bids
+    const inputs = page.locator('input[type="number"]');
+    await expect(inputs).toHaveCount(3);
+
+    // Change bids: 3+4+8=15 (valid, ≠ 17)
+    for (let i = 0; i < 3; i++) {
+      await inputs.nth(i).fill(['3', '4', '8'][i]);
+    }
+
+    // Submit
+    await page.getByRole('button', { name: 'Update Bids' }).click();
+
+    // Popup should close
+    await expect(page.getByRole('heading', { name: /Details/ })).not.toBeVisible();
+
+    // Re-open details to verify bids were updated
+    await page.keyboard.press('p');
+    await expect(page.getByRole('heading', { name: /Details/ })).toBeVisible();
+
+    // Bid labels should show the updated values
+    const bidLabels = page.locator('span.bg-blue-50');
+    await expect(bidLabels.nth(0)).toContainText('3');
+    await expect(bidLabels.nth(1)).toContainText('4');
+    await expect(bidLabels.nth(2)).toContainText('8');
+  });
+
+  test('edit bids validation rejects total equal to card count', async ({ page }) => {
+    await setupGame(page);
+    await placeBids(page, [5, 5, 5]);
+
+    // Open details popup
+    await page.keyboard.press('p');
+    await expect(page.getByRole('heading', { name: /Details/ })).toBeVisible();
+
+    // Click edit
+    await page.getByRole('button', { name: 'Edit bids' }).click();
+
+    // Set bids that total 17 (= card count): 10+5+2=17
+    const inputs = page.locator('input[type="number"]');
+    await inputs.nth(0).fill('10');
+    await inputs.nth(1).fill('5');
+    await inputs.nth(2).fill('2');
+
+    // Should show warning
+    await expect(page.getByText('cannot equal card count')).toBeVisible();
+
+    // Attempt submit
+    await page.getByRole('button', { name: 'Update Bids' }).click();
+
+    // Should show validation error and popup stays open
+    await expect(page.getByText('Total bids cannot equal 17')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Edit Bids/ })).toBeVisible();
+  });
+
   test('plays through entire game to completion popup', async ({ page }) => {
     // Use 7 players to get a shorter game (floor(52/7)=7, total games=13)
     await page.goto('/');
