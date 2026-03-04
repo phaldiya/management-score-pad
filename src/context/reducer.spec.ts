@@ -61,6 +61,137 @@ describe('reducer spec', () => {
     expect(pd.find((p) => p.playerId === 'p3')!.result).toBe(0);
   });
 
+  it('UPDATE_BIDS updates bids on current in-progress round', () => {
+    const state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [
+        {
+          gameIndex: 0,
+          gameNumber: 1,
+          cardCount: 17,
+          trump: 'spades',
+          phase: 'in_progress',
+          playerData: [
+            { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+            { playerId: 'p2', bid: 2, result: null, score: null, isDealer: false },
+            { playerId: 'p3', bid: 0, result: null, score: null, isDealer: false },
+          ],
+        },
+      ],
+    });
+    const result = appReducer(state, {
+      type: 'UPDATE_BIDS',
+      bids: [
+        { playerId: 'p1', bid: 5 },
+        { playerId: 'p2', bid: 4 },
+        { playerId: 'p3', bid: 6 },
+      ],
+    });
+    const pd = result.rounds[0].playerData;
+    expect(pd[0].bid).toBe(5);
+    expect(pd[1].bid).toBe(4);
+    expect(pd[2].bid).toBe(6);
+  });
+
+  it('UPDATE_BIDS preserves phase, trump, and dealer', () => {
+    const state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [
+        {
+          gameIndex: 0,
+          gameNumber: 1,
+          cardCount: 17,
+          trump: 'spades',
+          phase: 'in_progress',
+          playerData: [
+            { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+            { playerId: 'p2', bid: 2, result: null, score: null, isDealer: false },
+            { playerId: 'p3', bid: 0, result: null, score: null, isDealer: false },
+          ],
+        },
+      ],
+    });
+    const result = appReducer(state, {
+      type: 'UPDATE_BIDS',
+      bids: [{ playerId: 'p1', bid: 5 }],
+    });
+    const round = result.rounds[0];
+    expect(round.phase).toBe('in_progress');
+    expect(round.trump).toBe('spades');
+    expect(round.playerData[0].isDealer).toBe(true);
+    expect(round.playerData[1].isDealer).toBe(false);
+  });
+
+  it('UPDATE_BIDS does not mutate previous state', () => {
+    const inProgressRound = {
+      gameIndex: 0,
+      gameNumber: 1,
+      cardCount: 17,
+      trump: 'spades' as const,
+      phase: 'in_progress' as const,
+      playerData: [
+        { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+        { playerId: 'p2', bid: 2, result: null, score: null, isDealer: false },
+        { playerId: 'p3', bid: 0, result: null, score: null, isDealer: false },
+      ],
+    };
+    const state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound],
+    });
+    const pdBefore = state.rounds[0].playerData[0];
+    appReducer(state, {
+      type: 'UPDATE_BIDS',
+      bids: [{ playerId: 'p1', bid: 99 }],
+    });
+    expect(state.rounds[0].playerData[0]).toBe(pdBefore);
+    expect(state.rounds[0].playerData[0].bid).toBe(3);
+  });
+
+  it('UPDATE_BIDS with missing player falls back to existing bid', () => {
+    const state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [
+        {
+          gameIndex: 0,
+          gameNumber: 1,
+          cardCount: 17,
+          trump: 'spades',
+          phase: 'in_progress',
+          playerData: [
+            { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+            { playerId: 'p2', bid: 2, result: null, score: null, isDealer: false },
+            { playerId: 'p3', bid: 0, result: null, score: null, isDealer: false },
+          ],
+        },
+      ],
+    });
+    const result = appReducer(state, {
+      type: 'UPDATE_BIDS',
+      bids: [{ playerId: 'p1', bid: 7 }], // p2, p3 missing
+    });
+    const pd = result.rounds[0].playerData;
+    expect(pd[0].bid).toBe(7);
+    expect(pd[1].bid).toBe(2); // unchanged
+    expect(pd[2].bid).toBe(0); // unchanged
+  });
+
   it('REORDER_PLAYERS same index produces no change', () => {
     const state = createTestState({ players: testPlayers });
     const result = appReducer(state, { type: 'REORDER_PLAYERS', fromIndex: 1, toIndex: 1 });
