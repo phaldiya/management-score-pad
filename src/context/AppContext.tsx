@@ -83,6 +83,17 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, rounds };
     }
 
+    case 'UPDATE_BIDS': {
+      const rounds = [...state.rounds];
+      const current = { ...rounds[state.currentRoundIndex] };
+      current.playerData = current.playerData.map((pd) => {
+        const bidEntry = action.bids.find((b) => b.playerId === pd.playerId);
+        return { ...pd, bid: bidEntry?.bid ?? pd.bid };
+      });
+      rounds[state.currentRoundIndex] = current;
+      return { ...state, rounds };
+    }
+
     case 'REORDER_PLAYERS': {
       const players = [...state.players];
       const [moved] = players.splice(action.fromIndex, 1);
