@@ -23,7 +23,7 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
       <tr className="sticky top-0 z-20 bg-gray-600">
         <th
           scope="col"
-          className="sticky left-0 z-30 w-0 border border-gray-500 bg-gray-600 px-1 py-2 text-left font-semibold text-gray-300 text-xs uppercase tracking-wider"
+          className="w-0 border border-gray-500 bg-gray-600 px-1 py-2 text-left font-semibold text-gray-300 text-xs uppercase tracking-wider sm:sticky sm:left-0 sm:z-30"
         >
           Play
         </th>
@@ -54,7 +54,7 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
                     <span className="hidden sm:inline">
                       <PlayerAvatar avatar={player.avatar} name={player.name} size="sm" />
                     </span>
-                    <span className="font-bold text-base text-white">{player.name}</span>
+                    <span className="max-w-[6rem] truncate font-bold text-base text-white">{player.name}</span>
                   </div>
                   <button
                     type="button"
@@ -75,22 +75,16 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2.5">
-                  {isLeader ? (
-                    <>
-                      <span className="hidden text-4xl leading-none sm:inline">&#x1F451;</span>
-                      <span className="hidden sm:inline">
-                        <PlayerAvatar avatar={player.avatar} name={player.name} size="md" />
-                      </span>
-                    </>
-                  ) : (
-                    <span className="hidden sm:inline">
-                      <PlayerAvatar avatar={player.avatar} name={player.name} size="md" />
-                    </span>
-                  )}
+                  <span className="relative hidden sm:inline">
+                    <PlayerAvatar avatar={player.avatar} name={player.name} size={isLeader ? 'xs' : 'sm'} />
+                    {isLeader && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs leading-none">&#x1F451;</span>
+                    )}
+                  </span>
                   <div>
-                    <div className="font-bold text-base text-white">
+                    <div className="max-w-[6rem] truncate font-bold text-base text-white">
                       {player.name}
-                      {isLeader && <span className="text-yellow-300 sm:hidden"> *</span>}
+                      {isLeader && <sup className="pl-0.5 text-yellow-300">*</sup>}
                     </div>
                     <div className="font-medium text-blue-200 text-xs">{cumScore}</div>
                   </div>
