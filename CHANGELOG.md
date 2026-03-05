@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/phaldiya/management-score-pad/compare/v1.1.0...v1.2.0) (2026-03-05)
+
+
+### Features
+
+* fixed play column width and Cmd+P PDF download shortcut ([97cabd3](https://github.com/phaldiya/management-score-pad/commit/97cabd3ef9ad790a113340843f6b926530634792))
+
 # [1.1.0](https://github.com/phaldiya/management-score-pad/compare/v1.0.0...v1.1.0) (2026-03-04)
 
 
