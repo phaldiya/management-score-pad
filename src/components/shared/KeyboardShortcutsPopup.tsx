@@ -10,6 +10,7 @@ interface KeyboardShortcutsPopupProps {
 const shortcuts = [
   { label: 'Next Action', keys: ['N'], description: 'Start Play / Enter Results / Next Play' },
   { label: 'Play Details', keys: ['P'], description: 'View current play details' },
+  { label: 'Download PDF', keys: ['⌘', 'P'], description: 'Download scoreboard as PDF' },
   { label: 'New Game', keys: ['Shift', 'N'], description: 'Start a new game' },
   { label: 'Close Popup', keys: ['Esc'], description: 'Dismiss any open dialog' },
   { label: 'Show This Help', keys: ['?'], description: 'Open keyboard shortcuts' },

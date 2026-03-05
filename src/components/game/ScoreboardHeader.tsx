@@ -23,7 +23,7 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
       <tr className="sticky top-0 z-20 bg-gray-600">
         <th
           scope="col"
-          className="w-0 border border-gray-500 bg-gray-600 px-1 py-2 text-left font-semibold text-gray-300 text-xs uppercase tracking-wider sm:sticky sm:left-0 sm:z-30"
+          className="w-[49px] border border-gray-500 bg-gray-600 px-1 py-2 text-center font-semibold text-gray-300 text-xs uppercase tracking-wider sm:sticky sm:left-0 sm:z-30"
         >
           Play
         </th>

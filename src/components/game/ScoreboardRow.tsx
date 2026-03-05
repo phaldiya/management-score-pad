@@ -12,7 +12,7 @@ export default function ScoreboardRow({ round, players, onPlayCardClick }: Score
   return (
     <tr className={round.phase === 'in_progress' ? 'animate-pulse ring-2 ring-amber-400 ring-inset' : ''}>
       <td
-        className={`w-0 border border-gray-200 bg-gray-100 p-1 sm:sticky sm:left-0 sm:z-10${onPlayCardClick ? 'cursor-pointer' : ''}`}
+        className={`w-[49px] border border-gray-200 bg-gray-100 sm:sticky sm:left-0 sm:z-10 ${onPlayCardClick ? 'cursor-pointer' : ''}`}
         onClick={onPlayCardClick}
         onKeyDown={
           onPlayCardClick
@@ -25,7 +25,14 @@ export default function ScoreboardRow({ round, players, onPlayCardClick }: Score
         tabIndex={onPlayCardClick ? 0 : undefined}
         aria-label={onPlayCardClick ? `View play ${round.gameNumber} details` : undefined}
       >
-        <PlayCard cardCount={round.cardCount} trump={round.trump} size="sm" highlight={round.phase === 'in_progress'} />
+        <div className="flex items-center justify-center p-1">
+          <PlayCard
+            cardCount={round.cardCount}
+            trump={round.trump}
+            size="sm"
+            highlight={round.phase === 'in_progress'}
+          />
+        </div>
       </td>
       {players.map((player) => {
         const pd = round.playerData.find((d) => d.playerId === player.id);

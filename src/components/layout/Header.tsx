@@ -48,6 +48,12 @@ export default function Header() {
         setShowShortcuts(true);
         return;
       }
+      // Cmd/Ctrl+P for Download PDF (only on game page with rounds)
+      if (e.key === 'p' && (e.metaKey || e.ctrlKey) && state.gamePhase === 'playing' && state.rounds.length > 0) {
+        e.preventDefault();
+        printScoreboard(state.players, state.rounds);
+        return;
+      }
       // Shift+N for New Game (only on game page)
       if (e.key === 'N' && e.shiftKey && !e.metaKey && !e.ctrlKey && state.gamePhase === 'playing') {
         const target = e.target as HTMLElement;
@@ -58,7 +64,7 @@ export default function Header() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [showConfirm, showShortcuts, showRules, state.gamePhase, handleNewGame]);
+  }, [showConfirm, showShortcuts, showRules, state.gamePhase, state.players, state.rounds, handleNewGame]);
 
   return (
     <>
