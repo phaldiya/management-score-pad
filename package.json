@@ -20,7 +20,7 @@
     "test:smoke": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "verify": "biome check . && biome format . && vitest run && playwright test",
+    "verify": "bun install --frozen-lockfile && biome check . && biome format . && vitest run && playwright test",
     "setup-hooks": "sh ./scripts/setup-hooks.sh all"
   },
   "dependencies": {
