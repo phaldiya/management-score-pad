@@ -12,9 +12,16 @@ try {
   process.exit(0);
 }
 
+// Known upstream vulnerabilities that cannot be fixed (bundled transitive deps)
+const IGNORED_ADVISORIES = [
+  'GHSA-qffp-2rhf-9h96', // tar <=7.5.9 bundled in npm@11.11.0 (via @semantic-release/npm)
+];
+
 const rows = [];
 for (const [pkg, advisories] of Object.entries(data)) {
   for (const a of advisories) {
+    const ghsaId = a.url ? a.url.split('/').pop() : '';
+    if (IGNORED_ADVISORIES.includes(ghsaId)) continue;
     rows.push({
       package: pkg,
       severity: a.severity,
