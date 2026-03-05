@@ -46,8 +46,8 @@ export default function AddPlayerInline() {
         )}
         <input
           type="text"
-          placeholder="New player name"
-          aria-label="New player name"
+          placeholder={`Player ${state.players.length + 1}`}
+          aria-label={`Player ${state.players.length + 1} name`}
           aria-invalid={isDuplicate || undefined}
           aria-describedby={isDuplicate ? 'add-player-error' : undefined}
           value={name}
