@@ -26,7 +26,7 @@ const Scoreboard = forwardRef<HTMLTableElement, ScoreboardProps>(function Scoreb
 
   return (
     <div ref={scrollRef} className={`flex-1 overflow-auto ${rounds.length === 0 ? 'flex flex-col' : ''}`}>
-      <table ref={ref} id="scoreboard" className="w-full border-collapse">
+      <table ref={ref} id="scoreboard" className="min-w-full border-collapse">
         <caption className="sr-only">Scoreboard showing player bids, results, and scores across rounds</caption>
         <ScoreboardHeader players={players} rounds={rounds} />
         <tbody>

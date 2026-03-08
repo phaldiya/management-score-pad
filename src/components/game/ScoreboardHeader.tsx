@@ -31,7 +31,7 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
           const cumScore = scores[index] ?? 0;
           const isLeader = hasScores && cumScore === maxScore;
           return (
-            <th key={player.id} scope="col" className="border border-gray-500 px-3 py-2 text-center">
+            <th key={player.id} scope="col" className="min-w-[5rem] border border-gray-500 px-3 py-2 text-center">
               {canReorder ? (
                 <div className="flex items-center justify-center gap-1">
                   <button
