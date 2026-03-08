@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/phaldiya/management-score-pad/compare/v1.2.0...v1.3.0) (2026-03-08)
+
+
+### Bug Fixes
+
+* **ui:** constrain popup width to viewport on mobile ([de9402d](https://github.com/phaldiya/management-score-pad/commit/de9402d35100d41204749354dc8d2fdea5b3bd26))
+* **ui:** enable horizontal scroll on scoreboard with many players ([5123efb](https://github.com/phaldiya/management-score-pad/commit/5123efbb4a830382736039fa63c3fc73a0b27b4b))
+
+
+### Features
+
+* **setup:** limit maximum players to 6 ([6ab52e5](https://github.com/phaldiya/management-score-pad/commit/6ab52e56aba6b0866ee52788920aa26d4e18683c))
+
 # [1.2.0](https://github.com/phaldiya/management-score-pad/compare/v1.1.0...v1.2.0) (2026-03-05)
 
 
