@@ -151,7 +151,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
       aria-modal="true"
       aria-labelledby="play-form-title"
     >
-      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-[min(32rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <div className="flex items-center gap-2">
             <PlayCard cardCount={cardCount} trump={trump} size="xs" />

@@ -35,7 +35,7 @@ export function KeyboardShortcutsPopup({ onClose }: KeyboardShortcutsPopupProps)
       aria-modal="true"
       aria-labelledby="keyboard-shortcuts-title"
     >
-      <div className="w-full max-w-sm rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-[min(24rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <h2 id="keyboard-shortcuts-title" className="font-bold text-gray-900">
             Keyboard Shortcuts

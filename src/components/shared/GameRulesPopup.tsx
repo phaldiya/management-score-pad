@@ -28,7 +28,7 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
       aria-modal="true"
       aria-labelledby="game-rules-title"
     >
-      <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-[min(42rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <h2 id="game-rules-title" className="flex items-center gap-1 font-bold text-gray-900">
             Game Rules

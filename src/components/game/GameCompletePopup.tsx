@@ -67,7 +67,7 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
         aria-modal="true"
         aria-labelledby="game-complete-title"
       >
-        <div className="w-full max-w-md animate-fade-slide-up rounded-lg bg-white shadow-xl">
+        <div className="w-full max-w-[min(28rem,calc(100vw-40px))] animate-fade-slide-up rounded-lg bg-white shadow-xl">
           <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
             <h2 id="game-complete-title" className="font-bold text-gray-900 text-lg">
               Game Complete!

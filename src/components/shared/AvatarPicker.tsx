@@ -29,7 +29,7 @@ export default function AvatarPicker({ selected, onSelect, onClose, playerName }
       aria-modal="true"
       aria-labelledby="avatar-picker-title"
     >
-      <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-[min(28rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <h2 id="avatar-picker-title" className="font-bold text-gray-900">
             Pick an avatar for {playerName}

@@ -134,7 +134,7 @@ export default function Header() {
           aria-modal="true"
           aria-labelledby="abandon-game-title"
         >
-          <div className="w-full max-w-sm rounded-lg bg-white shadow-xl">
+          <div className="w-full max-w-[min(24rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
               <h2 id="abandon-game-title" className="font-bold text-gray-900">
                 Abandon Game?
