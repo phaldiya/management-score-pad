@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/phaldiya/management-score-pad/compare/v1.3.0...v1.3.1) (2026-03-08)
+
+
+### Bug Fixes
+
+* **ui:** cap popup max-width to viewport width minus 40px ([f47b82d](https://github.com/phaldiya/management-score-pad/commit/f47b82d7cd727c068edfd8fe7e71b969302385fc))
+
 # [1.3.0](https://github.com/phaldiya/management-score-pad/compare/v1.2.0...v1.3.0) (2026-03-08)
 
 
