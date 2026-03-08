@@ -147,6 +147,37 @@ test.describe('Visual Regression', () => {
   });
 });
 
+test.describe('Max Players & Layout', () => {
+  test('setup page with 6 players (max reached, no Add Player button)', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    const names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank'];
+    for (let i = 0; i < names.length; i++) {
+      if (i >= 3) {
+        await page.getByRole('button', { name: 'Add Player' }).click();
+      }
+      await page.getByPlaceholder(`Player ${i + 1}`).fill(names[i]);
+    }
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('setup-6-players-max.png');
+  });
+
+  test('game scoreboard with 6 players', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank']);
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('game-scoreboard-6-players.png');
+  });
+
+  test('bid popup with 6 players', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank']);
+    await page.getByRole('button', { name: 'Start First Play' }).click();
+    await expect(page.getByText('Place Bids')).toBeVisible();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('bid-popup-6-players.png');
+  });
+});
+
 test.describe('Winner Screen', () => {
   test('scoreboard with Game Complete button (3 players)', async ({ page }) => {
     await playFullGame(page, ['Alice', 'Bob', 'Charlie']);
@@ -164,13 +195,13 @@ test.describe('Winner Screen', () => {
     await expect(page).toHaveScreenshot('winner-popup-3-players.png');
   });
 
-  test('winner popup with 7 players', async ({ page }) => {
-    await playFullGame(page, ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7']);
+  test('winner popup with 6 players', async ({ page }) => {
+    await playFullGame(page, ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']);
     await page.getByRole('button', { name: 'Game Complete!' }).click();
     await page.waitForTimeout(500);
     await page.evaluate(() =>
       document.querySelectorAll('.confetti-piece').forEach(el => el.remove()),
     );
-    await expect(page).toHaveScreenshot('winner-popup-7-players.png');
+    await expect(page).toHaveScreenshot('winner-popup-6-players.png');
   });
 });
