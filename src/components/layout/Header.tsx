@@ -129,12 +129,12 @@ export default function Header() {
 
       {showConfirm && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="abandon-game-title"
         >
-          <div className="mx-4 w-full max-w-sm rounded-lg bg-white shadow-xl">
+          <div className="w-full max-w-sm rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
               <h2 id="abandon-game-title" className="font-bold text-gray-900">
                 Abandon Game?

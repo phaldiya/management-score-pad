@@ -146,12 +146,12 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="play-form-title"
     >
-      <div className="mx-4 w-full max-w-lg rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <div className="flex items-center gap-2">
             <PlayCard cardCount={cardCount} trump={trump} size="xs" />
