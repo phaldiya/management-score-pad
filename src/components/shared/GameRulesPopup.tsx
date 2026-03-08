@@ -23,12 +23,12 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="game-rules-title"
     >
-      <div className="mx-4 w-full max-w-2xl rounded-lg bg-white shadow-xl">
+      <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
           <h2 id="game-rules-title" className="flex items-center gap-1 font-bold text-gray-900">
             Game Rules
@@ -118,11 +118,6 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
                   <td className="py-0.5 pr-2">6</td>
                   <td className="py-0.5 pr-2">8</td>
                   <td className="py-0.5">15</td>
-                </tr>
-                <tr>
-                  <td className="py-0.5 pr-2">7</td>
-                  <td className="py-0.5 pr-2">7</td>
-                  <td className="py-0.5">13</td>
                 </tr>
               </tbody>
             </table>

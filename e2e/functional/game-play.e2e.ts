@@ -324,12 +324,12 @@ test.describe('Game Play Flow', () => {
   });
 
   test('plays through entire game to completion popup', async ({ page }) => {
-    // Use 7 players to get a shorter game (floor(52/7)=7, total games=13)
+    // Use 6 players to get a shorter game (floor(52/6)=8, total games=15)
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
     await page.reload();
 
-    const players = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
+    const players = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
     for (let i = 0; i < players.length; i++) {
       if (i >= 3) {
         await page.getByRole('button', { name: 'Add Player' }).click();
@@ -338,14 +338,14 @@ test.describe('Game Play Flow', () => {
     }
     await page.getByRole('button', { name: /Start Game/ }).click();
 
-    // 7 players → maxCards=7, sequence = [7,6,5,4,3,2,1,2,3,4,5,6,7], 13 games total
-    const cardSequence = [7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7];
+    // 6 players → maxCards=8, sequence = [8,7,6,5,4,3,2,1,2,3,4,5,6,7,8], 15 games total
+    const cardSequence = [8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8];
 
     for (let round = 0; round < cardSequence.length; round++) {
       const cardCount = cardSequence[round];
 
       // Create valid bids: all zeros except first player gets 1 (total=1 ≠ cardCount, unless cardCount=1)
-      const bids = new Array(7).fill(0);
+      const bids = new Array(6).fill(0);
       if (cardCount === 1) {
         // For card count 1, total bids can't equal 1, so all zeros works (total=0 ≠ 1)
         // Keep all zeros
@@ -354,13 +354,13 @@ test.describe('Game Play Flow', () => {
       }
 
       // Create valid results: all zeros except first player gets all cards
-      const results = new Array(7).fill(0);
+      const results = new Array(6).fill(0);
       results[0] = cardCount;
 
       await playRound(page, bids, results, players);
     }
 
-    // After all 13 rounds, the button should say "Game Complete!"
+    // After all 15 rounds, the button should say "Game Complete!"
     await page.getByRole('button', { name: 'Game Complete!' }).click();
 
     // Game complete popup should appear

@@ -68,12 +68,8 @@ describe('gameLogic – smoke', () => {
       expect(getMaxCardsPerPlayer(4)).toBe(13);
     });
 
-    it('7 players → 7', () => {
-      expect(getMaxCardsPerPlayer(7)).toBe(7);
-    });
-
-    it('52 players → 1', () => {
-      expect(getMaxCardsPerPlayer(52)).toBe(1);
+    it('6 players → 8', () => {
+      expect(getMaxCardsPerPlayer(6)).toBe(8);
     });
   });
 
@@ -161,11 +157,11 @@ describe('gameLogic – deep', () => {
     });
   });
 
-  describe('full sequence for 7 players (7 cards)', () => {
-    const seq = generateCardSequence(7);
+  describe('full sequence for 6 players (8 cards)', () => {
+    const seq = generateCardSequence(8);
 
-    it('length = 13', () => {
-      expect(seq).toHaveLength(13);
+    it('length = 15', () => {
+      expect(seq).toHaveLength(15);
     });
   });
 
@@ -188,12 +184,8 @@ describe('gameLogic – deep', () => {
   });
 
   describe('edge cases for player counts', () => {
-    it('1 player → maxCards = 52', () => {
-      expect(getMaxCardsPerPlayer(1)).toBe(52);
-    });
-
-    it('2 players → maxCards = 26', () => {
-      expect(getMaxCardsPerPlayer(2)).toBe(26);
+    it('3 players → maxCards = 17', () => {
+      expect(getMaxCardsPerPlayer(3)).toBe(17);
     });
   });
 });

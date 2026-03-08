@@ -185,15 +185,17 @@ export default function SetupPage() {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={addPlayer}
-            disabled={!allFilled}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 border-dashed py-2 text-gray-700 text-sm hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700"
-          >
-            <PlusIcon className="h-4 w-4" />
-            Add Player
-          </button>
+          {players.length < 6 && (
+            <button
+              type="button"
+              onClick={addPlayer}
+              disabled={!allFilled}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 border-dashed py-2 text-gray-700 text-sm hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700"
+            >
+              <PlusIcon className="h-4 w-4" />
+              Add Player
+            </button>
+          )}
 
           <button
             type="button"

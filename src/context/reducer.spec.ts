@@ -214,7 +214,6 @@ describe('reducer spec', () => {
     { count: 4, expectedMax: 13, expectedTotal: 25 },
     { count: 5, expectedMax: 10, expectedTotal: 19 },
     { count: 6, expectedMax: 8, expectedTotal: 15 },
-    { count: 7, expectedMax: 7, expectedTotal: 13 },
   ])('START_GAME with $count players gives maxCards=$expectedMax, totalGames=$expectedTotal', ({
     count,
     expectedMax,

@@ -26,7 +26,6 @@ Max cards = floor(52 ÷ players)
 | 4       | 13        | 25           |
 | 5       | 10        | 19           |
 | 6       | 8         | 15           |
-| 7       | 7         | 13           |
 
 ## Trump Rotation
 
