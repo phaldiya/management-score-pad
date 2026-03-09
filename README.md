@@ -6,6 +6,7 @@ Score tracking app for the **Management** (a.k.a. **Judgement**) card game. Ente
 
 | Rule | Detail |
 |---|---|
+| Players | 3–6 |
 | Max cards per player | `floor(52 / numPlayers)` |
 | Card sequence | `y, y-1, ..., 2, 1, 2, ..., y-1, y` (total `2y - 1` rounds) |
 | Trump rotation | Spades -> Hearts -> Clubs -> Diamonds (repeating) |
@@ -17,7 +18,7 @@ Score tracking app for the **Management** (a.k.a. **Judgement**) card game. Ente
 
 ## Features
 
-- Player setup with dynamic add/remove and reorder before first round
+- 3–6 player support with dynamic add/remove and reorder before first round
 - Visual playing card display with trump suit and card count
 - Bid entry with validation (total bids cannot equal card count)
 - Result entry with validation (total results must equal card count)
@@ -25,6 +26,8 @@ Score tracking app for the **Management** (a.k.a. **Judgement**) card game. Ente
 - Crown indicator for the current leader
 - Dealer rotation tracking
 - Game restore from localStorage on page reload
+- Transfer game to another device via QR code or shareable link
+- Import transferred game with validation and active-game warnings
 - Download scoreboard as PDF
 - Winner celebration with confetti animation on game completion
 

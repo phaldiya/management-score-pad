@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Management Score Pad — a card game scoring app for the Management (Judgement) card game. Tracks bids, results, and cumulative scores across rounds.
+Management Score Pad — a card game scoring app for the Management (Judgement) card game. Supports 3–6 players. Tracks bids, results, and cumulative scores across rounds.
 
 ## Tech Stack
 

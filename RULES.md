@@ -2,7 +2,7 @@
 
 ## Overview
 
-Management/Judgement is a trick-taking card game. Players predict how many tricks they'll win each round. This app tracks bids, results, and scores across all rounds.
+Management/Judgement is a trick-taking card game for **3–6 players**. Players predict how many tricks they'll win each round. This app tracks bids, results, and scores across all rounds.
 
 ## Seating Order
 
