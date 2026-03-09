@@ -3,14 +3,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext.tsx';
 import { printScoreboard } from '../../lib/exportPdf.ts';
 import { GameRulesPopup } from '../shared/GameRulesPopup.tsx';
-import { AppIcon, BookIcon, CloseIcon, KeyboardIcon } from '../shared/Icons.tsx';
+import { AppIcon, BookIcon, CloseIcon, KeyboardIcon, ShareIcon } from '../shared/Icons.tsx';
 import { KeyboardShortcutsPopup } from '../shared/KeyboardShortcutsPopup.tsx';
+import { TransferGamePopup } from '../shared/TransferGamePopup.tsx';
 
 export default function Header() {
   const { state, dispatch } = useAppContext();
   const [showConfirm, setShowConfirm] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showTransfer, setShowTransfer] = useState(false);
 
   const hasRoundsInProgress = state.rounds.length > 0 && state.rounds.some((r) => r.phase !== 'completed');
   const hasCompletedRounds = state.rounds.some((r) => r.phase === 'completed');
@@ -27,6 +29,10 @@ export default function Header() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (showTransfer) {
+          setShowTransfer(false);
+          return;
+        }
         if (showRules) {
           setShowRules(false);
           return;
@@ -54,6 +60,14 @@ export default function Header() {
         printScoreboard(state.players, state.rounds);
         return;
       }
+      // Shift+S for Share/Transfer (only on game page)
+      if (e.key === 'S' && e.shiftKey && !e.metaKey && !e.ctrlKey && state.gamePhase === 'playing') {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
+        e.preventDefault();
+        setShowTransfer(true);
+        return;
+      }
       // Shift+N for New Game (only on game page)
       if (e.key === 'N' && e.shiftKey && !e.metaKey && !e.ctrlKey && state.gamePhase === 'playing') {
         const target = e.target as HTMLElement;
@@ -64,7 +78,16 @@ export default function Header() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [showConfirm, showShortcuts, showRules, state.gamePhase, state.players, state.rounds, handleNewGame]);
+  }, [
+    showConfirm,
+    showShortcuts,
+    showRules,
+    showTransfer,
+    state.gamePhase,
+    state.players,
+    state.rounds,
+    handleNewGame,
+  ]);
 
   return (
     <>
@@ -100,6 +123,17 @@ export default function Header() {
           {state.gamePhase === 'playing' && (
             <button
               type="button"
+              className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+              onClick={() => setShowTransfer(true)}
+              title="Transfer game (Shift+S)"
+              aria-label="Transfer game"
+            >
+              <ShareIcon className="h-4 w-4" />
+            </button>
+          )}
+          {state.gamePhase === 'playing' && (
+            <button
+              type="button"
               className="flex h-7 items-center rounded bg-red-500 p-1.5 font-medium text-sm text-white hover:bg-red-600 sm:px-3"
               onClick={handleNewGame}
               aria-label="New game"
@@ -113,6 +147,7 @@ export default function Header() {
 
       {showRules && <GameRulesPopup onClose={() => setShowRules(false)} />}
       {showShortcuts && <KeyboardShortcutsPopup onClose={() => setShowShortcuts(false)} />}
+      {showTransfer && <TransferGamePopup onClose={() => setShowTransfer(false)} />}
 
       {showConfirm && (
         <div
