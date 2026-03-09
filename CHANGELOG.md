@@ -1,3 +1,13 @@
+# [1.4.0](https://github.com/phaldiya/management-score-pad/compare/v1.3.1...v1.4.0) (2026-03-09)
+
+
+### Features
+
+* add game state compression library for transfers ([2c1585c](https://github.com/phaldiya/management-score-pad/commit/2c1585c398bb48fb4f94208707513533c780c851))
+* add ImportPage and /import route ([53937fb](https://github.com/phaldiya/management-score-pad/commit/53937fb188f1acb620defb380a9b0703792df1b3))
+* add TransferGamePopup and ShareIcon components ([862255f](https://github.com/phaldiya/management-score-pad/commit/862255fc14c7e4e70972a65e4515cf13ae02ab2f))
+* **header:** add transfer game button and Shift+S shortcut ([7ad7bcc](https://github.com/phaldiya/management-score-pad/commit/7ad7bcc9d8d2e252b3e22fc9eb200dd2aebbccb8))
+
 ## [1.3.1](https://github.com/phaldiya/management-score-pad/compare/v1.3.0...v1.3.1) (2026-03-08)
 
 
