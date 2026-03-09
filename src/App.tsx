@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import GamePage from './components/game/GamePage.tsx';
+import ImportPage from './components/game/ImportPage.tsx';
 import Header from './components/layout/Header.tsx';
 import SetupPage from './components/setup/SetupPage.tsx';
 import ErrorBoundary from './components/shared/ErrorBoundary.tsx';
@@ -21,6 +22,7 @@ function AppLayout() {
           <Routes>
             <Route index element={<SetupPage />} />
             <Route path="/game" element={<GamePage />} />
+            <Route path="/import" element={<ImportPage />} />
           </Routes>
         </ErrorBoundary>
       </main>
