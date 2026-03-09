@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext.tsx';
 import { printScoreboard } from '../../lib/exportPdf.ts';
 import { GameRulesPopup } from '../shared/GameRulesPopup.tsx';
-import { AppIcon, BookIcon, CloseIcon, DownloadIcon, KeyboardIcon } from '../shared/Icons.tsx';
+import { AppIcon, BookIcon, CloseIcon, KeyboardIcon } from '../shared/Icons.tsx';
 import { KeyboardShortcutsPopup } from '../shared/KeyboardShortcutsPopup.tsx';
 
 export default function Header() {
@@ -98,28 +98,15 @@ export default function Header() {
             <KeyboardIcon className="h-4 w-4" />
           </button>
           {state.gamePhase === 'playing' && (
-            <>
-              {state.rounds.length > 0 && (
-                <button
-                  type="button"
-                  className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-                  onClick={() => printScoreboard(state.players, state.rounds)}
-                  title="Download scoreboard as PDF"
-                  aria-label="Download scoreboard as PDF"
-                >
-                  <DownloadIcon className="h-4 w-4" />
-                </button>
-              )}
-              <button
-                type="button"
-                className="flex h-7 items-center rounded bg-red-500 p-1.5 font-medium text-sm text-white hover:bg-red-600 sm:px-3"
-                onClick={handleNewGame}
-                aria-label="New game"
-              >
-                <span className="hidden sm:inline">+ Game</span>
-                <span className="flex h-4 w-4 items-center justify-center sm:hidden">+</span>
-              </button>
-            </>
+            <button
+              type="button"
+              className="flex h-7 items-center rounded bg-red-500 p-1.5 font-medium text-sm text-white hover:bg-red-600 sm:px-3"
+              onClick={handleNewGame}
+              aria-label="New game"
+            >
+              <span className="hidden sm:inline">+ Game</span>
+              <span className="flex h-4 w-4 items-center justify-center sm:hidden">+</span>
+            </button>
           )}
         </div>
       </header>
