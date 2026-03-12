@@ -147,6 +147,34 @@ test.describe('Visual Regression', () => {
   });
 });
 
+test.describe('Game Rules', () => {
+  test('game rules setup tab', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie']);
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('game-rules-setup-tab.png');
+  });
+
+  test('game rules gameplay tab', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie']);
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('tab', { name: 'Gameplay' }).click();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('game-rules-gameplay-tab.png');
+  });
+
+  test('game rules scoring tab', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie']);
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('tab', { name: 'Scoring' }).click();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('game-rules-scoring-tab.png');
+  });
+});
+
 test.describe('Max Players & Layout', () => {
   test('setup page with 6 players (max reached, no Add Player button)', async ({ page }) => {
     await page.goto('/');
