@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/phaldiya/management-score-pad/compare/v1.4.0...v1.5.0) (2026-03-12)
+
+
+### Bug Fixes
+
+* upgrade tar to 7.5.11 to resolve symlink path traversal vulnerability ([a523244](https://github.com/phaldiya/management-score-pad/commit/a5232441a7abccbe412907fdaecf799907219df5))
+
+
+### Features
+
+* **rules:** reorganize game rules into tabbed layout with trick-winning section ([c7e8444](https://github.com/phaldiya/management-score-pad/commit/c7e8444ad5136de2c4242e07804eb88c30ff65e4))
+
 # [1.4.0](https://github.com/phaldiya/management-score-pad/compare/v1.3.1...v1.4.0) (2026-03-09)
 
 
