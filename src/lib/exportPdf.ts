@@ -23,7 +23,8 @@ const PRINT_STYLES = `
   .card-num { font-weight: 700; }
   .suit-red { color: #dc2626; font-size: 16px; }
   .suit-black { color: #111827; font-size: 16px; }
-  .score { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .score { font-size: 18px; font-weight: 700; margin-bottom: 2px; display: inline-flex; align-items: flex-start; }
+  .score .dealer { width: 10px; height: 10px; margin-left: 2px; margin-top: -2px; }
   .bid { background: #dbeafe; color: #1d4ed8; padding: 1px 6px; border-radius: 9999px; }
   .result { background: #d1fae5; color: #047857; padding: 1px 6px; border-radius: 9999px; }
   .sep { color: #d1d5db; margin: 0 2px; }
@@ -124,18 +125,17 @@ export function printScoreboard(players: Player[], rounds: GameRound[]): void {
       const scoreDiv = doc.createElement('div');
       scoreDiv.className = 'score';
       scoreDiv.textContent = isCompleted ? String(pd.score) : '-';
-      td.appendChild(scoreDiv);
-
-      const brDiv = doc.createElement('div');
-      brDiv.className = 'bid-result';
-
       if (pd.isDealer) {
         const dealer = doc.createElement('img');
         dealer.className = 'dealer';
         dealer.src = `${window.location.origin}${import.meta.env.BASE_URL}dealer.png`;
         dealer.alt = 'Dealer';
-        brDiv.appendChild(dealer);
+        scoreDiv.appendChild(dealer);
       }
+      td.appendChild(scoreDiv);
+
+      const brDiv = doc.createElement('div');
+      brDiv.className = 'bid-result';
 
       const bidSpan = doc.createElement('span');
       bidSpan.className = 'bid';

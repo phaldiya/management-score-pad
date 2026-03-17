@@ -247,8 +247,8 @@ describe('exportPdf spec', () => {
     const tbody = table.children.find((c) => c.tag === 'tbody')!;
     const row = tbody.children[0];
     const p1Cell = row.children[1];
-    const bidResult = p1Cell.children.find((c) => c.className === 'bid-result')!;
-    const dealerImg = bidResult.children.find((c) => c.className === 'dealer');
+    const scoreDiv = p1Cell.children.find((c) => c.className === 'score')!;
+    const dealerImg = scoreDiv.children.find((c) => c.className === 'dealer');
     expect(dealerImg).toBeDefined();
     expect(dealerImg!.tag).toBe('img');
     expect(dealerImg!.alt).toBe('Dealer');
