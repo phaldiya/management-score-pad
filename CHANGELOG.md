@@ -1,3 +1,11 @@
+## [1.5.1](https://github.com/phaldiya/management-score-pad/compare/v1.5.0...v1.5.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* **scoreboard:** show dealer icon as superscript next to score ([3f46572](https://github.com/phaldiya/management-score-pad/commit/3f465720798f72825e9f4a272de6a4cb280bab7c))
+* upgrade undici to 7.24.0+ to resolve WebSocket vulnerabilities ([78e9e94](https://github.com/phaldiya/management-score-pad/commit/78e9e94a8d4d983140ae60aba2b1f60a159894a4))
+
 # [1.5.0](https://github.com/phaldiya/management-score-pad/compare/v1.4.0...v1.5.0) (2026-03-12)
 
 
