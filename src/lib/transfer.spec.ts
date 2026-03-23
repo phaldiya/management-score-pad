@@ -1,7 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('qrcode', () => ({
+  default: {
+    toCanvas: vi.fn().mockResolvedValue(undefined),
+  },
+}));
 
 import type { AppState } from '../types/index.ts';
-import { compressState, decompressState } from './transfer.ts';
+import { buildTransferUrl, compressState, decompressState, generateQrDataUrl } from './transfer.ts';
 
 const mockState: AppState = {
   gameId: 'test-game-123',
@@ -108,6 +114,87 @@ describe('transfer', () => {
       }
       const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       await expect(decompressState(encoded)).rejects.toThrow();
+    });
+  });
+
+  describe('buildTransferUrl', () => {
+    it('produces a URL with #/import?d= fragment and dot terminator', async () => {
+      // Mock window.location.href
+      const original = globalThis.window;
+      globalThis.window = { location: { href: 'https://example.com/app/#/game' } } as unknown as Window &
+        typeof globalThis;
+
+      const url = await buildTransferUrl(mockState);
+      expect(url).toMatch(/^https:\/\/example\.com\/app\/#\/import\?d=.+\.$/);
+
+      globalThis.window = original;
+    });
+
+    it('encoded data in URL can be decompressed back', async () => {
+      globalThis.window = { location: { href: 'https://example.com/#/game' } } as unknown as Window & typeof globalThis;
+
+      const url = await buildTransferUrl(mockState);
+      const encoded = url.split('d=')[1];
+      const decoded = await decompressState(encoded);
+      expect(decoded).toEqual(mockState);
+
+      delete (globalThis as Record<string, unknown>).window;
+    });
+  });
+
+  describe('generateQrDataUrl', () => {
+    it('returns null for URLs exceeding max length', async () => {
+      const longUrl = `https://example.com/${'a'.repeat(1200)}`;
+      const result = await generateQrDataUrl(longUrl);
+      expect(result).toBeNull();
+    });
+
+    it('generates a data URL for a valid short URL', async () => {
+      const mockCtx = {
+        fillStyle: '',
+        beginPath: vi.fn(),
+        roundRect: vi.fn(),
+        fill: vi.fn(),
+        drawImage: vi.fn(),
+      };
+      const mockCanvas = {
+        getContext: vi.fn(() => mockCtx),
+        toDataURL: vi.fn(() => 'data:image/png;base64,mockqr'),
+      };
+      globalThis.document = {
+        createElement: vi.fn(() => mockCanvas),
+      } as unknown as Document;
+
+      // Mock Image constructor — simulate logo load failure (catch branch)
+      globalThis.Image = vi.fn().mockImplementation(() => {
+        const img = { onload: null as (() => void) | null, onerror: null as (() => void) | null, src: '' };
+        setTimeout(() => img.onerror?.(), 0);
+        return img;
+      }) as unknown as typeof Image;
+
+      const result = await generateQrDataUrl('https://example.com/short');
+      expect(result).toBe('data:image/png;base64,mockqr');
+      expect(mockCanvas.getContext).toHaveBeenCalledWith('2d');
+      expect(mockCtx.beginPath).toHaveBeenCalled();
+      expect(mockCtx.fill).toHaveBeenCalled();
+
+      delete (globalThis as Record<string, unknown>).document;
+      delete (globalThis as Record<string, unknown>).Image;
+    });
+
+    it('works when canvas context is null', async () => {
+      const mockCanvas = {
+        getContext: vi.fn(() => null),
+        toDataURL: vi.fn(() => 'data:image/png;base64,nologo'),
+      };
+      globalThis.document = {
+        createElement: vi.fn(() => mockCanvas),
+      } as unknown as Document;
+
+      const result = await generateQrDataUrl('https://example.com/test');
+      expect(result).toBe('data:image/png;base64,nologo');
+
+      delete (globalThis as Record<string, unknown>).document;
     });
   });
 });
