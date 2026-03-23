@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/phaldiya/management-score-pad/compare/v1.5.1...v1.6.0) (2026-03-23)
+
+
+### Bug Fixes
+
+* upgrade @dicebear/core and @dicebear/collection to 9.4.2 ([dbdf6a5](https://github.com/phaldiya/management-score-pad/commit/dbdf6a52ed6a7312c90e740942bb16cd906c505a))
+
+
+### Features
+
+* **scoreboard:** add tooltip to in-progress play card ([e6a6232](https://github.com/phaldiya/management-score-pad/commit/e6a6232a8cd21d6792dbef0e8f715a0bbc2d7708))
+* **shared:** add auto-positioning Tooltip component ([5165fc3](https://github.com/phaldiya/management-score-pad/commit/5165fc3aa91b7da71f098e90b3260730ef3b99fa))
+* **ui:** add tooltips across the app for better discoverability ([7f5af94](https://github.com/phaldiya/management-score-pad/commit/7f5af946ac3d89ea7f031a8e437099b2633c6b84))
+
 ## [1.5.1](https://github.com/phaldiya/management-score-pad/compare/v1.5.0...v1.5.1) (2026-03-19)
 
 

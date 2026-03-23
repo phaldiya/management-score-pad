@@ -2,7 +2,7 @@
   "name": "management-score-pad",
   "description": "Score tracking app for the Management (Judgement) card game — track bids, results, and cumulative scores across rounds.",
   "private": true,
-  "version": "1.5.1",
+  "version": "1.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
