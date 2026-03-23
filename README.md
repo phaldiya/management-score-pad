@@ -1,5 +1,7 @@
 # Management Score Pad
 
+[![Deploy to GitHub Pages](https://github.com/phaldiya/management-score-pad/actions/workflows/deploy.yml/badge.svg)](https://github.com/phaldiya/management-score-pad/actions/workflows/deploy.yml) [![GitHub Pages](https://img.shields.io/badge/demo-GitHub%20Pages-blue)](https://phaldiya.github.io/management-score-pad/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/) [![Bun](https://img.shields.io/badge/Bun-runtime-f9f1e1?logo=bun)](https://bun.sh/)
+
 Score tracking app for the **Management** (a.k.a. **Judgement**) card game. Enter player names, track bids and results round by round, and see live cumulative standings with automatic score calculation.
 
 ## Game Rules
