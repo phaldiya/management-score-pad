@@ -11,6 +11,8 @@ export default mergeConfig(
       include: ['src/**/*.spec.ts'],
       setupFiles: ['./tests/setup.ts'],
       coverage: {
+        provider: 'v8',
+        reporter: ['text', 'lcov'],
         include: ['src/lib/**', 'src/context/**'],
       },
     },
