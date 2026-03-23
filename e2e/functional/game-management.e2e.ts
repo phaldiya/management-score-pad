@@ -70,8 +70,8 @@ test.describe('Game Management', () => {
     await expect(btn).toBeVisible();
     await expect(btn).toHaveAccessibleName('New game');
 
-    // Desktop: shows "+ Game" text
-    await expect(btn.locator('span.hidden.sm\\:inline')).toHaveText('+ Game');
+    // Desktop: shows "New Game" text
+    await expect(btn.locator('span.hidden.sm\\:inline')).toHaveText('New Game');
 
     // Mobile: shows "+" icon-sized button
     await page.setViewportSize({ width: 375, height: 812 });

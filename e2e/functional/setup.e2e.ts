@@ -23,7 +23,7 @@ test.describe('Setup Page', () => {
   });
 
   test('cannot start with empty names (button disabled)', async ({ page }) => {
-    const startButton = page.getByRole('button', { name: 'Start Game' });
+    const startButton = page.getByRole('button', { name: 'Enter player names to start' });
     await expect(startButton).toBeDisabled();
   });
 
@@ -81,7 +81,7 @@ test.describe('Setup Page', () => {
     await page.getByPlaceholder('Player 3').fill('Charlie');
 
     await expect(page.getByText('Name must be at least 2 characters')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Start Game' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Enter player names to start' })).toBeDisabled();
   });
 
   test('allows player name with exactly 2 characters', async ({ page }) => {
@@ -100,16 +100,16 @@ test.describe('Setup Page', () => {
   });
 
   test('requires minimum 3 filled names to start', async ({ page }) => {
-    const startButton = page.getByRole('button', { name: 'Start Game' });
-
     // Only 2 filled
     await page.getByPlaceholder('Player 1').fill('Alice');
     await page.getByPlaceholder('Player 2').fill('Bob');
-    await expect(startButton).toBeDisabled();
+    const disabledButton = page.getByRole('button', { name: 'Enter player names to start' });
+    await expect(disabledButton).toBeDisabled();
 
     // Fill 3rd
     await page.getByPlaceholder('Player 3').fill('Charlie');
-    await expect(startButton).toBeEnabled();
+    const enabledButton = page.getByRole('button', { name: 'Start Game' });
+    await expect(enabledButton).toBeEnabled();
   });
 
   test('ignores empty fields when starting (only sends filled names)', async ({ page }) => {
