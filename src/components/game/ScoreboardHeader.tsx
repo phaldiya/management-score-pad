@@ -2,6 +2,7 @@ import { useAppContext } from '../../context/AppContext.tsx';
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 
 interface ScoreboardHeaderProps {
   players: Player[];
@@ -34,44 +35,46 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
             <th key={player.id} scope="col" className="min-w-[5rem] border border-gray-500 px-3 py-2 text-center">
               {canReorder ? (
                 <div className="flex items-center justify-center gap-1">
-                  <button
-                    type="button"
-                    disabled={index === 0}
-                    className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
-                    aria-label={`Move ${player.name} left`}
-                    title={`Move ${player.name} to left`}
-                    onClick={() =>
-                      dispatch({
-                        type: 'REORDER_PLAYERS',
-                        fromIndex: index,
-                        toIndex: index - 1,
-                      })
-                    }
-                  >
-                    ←
-                  </button>
+                  <Tooltip text="Move left">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
+                      aria-label={`Move ${player.name} left`}
+                      onClick={() =>
+                        dispatch({
+                          type: 'REORDER_PLAYERS',
+                          fromIndex: index,
+                          toIndex: index - 1,
+                        })
+                      }
+                    >
+                      ←
+                    </button>
+                  </Tooltip>
                   <div className="flex items-center gap-2">
                     <span className="hidden sm:inline">
                       <PlayerAvatar avatar={player.avatar} name={player.name} size="sm" />
                     </span>
                     <span className="max-w-[6rem] truncate font-bold text-base text-white">{player.name}</span>
                   </div>
-                  <button
-                    type="button"
-                    disabled={index === players.length - 1}
-                    className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
-                    aria-label={`Move ${player.name} right`}
-                    title={`Move ${player.name} to right`}
-                    onClick={() =>
-                      dispatch({
-                        type: 'REORDER_PLAYERS',
-                        fromIndex: index,
-                        toIndex: index + 1,
-                      })
-                    }
-                  >
-                    →
-                  </button>
+                  <Tooltip text="Move right">
+                    <button
+                      type="button"
+                      disabled={index === players.length - 1}
+                      className="text-gray-300 text-xl leading-none enabled:hover:text-white disabled:opacity-30"
+                      aria-label={`Move ${player.name} right`}
+                      onClick={() =>
+                        dispatch({
+                          type: 'REORDER_PLAYERS',
+                          fromIndex: index,
+                          toIndex: index + 1,
+                        })
+                      }
+                    >
+                      →
+                    </button>
+                  </Tooltip>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2.5">

@@ -1,4 +1,5 @@
 import type { GameRound } from '../../types/index.ts';
+import { Tooltip } from '../shared/Tooltip.tsx';
 
 interface NextGameButtonProps {
   currentRound: GameRound | undefined;
@@ -22,50 +23,58 @@ export default function NextGameButton({
   // No rounds yet - start first game
   if (!currentRound) {
     return (
-      <button
-        type="button"
-        onClick={onStartFirstGame}
-        className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700"
-      >
-        Start First Play
-      </button>
+      <Tooltip text="Start first play (N)" block>
+        <button
+          type="button"
+          onClick={onStartFirstGame}
+          className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700"
+        >
+          Start First Play
+        </button>
+      </Tooltip>
     );
   }
 
   // Current round in progress - enter results
   if (currentRound.phase === 'in_progress') {
     return (
-      <button
-        type="button"
-        onClick={onEnterResults}
-        className="w-full rounded-lg bg-green-600 py-3 font-medium text-white hover:bg-green-700"
-      >
-        Enter Results
-      </button>
+      <Tooltip text="Enter results (N)" block>
+        <button
+          type="button"
+          onClick={onEnterResults}
+          className="w-full rounded-lg bg-green-600 py-3 font-medium text-white hover:bg-green-700"
+        >
+          Enter Results
+        </button>
+      </Tooltip>
     );
   }
 
   // All rounds completed
   if (roundsPlayed >= totalGames) {
     return (
-      <button
-        type="button"
-        onClick={onGameComplete}
-        className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600"
-      >
-        Game Complete!
-      </button>
+      <Tooltip text="View final results" block>
+        <button
+          type="button"
+          onClick={onGameComplete}
+          className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600"
+        >
+          Game Complete!
+        </button>
+      </Tooltip>
     );
   }
 
   // Current round completed, more to go
   return (
-    <button
-      type="button"
-      onClick={onNextGame}
-      className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700"
-    >
-      Next Play ({roundsPlayed}/{totalGames})
-    </button>
+    <Tooltip text="Next play (N)" block>
+      <button
+        type="button"
+        onClick={onNextGame}
+        className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700"
+      >
+        Next Play ({roundsPlayed}/{totalGames})
+      </button>
+    </Tooltip>
   );
 }

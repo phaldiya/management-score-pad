@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { AVATAR_CATEGORIES, getAvatarDataUri } from '../../lib/avatars.ts';
 import { CloseIcon } from './Icons.tsx';
+import { Tooltip } from './Tooltip.tsx';
 
 interface AvatarPickerProps {
   selected: string;
@@ -34,9 +35,11 @@ export default function AvatarPicker({ selected, onSelect, onClose, playerName }
           <h2 id="avatar-picker-title" className="font-bold text-gray-900">
             Pick an avatar for {playerName}
           </h2>
-          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
-            <CloseIcon />
-          </button>
+          <Tooltip text="Close">
+            <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+              <CloseIcon />
+            </button>
+          </Tooltip>
         </div>
         <div className="max-h-[70vh] overflow-y-auto p-4">
           {AVATAR_CATEGORIES.map((cat) => (

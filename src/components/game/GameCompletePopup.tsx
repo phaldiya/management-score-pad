@@ -4,6 +4,7 @@ import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
 import { CloseIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 
 interface GameCompletePopupProps {
   players: Player[];
@@ -72,9 +73,11 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
             <h2 id="game-complete-title" className="font-bold text-gray-900 text-lg">
               Game Complete!
             </h2>
-            <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
-              <CloseIcon />
-            </button>
+            <Tooltip text="Close (Esc)">
+              <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+                <CloseIcon />
+              </button>
+            </Tooltip>
           </div>
 
           <div className="p-4">

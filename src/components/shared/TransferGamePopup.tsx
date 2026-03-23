@@ -4,6 +4,7 @@ import { useAppContext } from '../../context/AppContext.tsx';
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import { buildTransferUrl, generateQrDataUrl } from '../../lib/transfer.ts';
 import { CloseIcon, ShareIcon, SuitIcon } from './Icons.tsx';
+import { Tooltip } from './Tooltip.tsx';
 
 interface TransferGamePopupProps {
   onClose: () => void;
@@ -122,9 +123,11 @@ export function TransferGamePopup({ onClose }: TransferGamePopupProps) {
             <ShareIcon className="h-5 w-5" />
             Transfer Game
           </h2>
-          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
-            <CloseIcon />
-          </button>
+          <Tooltip text="Close (Esc)">
+            <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+              <CloseIcon />
+            </button>
+          </Tooltip>
         </div>
         <div className="p-4">
           <div className="mb-3 space-y-2 text-sm">

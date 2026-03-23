@@ -5,6 +5,7 @@ import { DEFAULT_AVATAR } from '../../lib/avatars.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
 import { PlusIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 
 export default function AddPlayerInline() {
   const { state, dispatch } = useAppContext();
@@ -28,14 +29,16 @@ export default function AddPlayerInline() {
   return (
     <div className="mt-4 flex flex-col items-center">
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setPickerOpen(!pickerOpen)}
-          className="rounded-full border-2 border-transparent hover:border-blue-400"
-          aria-label="Change avatar for new player"
-        >
-          <PlayerAvatar avatar={avatar} name="New player" size="sm" />
-        </button>
+        <Tooltip text="Change avatar">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(!pickerOpen)}
+            className="rounded-full border-2 border-transparent hover:border-blue-400"
+            aria-label="Change avatar for new player"
+          >
+            <PlayerAvatar avatar={avatar} name="New player" size="sm" />
+          </button>
+        </Tooltip>
         {pickerOpen && (
           <AvatarPicker
             selected={avatar}

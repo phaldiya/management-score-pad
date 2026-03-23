@@ -5,6 +5,7 @@ import { printScoreboard } from '../../lib/exportPdf.ts';
 import { GameRulesPopup } from '../shared/GameRulesPopup.tsx';
 import { AppIcon, BookIcon, CloseIcon, KeyboardIcon, ShareIcon } from '../shared/Icons.tsx';
 import { KeyboardShortcutsPopup } from '../shared/KeyboardShortcutsPopup.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 import { TransferGamePopup } from '../shared/TransferGamePopup.tsx';
 
 export default function Header() {
@@ -102,45 +103,50 @@ export default function Header() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-            onClick={() => setShowRules(true)}
-            title="Game rules"
-            aria-label="Game rules"
-          >
-            <BookIcon className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-            onClick={() => setShowShortcuts(true)}
-            title="Keyboard shortcuts (?)"
-            aria-label="Keyboard shortcuts"
-          >
-            <KeyboardIcon className="h-4 w-4" />
-          </button>
-          {state.gamePhase === 'playing' && (
+          <Tooltip text="Game rules">
             <button
               type="button"
               className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-              onClick={() => setShowTransfer(true)}
-              title="Transfer game (Shift+S)"
-              aria-label="Transfer game"
+              onClick={() => setShowRules(true)}
+              aria-label="Game rules"
             >
-              <ShareIcon className="h-4 w-4" />
+              <BookIcon className="h-4 w-4" />
             </button>
-          )}
-          {state.gamePhase === 'playing' && (
+          </Tooltip>
+          <Tooltip text="Keyboard shortcuts (?)">
             <button
               type="button"
-              className="flex h-7 items-center rounded bg-red-500 p-1.5 font-medium text-sm text-white hover:bg-red-600 sm:px-3"
-              onClick={handleNewGame}
-              aria-label="New game"
+              className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+              onClick={() => setShowShortcuts(true)}
+              aria-label="Keyboard shortcuts"
             >
-              <span className="hidden sm:inline">+ Game</span>
-              <span className="flex h-4 w-4 items-center justify-center sm:hidden">+</span>
+              <KeyboardIcon className="h-4 w-4" />
             </button>
+          </Tooltip>
+          {state.gamePhase === 'playing' && (
+            <Tooltip text="Transfer game (Shift+S)">
+              <button
+                type="button"
+                className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                onClick={() => setShowTransfer(true)}
+                aria-label="Transfer game"
+              >
+                <ShareIcon className="h-4 w-4" />
+              </button>
+            </Tooltip>
+          )}
+          {state.gamePhase === 'playing' && (
+            <Tooltip text="New game (Shift+N)">
+              <button
+                type="button"
+                className="flex h-7 items-center rounded border border-gray-300 bg-white p-1.5 font-medium text-gray-700 text-sm hover:bg-gray-100 sm:px-3"
+                onClick={handleNewGame}
+                aria-label="New game"
+              >
+                <span className="hidden sm:inline">New Game</span>
+                <span className="flex h-4 w-4 items-center justify-center sm:hidden">+</span>
+              </button>
+            </Tooltip>
           )}
         </div>
       </header>

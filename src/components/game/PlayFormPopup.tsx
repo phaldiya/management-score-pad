@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { GameRound, Player, Suit } from '../../types/index.ts';
 import { CloseIcon, PencilIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 import PlayCard from './PlayCard.tsx';
 
 interface Base {
@@ -159,9 +160,11 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
               {title}
             </h2>
           </div>
-          <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
-            <CloseIcon />
-          </button>
+          <Tooltip text="Close (Esc)">
+            <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+              <CloseIcon />
+            </button>
+          </Tooltip>
         </div>
 
         <Wrapper onSubmit={onFormSubmit} className="p-4">
@@ -186,14 +189,16 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-gray-700 text-xs uppercase tracking-wider">{sectionLabel}</span>
                   {mode === 'details' && !isEditingBids && props.onEditBids && (
-                    <button
-                      type="button"
-                      aria-label="Edit bids"
-                      onClick={() => setIsEditingBids(true)}
-                      className="text-gray-400 hover:text-blue-600"
-                    >
-                      <PencilIcon />
-                    </button>
+                    <Tooltip text="Edit bids">
+                      <button
+                        type="button"
+                        aria-label="Edit bids"
+                        onClick={() => setIsEditingBids(true)}
+                        className="text-gray-400 hover:text-blue-600"
+                      >
+                        <PencilIcon />
+                      </button>
+                    </Tooltip>
                   )}
                 </div>
                 {ordered.map((p, idx) => {
