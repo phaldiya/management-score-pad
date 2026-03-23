@@ -8,6 +8,7 @@ import type { AppState } from '../../types/index.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
 import { AppIcon, PlusIcon, TrashIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
+import { Tooltip } from '../shared/Tooltip.tsx';
 import RestoreGamePopup from './RestoreGamePopup.tsx';
 
 export default function SetupPage() {
@@ -127,14 +128,16 @@ export default function SetupPage() {
             {players.map((player, index) => (
               <div key={index}>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPickerOpen(pickerOpen === index ? null : index)}
-                    className="rounded-full border-2 border-transparent hover:border-blue-400"
-                    aria-label={`Change avatar for ${player.name || `Player ${index + 1}`}`}
-                  >
-                    <PlayerAvatar avatar={player.avatar} name={player.name || `Player ${index + 1}`} size="md" />
-                  </button>
+                  <Tooltip text="Change avatar">
+                    <button
+                      type="button"
+                      onClick={() => setPickerOpen(pickerOpen === index ? null : index)}
+                      className="rounded-full border-2 border-transparent hover:border-blue-400"
+                      aria-label={`Change avatar for ${player.name || `Player ${index + 1}`}`}
+                    >
+                      <PlayerAvatar avatar={player.avatar} name={player.name || `Player ${index + 1}`} size="md" />
+                    </button>
+                  </Tooltip>
                   {pickerOpen === index && (
                     <AvatarPicker
                       selected={player.avatar}
@@ -161,14 +164,16 @@ export default function SetupPage() {
                     }`}
                   />
                   {index >= 3 && (
-                    <button
-                      type="button"
-                      onClick={() => removePlayer(index)}
-                      className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:border-red-300 hover:text-red-500"
-                      aria-label={`Remove player ${index + 1}`}
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
+                    <Tooltip text="Remove player">
+                      <button
+                        type="button"
+                        onClick={() => removePlayer(index)}
+                        className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:border-red-300 hover:text-red-500"
+                        aria-label={`Remove player ${index + 1}`}
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </Tooltip>
                   )}
                 </div>
                 {duplicateIndices.has(index) && (
@@ -201,9 +206,9 @@ export default function SetupPage() {
             type="button"
             disabled={!canStart}
             onClick={handleStart}
-            className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+            className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-2 disabled:border-blue-300 disabled:border-dashed disabled:bg-white disabled:text-blue-400"
           >
-            Start Game {canStart && `(${filledPlayers.length} players)`}
+            {canStart ? `Start Game (${filledPlayers.length} players)` : 'Enter player names to start'}
           </button>
         </div>
       </div>
