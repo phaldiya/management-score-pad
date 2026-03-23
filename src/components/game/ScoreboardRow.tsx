@@ -1,4 +1,5 @@
 import type { GameRound, Player } from '../../types/index.ts';
+import { Tooltip } from '../shared/Tooltip.tsx';
 import PlayCard from './PlayCard.tsx';
 import PlayScore from './PlayScore.tsx';
 
@@ -26,12 +27,23 @@ export default function ScoreboardRow({ round, players, onPlayCardClick }: Score
         aria-label={onPlayCardClick ? `View play ${round.gameNumber} details` : undefined}
       >
         <div className="flex items-center justify-center p-1">
-          <PlayCard
-            cardCount={round.cardCount}
-            trump={round.trump}
-            size="sm"
-            highlight={round.phase === 'in_progress'}
-          />
+          {onPlayCardClick ? (
+            <Tooltip text="View play details (P)">
+              <PlayCard
+                cardCount={round.cardCount}
+                trump={round.trump}
+                size="sm"
+                highlight={round.phase === 'in_progress'}
+              />
+            </Tooltip>
+          ) : (
+            <PlayCard
+              cardCount={round.cardCount}
+              trump={round.trump}
+              size="sm"
+              highlight={round.phase === 'in_progress'}
+            />
+          )}
         </div>
       </td>
       {players.map((player) => {
