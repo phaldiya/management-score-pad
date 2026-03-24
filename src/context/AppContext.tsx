@@ -144,6 +144,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
+  useEffect(() => {
+    if (state.gamePhase !== 'playing') return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [state.gamePhase]);
+
   return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
 }
 
