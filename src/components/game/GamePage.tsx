@@ -3,22 +3,37 @@ import { Navigate } from 'react-router-dom';
 
 import { useAppContext } from '../../context/AppContext.tsx';
 import { getTrumpForGame } from '../../lib/gameLogic.ts';
+import { CloseIcon, SuitIcon } from '../shared/Icons.tsx';
 import GameCompletePopup from './GameCompletePopup.tsx';
 import NextGameButton from './NextGameButton.tsx';
 import PlayFormPopup from './PlayFormPopup.tsx';
 import Scoreboard from './Scoreboard.tsx';
 
-type Popup = 'none' | 'bid' | 'results' | 'complete' | 'details';
+type Popup = 'none' | 'bid' | 'results' | 'complete' | 'details' | 'undo';
 
 export default function GamePage() {
   const { state, dispatch } = useAppContext();
   const [popup, setPopup] = useState<Popup>('none');
+
+  const completedRounds = state.rounds.filter((r) => r.phase === 'completed');
+  const hasCompletedRounds = completedRounds.length > 0;
+  const lastCompletedRound = completedRounds[completedRounds.length - 1];
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       // Escape closes any open popup
       if (e.key === 'Escape' && popup !== 'none') {
         setPopup('none');
+        return;
+      }
+      // Shift+D for Delete Last Play
+      if (e.key === 'D' && e.shiftKey && !e.metaKey && !e.ctrlKey && popup === 'none') {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
+        if (hasCompletedRounds) {
+          e.preventDefault();
+          setPopup('undo');
+        }
         return;
       }
       // N key opens next play / enter results when no popup is open
@@ -50,7 +65,7 @@ export default function GamePage() {
         }
       }
     },
-    [popup, state.currentRoundIndex, state.rounds, state.totalGames],
+    [popup, state.currentRoundIndex, state.rounds, state.totalGames, hasCompletedRounds],
   );
 
   useEffect(() => {
@@ -64,7 +79,7 @@ export default function GamePage() {
 
   const { players, rounds, currentRoundIndex, cardSequence, totalGames } = state;
   const currentRound = currentRoundIndex >= 0 ? rounds[currentRoundIndex] : undefined;
-  const completedRounds = rounds.filter((r) => r.phase === 'completed').length;
+  const completedCount = rounds.filter((r) => r.phase === 'completed').length;
 
   const nextGameIndex = currentRoundIndex + 1;
   const nextCardCount = cardSequence[nextGameIndex] ?? 0;
@@ -73,13 +88,18 @@ export default function GamePage() {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <Scoreboard players={players} rounds={rounds} onInProgressPlayClick={() => setPopup('details')} />
+      <Scoreboard
+        players={players}
+        rounds={rounds}
+        onInProgressPlayClick={() => setPopup('details')}
+        onUndoLastRound={() => setPopup('undo')}
+      />
 
       <div className="border-gray-200 border-t bg-white p-4">
         <NextGameButton
           currentRound={currentRound}
           totalGames={totalGames}
-          roundsPlayed={completedRounds}
+          roundsPlayed={completedCount}
           onStartFirstGame={() => setPopup('bid')}
           onEnterResults={() => setPopup('results')}
           onNextGame={() => setPopup('bid')}
@@ -136,6 +156,57 @@ export default function GamePage() {
           onClose={() => setPopup('none')}
           onNewGame={() => dispatch({ type: 'RESET_GAME' })}
         />
+      )}
+
+      {popup === 'undo' && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="undo-round-title"
+        >
+          <div className="w-full max-w-[min(24rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
+            <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
+              <h2 id="undo-round-title" className="font-bold text-gray-900">
+                Delete Last Play?
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPopup('none')}
+                className="text-gray-600 hover:text-gray-900"
+                aria-label="Close"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="p-4">
+              <p className="mb-4 text-gray-600 text-sm">
+                Delete Play {lastCompletedRound?.gameNumber} ({lastCompletedRound?.cardCount} cards,{' '}
+                <SuitIcon suit={lastCompletedRound?.trump ?? 'spades'} className="mb-0.5 inline h-3.5 w-3.5" /> trump)
+                and its scores. You can replay this round afterwards.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="flex-1 rounded bg-red-500 px-4 py-2 font-medium text-white hover:bg-red-600"
+                  onClick={() => {
+                    dispatch({ type: 'UNDO_LAST_ROUND' });
+                    setPopup('none');
+                  }}
+                >
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300"
+                  onClick={() => setPopup('none')}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

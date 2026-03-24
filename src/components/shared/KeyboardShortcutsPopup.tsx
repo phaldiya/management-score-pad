@@ -13,6 +13,7 @@ const shortcuts = [
   { label: 'Download PDF', keys: ['⌘', 'P'], description: 'Download scoreboard as PDF' },
   { label: 'Transfer Game', keys: ['Shift', 'S'], description: 'Share game to another device' },
   { label: 'New Game', keys: ['Shift', 'N'], description: 'Start a new game' },
+  { label: 'Delete Last Play', keys: ['Shift', 'D'], description: 'Delete the last completed play' },
   { label: 'Close Popup', keys: ['Esc'], description: 'Dismiss any open dialog' },
   { label: 'Show This Help', keys: ['?'], description: 'Open keyboard shortcuts' },
 ] as const;

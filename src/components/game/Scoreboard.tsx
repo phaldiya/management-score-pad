@@ -10,13 +10,22 @@ interface ScoreboardProps {
   players: Player[];
   rounds: GameRound[];
   onInProgressPlayClick?: () => void;
+  onUndoLastRound?: () => void;
+}
+
+function getLastCompletedIndex(rounds: GameRound[]): number {
+  for (let i = rounds.length - 1; i >= 0; i--) {
+    if (rounds[i].phase === 'completed') return i;
+  }
+  return -1;
 }
 
 const Scoreboard = forwardRef<HTMLTableElement, ScoreboardProps>(function Scoreboard(
-  { players, rounds, onInProgressPlayClick },
+  { players, rounds, onInProgressPlayClick, onUndoLastRound },
   ref,
 ) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastCompletedIndex = getLastCompletedIndex(rounds);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -30,12 +39,13 @@ const Scoreboard = forwardRef<HTMLTableElement, ScoreboardProps>(function Scoreb
         <caption className="sr-only">Scoreboard showing player bids, results, and scores across rounds</caption>
         <ScoreboardHeader players={players} rounds={rounds} />
         <tbody>
-          {rounds.map((round) => (
+          {rounds.map((round, index) => (
             <ScoreboardRow
               key={round.gameIndex}
               round={round}
               players={players}
               onPlayCardClick={round.phase === 'in_progress' ? onInProgressPlayClick : undefined}
+              onUndo={index === lastCompletedIndex ? onUndoLastRound : undefined}
             />
           ))}
         </tbody>

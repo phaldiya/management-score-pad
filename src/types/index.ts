@@ -45,5 +45,6 @@ export type AppAction =
   | { type: 'COMPLETE_ROUND'; results: { playerId: string; result: number }[] }
   | { type: 'REORDER_PLAYERS'; fromIndex: number; toIndex: number }
   | { type: 'UPDATE_BIDS'; bids: { playerId: string; bid: number }[] }
+  | { type: 'UNDO_LAST_ROUND' }
   | { type: 'RESET_GAME' }
   | { type: 'LOAD_STATE'; state: AppState };

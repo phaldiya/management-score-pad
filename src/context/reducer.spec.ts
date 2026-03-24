@@ -368,6 +368,278 @@ describe('reducer – deep', () => {
     });
   });
 
+  describe('UNDO_LAST_ROUND', () => {
+    it('removes last completed round and decrements currentRoundIndex', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+      });
+      expect(state.rounds).toHaveLength(1);
+      expect(state.currentRoundIndex).toBe(0);
+
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toHaveLength(0);
+      expect(state.currentRoundIndex).toBe(-1);
+    });
+
+    it('returns state unchanged when no rounds exist', () => {
+      const state = createTestState({
+        gameId: 'g1',
+        gamePhase: 'playing',
+        players: testPlayers,
+        rounds: [],
+        currentRoundIndex: -1,
+      });
+      const result = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(result).toBe(state);
+    });
+
+    it('returns state unchanged when last round is in_progress', () => {
+      const state = createTestState({
+        gameId: 'g1',
+        gamePhase: 'playing',
+        players: testPlayers,
+        cardSequence: [17, 16],
+        currentRoundIndex: 0,
+        rounds: [
+          {
+            gameIndex: 0,
+            gameNumber: 1,
+            cardCount: 17,
+            trump: 'spades',
+            phase: 'in_progress',
+            playerData: [
+              { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+              { playerId: 'p2', bid: 2, result: null, score: null, isDealer: false },
+              { playerId: 'p3', bid: 0, result: null, score: null, isDealer: false },
+            ],
+          },
+        ],
+      });
+      const result = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(result).toBe(state);
+    });
+
+    it('does not mutate previous state', () => {
+      const completedRound = {
+        gameIndex: 0,
+        gameNumber: 1,
+        cardCount: 17,
+        trump: 'spades' as const,
+        phase: 'completed' as const,
+        playerData: [
+          { playerId: 'p1', bid: 3, result: 3, score: 30, isDealer: true },
+          { playerId: 'p2', bid: 2, result: 2, score: 20, isDealer: false },
+          { playerId: 'p3', bid: 0, result: 0, score: 10, isDealer: false },
+        ],
+      };
+      const state = createTestState({
+        gameId: 'g1',
+        gamePhase: 'playing',
+        players: testPlayers,
+        cardSequence: [17, 16],
+        currentRoundIndex: 0,
+        rounds: [completedRound],
+      });
+      const roundsBefore = state.rounds;
+      appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toBe(roundsBefore);
+      expect(state.rounds).toHaveLength(1);
+      expect(state.currentRoundIndex).toBe(0);
+    });
+
+    it('preserves gameId, gamePhase, players, and cardSequence', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+      const { gameId, gamePhase, players, cardSequence, totalGames } = state;
+
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+      });
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+
+      expect(state.gameId).toBe(gameId);
+      expect(state.gamePhase).toBe(gamePhase);
+      expect(state.players).toEqual(players);
+      expect(state.cardSequence).toEqual(cardSequence);
+      expect(state.totalGames).toBe(totalGames);
+    });
+
+    it('only removes last completed round when in-progress round follows', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Complete round 1
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+      });
+
+      // Start round 2 (in progress, not completed)
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 2 })),
+        dealerId: 'p2',
+      });
+      expect(state.rounds).toHaveLength(2);
+      expect(state.rounds[1].phase).toBe('in_progress');
+
+      // UNDO should not remove in-progress round
+      const result = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(result).toBe(state);
+    });
+
+    it('allows replay after delete — START_ROUND uses same card sequence slot', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Play and complete round 1
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+        dealerId: 'p1',
+      });
+      const firstRoundCardCount = state.rounds[0].cardCount;
+      const firstRoundTrump = state.rounds[0].trump;
+
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+      });
+
+      // Delete it
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.currentRoundIndex).toBe(-1);
+
+      // Replay — should get same cardCount and trump
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 2 })),
+        dealerId: 'p1',
+      });
+      expect(state.rounds[0].cardCount).toBe(firstRoundCardCount);
+      expect(state.rounds[0].trump).toBe(firstRoundTrump);
+      expect(state.currentRoundIndex).toBe(0);
+    });
+
+    it('consecutive deletes remove rounds one by one', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Play 3 rounds
+      for (let i = 0; i < 3; i++) {
+        state = appReducer(state, {
+          type: 'START_ROUND',
+          bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+          dealerId: testPlayers[i].id,
+        });
+        state = appReducer(state, {
+          type: 'COMPLETE_ROUND',
+          results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+        });
+      }
+      expect(state.rounds).toHaveLength(3);
+      expect(state.currentRoundIndex).toBe(2);
+
+      // Delete all 3 one by one
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toHaveLength(2);
+      expect(state.currentRoundIndex).toBe(1);
+
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toHaveLength(1);
+      expect(state.currentRoundIndex).toBe(0);
+
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toHaveLength(0);
+      expect(state.currentRoundIndex).toBe(-1);
+
+      // No more to delete
+      const result = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(result).toBe(state);
+    });
+
+    it('undo after multiple rounds restores to correct state', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Play 2 rounds
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: [
+          { playerId: 'p1', bid: 3 },
+          { playerId: 'p2', bid: 2 },
+          { playerId: 'p3', bid: 0 },
+        ],
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 3 },
+          { playerId: 'p2', result: 2 },
+          { playerId: 'p3', result: 0 },
+        ],
+      });
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: [
+          { playerId: 'p1', bid: 1 },
+          { playerId: 'p2', bid: 4 },
+          { playerId: 'p3', bid: 1 },
+        ],
+        dealerId: 'p2',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 1 },
+          { playerId: 'p2', result: 4 },
+          { playerId: 'p3', result: 1 },
+        ],
+      });
+      expect(state.rounds).toHaveLength(2);
+      expect(state.currentRoundIndex).toBe(1);
+
+      // Undo last round
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+      expect(state.rounds).toHaveLength(1);
+      expect(state.currentRoundIndex).toBe(0);
+      expect(state.rounds[0].phase).toBe('completed');
+      expect(state.rounds[0].playerData[0].score).toBe(30);
+    });
+  });
+
   describe('REORDER_PLAYERS', () => {
     it('swaps player positions', () => {
       const state = applyActions(createTestState({ players: testPlayers }), [

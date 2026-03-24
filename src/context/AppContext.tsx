@@ -94,6 +94,16 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, rounds };
     }
 
+    case 'UNDO_LAST_ROUND': {
+      const lastRound = state.rounds[state.rounds.length - 1];
+      if (!lastRound || lastRound.phase !== 'completed') return state;
+      return {
+        ...state,
+        rounds: state.rounds.slice(0, -1),
+        currentRoundIndex: state.currentRoundIndex - 1,
+      };
+    }
+
     case 'REORDER_PLAYERS': {
       const players = [...state.players];
       const [moved] = players.splice(action.fromIndex, 1);
