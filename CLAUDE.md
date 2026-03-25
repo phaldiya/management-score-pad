@@ -7,8 +7,8 @@ Management Score Pad — a card game scoring app for the Management (Judgement) 
 ## Tech Stack
 
 - **Runtime**: Bun (package manager + script runner)
-- **Framework**: React 19 + TypeScript 5.9 (strict mode)
-- **Build**: Vite 7 with SWC plugin
+- **Framework**: React 19 + TypeScript 6 (strict mode)
+- **Build**: Vite 8 with SWC plugin
 - **Styling**: Tailwind CSS 4
 - **Forms**: react-hook-form + Zod validation
 - **Routing**: react-router-dom (HashRouter, two routes: `/` setup, `/game` play)
