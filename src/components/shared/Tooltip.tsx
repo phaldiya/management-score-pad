@@ -15,38 +15,40 @@ interface Position {
 
 const VIEWPORT_PADDING = 8;
 const SHOW_DELAY = 300;
+const CURSOR_OFFSET_X = 12;
+const CURSOR_OFFSET_Y = 16;
 
 export function Tooltip({ text, children, offset = 6, block = false }: TooltipProps) {
   const tooltipId = useId();
   const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
 
   const calculatePosition = useCallback(() => {
-    const trigger = triggerRef.current;
     const tooltip = tooltipRef.current;
-    if (!trigger || !tooltip) return;
+    if (!tooltip) return;
 
-    const triggerRect = trigger.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
+    const mx = mouseRef.current.x;
+    const my = mouseRef.current.y;
 
-    // Default: centered below trigger
-    let top = triggerRect.bottom + offset;
-    let left = triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+    let top = my + CURSOR_OFFSET_Y;
+    let left = mx + CURSOR_OFFSET_X;
 
-    // Flip to top if overflows bottom
+    // Flip up if overflows bottom
     if (top + tooltipRect.height > window.innerHeight - VIEWPORT_PADDING) {
-      top = triggerRect.top - tooltipRect.height - offset;
+      top = my - tooltipRect.height - offset;
     }
 
-    // Shift horizontally if overflows right
+    // Shift left if overflows right
     if (left + tooltipRect.width > window.innerWidth - VIEWPORT_PADDING) {
-      left = window.innerWidth - VIEWPORT_PADDING - tooltipRect.width;
+      left = mx - tooltipRect.width - CURSOR_OFFSET_X;
     }
 
-    // Shift horizontally if overflows left
+    // Shift right if overflows left
     if (left < VIEWPORT_PADDING) {
       left = VIEWPORT_PADDING;
     }
@@ -60,19 +62,18 @@ export function Tooltip({ text, children, offset = 6, block = false }: TooltipPr
     }
   }, [visible, calculatePosition]);
 
-  useEffect(() => {
-    if (!visible) return;
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+      if (visible) {
+        calculatePosition();
+      }
+    },
+    [visible, calculatePosition],
+  );
 
-    const handleScrollOrResize = () => calculatePosition();
-    window.addEventListener('scroll', handleScrollOrResize, true);
-    window.addEventListener('resize', handleScrollOrResize);
-    return () => {
-      window.removeEventListener('scroll', handleScrollOrResize, true);
-      window.removeEventListener('resize', handleScrollOrResize);
-    };
-  }, [visible, calculatePosition]);
-
-  const show = () => {
+  const show = (e: React.MouseEvent) => {
+    mouseRef.current = { x: e.clientX, y: e.clientY };
     timerRef.current = setTimeout(() => setVisible(true), SHOW_DELAY);
   };
 
@@ -89,9 +90,12 @@ export function Tooltip({ text, children, offset = 6, block = false }: TooltipPr
         ref={triggerRef}
         className={block ? 'flex' : 'inline-flex'}
         onMouseEnter={show}
+        onMouseMove={handleMouseMove}
         onMouseLeave={hide}
         onMouseDown={hide}
-        onFocus={show}
+        onFocus={() => {
+          timerRef.current = setTimeout(() => setVisible(true), SHOW_DELAY);
+        }}
         onBlur={hide}
         aria-describedby={visible ? tooltipId : undefined}
       >
