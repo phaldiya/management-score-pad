@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { testPlayers } from '../../tests/helpers/fixtures.ts';
 import { applyActions, createTestState } from '../../tests/helpers/testReducer.ts';
+import { getCumulativeScore } from '../lib/scoreCalculation.ts';
 import { appReducer, initialState } from './AppContext.tsx';
 
 describe('reducer spec', () => {
@@ -769,6 +770,195 @@ describe('reducer – deep', () => {
       expect(state.rounds[2].playerData[0].score).toBe(50);
       expect(state.rounds[2].playerData[1].score).toBe(0);
       expect(state.rounds[2].playerData[2].score).toBe(20);
+    });
+  });
+
+  describe('round details data (play-by-play)', () => {
+    it('completed round has all fields needed for details view', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: [
+          { playerId: 'p1', bid: 3 },
+          { playerId: 'p2', bid: 5 },
+          { playerId: 'p3', bid: 0 },
+        ],
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 3 },
+          { playerId: 'p2', result: 2 },
+          { playerId: 'p3', result: 0 },
+        ],
+      });
+
+      const round = state.rounds[0];
+      expect(round.phase).toBe('completed');
+      expect(round.gameNumber).toBe(1);
+      expect(round.cardCount).toBe(17);
+      expect(round.trump).toBe('spades');
+
+      // Each player has bid, result, score, and dealer flag
+      const p1 = round.playerData.find((p) => p.playerId === 'p1')!;
+      expect(p1.bid).toBe(3);
+      expect(p1.result).toBe(3);
+      expect(p1.score).toBe(30); // matched
+      expect(p1.isDealer).toBe(true);
+
+      const p2 = round.playerData.find((p) => p.playerId === 'p2')!;
+      expect(p2.bid).toBe(5);
+      expect(p2.result).toBe(2);
+      expect(p2.score).toBe(0); // missed
+      expect(p2.isDealer).toBe(false);
+
+      const p3 = round.playerData.find((p) => p.playerId === 'p3')!;
+      expect(p3.bid).toBe(0);
+      expect(p3.result).toBe(0);
+      expect(p3.score).toBe(10); // nil bid matched
+      expect(p3.isDealer).toBe(false);
+    });
+
+    it('cumulative scores are correct across multiple rounds', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Round 1: p1=30, p2=0, p3=10
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: [
+          { playerId: 'p1', bid: 3 },
+          { playerId: 'p2', bid: 2 },
+          { playerId: 'p3', bid: 0 },
+        ],
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 3 },
+          { playerId: 'p2', result: 1 },
+          { playerId: 'p3', result: 0 },
+        ],
+      });
+
+      // Round 2: p1=10, p2=40, p3=0
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: [
+          { playerId: 'p1', bid: 0 },
+          { playerId: 'p2', bid: 4 },
+          { playerId: 'p3', bid: 1 },
+        ],
+        dealerId: 'p2',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 0 },
+          { playerId: 'p2', result: 4 },
+          { playerId: 'p3', result: 2 },
+        ],
+      });
+
+      // Verify individual round scores
+      expect(state.rounds[0].playerData[0].score).toBe(30);
+      expect(state.rounds[1].playerData[0].score).toBe(10);
+
+      // Verify cumulative via getCumulativeScore
+
+      expect(getCumulativeScore(state.rounds, 'p1', 0)).toBe(30);
+      expect(getCumulativeScore(state.rounds, 'p1', 1)).toBe(40);
+      expect(getCumulativeScore(state.rounds, 'p2', 0)).toBe(0);
+      expect(getCumulativeScore(state.rounds, 'p2', 1)).toBe(40);
+      expect(getCumulativeScore(state.rounds, 'p3', 0)).toBe(10);
+      expect(getCumulativeScore(state.rounds, 'p3', 1)).toBe(10);
+    });
+
+    it('deleting a round recalculates cumulative correctly', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Play 2 rounds
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 2 })),
+        dealerId: 'p1',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 2 },
+          { playerId: 'p2', result: 2 },
+          { playerId: 'p3', result: 2 },
+        ],
+      });
+      state = appReducer(state, {
+        type: 'START_ROUND',
+        bids: testPlayers.map((p) => ({ playerId: p.id, bid: 3 })),
+        dealerId: 'p2',
+      });
+      state = appReducer(state, {
+        type: 'COMPLETE_ROUND',
+        results: [
+          { playerId: 'p1', result: 3 },
+          { playerId: 'p2', result: 3 },
+          { playerId: 'p3', result: 3 },
+        ],
+      });
+
+      // Before delete: round 1=20, round 2=30, cumulative at 1=50
+      expect(getCumulativeScore(state.rounds, 'p1', 1)).toBe(50);
+
+      // Delete round 2
+      state = appReducer(state, { type: 'UNDO_LAST_ROUND' });
+
+      // After delete: only round 1 remains, cumulative at 0=20
+      expect(getCumulativeScore(state.rounds, 'p1', 0)).toBe(20);
+      expect(state.rounds).toHaveLength(1);
+    });
+
+    it('each round stores correct trump and card count for details', () => {
+      let state = applyActions(createTestState(), [
+        { type: 'SET_PLAYERS', players: testPlayers },
+        { type: 'START_GAME' },
+      ]);
+
+      // Play 3 rounds
+      for (let i = 0; i < 3; i++) {
+        state = appReducer(state, {
+          type: 'START_ROUND',
+          bids: testPlayers.map((p) => ({ playerId: p.id, bid: 1 })),
+          dealerId: testPlayers[i].id,
+        });
+        state = appReducer(state, {
+          type: 'COMPLETE_ROUND',
+          results: testPlayers.map((p) => ({ playerId: p.id, result: 1 })),
+        });
+      }
+
+      // Trump rotates: spades, hearts, clubs, diamonds
+      expect(state.rounds[0].trump).toBe('spades');
+      expect(state.rounds[1].trump).toBe('hearts');
+      expect(state.rounds[2].trump).toBe('clubs');
+
+      // Card count decreases: 17, 16, 15
+      expect(state.rounds[0].cardCount).toBe(17);
+      expect(state.rounds[1].cardCount).toBe(16);
+      expect(state.rounds[2].cardCount).toBe(15);
+
+      // Game numbers
+      expect(state.rounds[0].gameNumber).toBe(1);
+      expect(state.rounds[1].gameNumber).toBe(2);
+      expect(state.rounds[2].gameNumber).toBe(3);
     });
   });
 });

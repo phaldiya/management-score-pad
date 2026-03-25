@@ -30,7 +30,7 @@ export default function ScoreboardRow({ round, players, onPlayCardClick, onUndo 
       >
         <div className="relative flex items-center justify-center p-1">
           {onPlayCardClick ? (
-            <Tooltip text="View play details (P)">
+            <Tooltip text={round.phase === 'in_progress' ? 'View play details (P)' : 'View play details'}>
               <PlayCard
                 cardCount={round.cardCount}
                 trump={round.trump}

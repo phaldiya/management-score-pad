@@ -7,13 +7,15 @@ import { CloseIcon, SuitIcon } from '../shared/Icons.tsx';
 import GameCompletePopup from './GameCompletePopup.tsx';
 import NextGameButton from './NextGameButton.tsx';
 import PlayFormPopup from './PlayFormPopup.tsx';
+import RoundDetailsPopup from './RoundDetailsPopup.tsx';
 import Scoreboard from './Scoreboard.tsx';
 
-type Popup = 'none' | 'bid' | 'results' | 'complete' | 'details' | 'undo';
+type Popup = 'none' | 'bid' | 'results' | 'complete' | 'details' | 'undo' | 'round-details';
 
 export default function GamePage() {
   const { state, dispatch } = useAppContext();
   const [popup, setPopup] = useState<Popup>('none');
+  const [selectedRoundIndex, setSelectedRoundIndex] = useState(-1);
 
   const completedRounds = state.rounds.filter((r) => r.phase === 'completed');
   const hasCompletedRounds = completedRounds.length > 0;
@@ -92,6 +94,10 @@ export default function GamePage() {
         players={players}
         rounds={rounds}
         onInProgressPlayClick={() => setPopup('details')}
+        onCompletedPlayClick={(index) => {
+          setSelectedRoundIndex(index);
+          setPopup('round-details');
+        }}
         onUndoLastRound={() => setPopup('undo')}
       />
 
@@ -207,6 +213,15 @@ export default function GamePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {popup === 'round-details' && selectedRoundIndex >= 0 && rounds[selectedRoundIndex] && (
+        <RoundDetailsPopup
+          round={rounds[selectedRoundIndex]}
+          rounds={rounds}
+          players={players}
+          onClose={() => setPopup('none')}
+        />
       )}
     </div>
   );
