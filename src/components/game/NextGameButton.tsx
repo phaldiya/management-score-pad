@@ -20,6 +20,8 @@ export default function NextGameButton({
   onNextGame,
   onGameComplete,
 }: NextGameButtonProps) {
+  const progressPercent = totalGames > 0 ? Math.round((roundsPlayed / totalGames) * 100) : 0;
+
   // No rounds yet - start first game
   if (!currentRound) {
     return (
@@ -42,9 +44,16 @@ export default function NextGameButton({
         <button
           type="button"
           onClick={onEnterResults}
-          className="w-full rounded-lg bg-green-600 py-3 font-medium text-white hover:bg-green-700"
+          className="relative w-full overflow-hidden rounded-lg bg-green-700 py-3 font-medium text-white hover:bg-green-800"
         >
-          Enter Results
+          <div
+            className="absolute inset-y-0 left-0 bg-green-500 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+          <span className="relative">
+            Enter Results
+            {roundsPlayed > 0 && <span className="ml-1.5 text-green-200 text-xs">{progressPercent}%</span>}
+          </span>
         </button>
       </Tooltip>
     );
@@ -71,9 +80,16 @@ export default function NextGameButton({
       <button
         type="button"
         onClick={onNextGame}
-        className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700"
+        className="relative w-full overflow-hidden rounded-lg bg-blue-700 py-3 font-medium text-white hover:bg-blue-800"
       >
-        Next Play ({roundsPlayed}/{totalGames})
+        <div
+          className="absolute inset-y-0 left-0 bg-blue-500 transition-all duration-500"
+          style={{ width: `${progressPercent}%` }}
+        />
+        <span className="relative">
+          Next Play ({roundsPlayed}/{totalGames})
+          <span className="ml-1.5 text-blue-200 text-xs">{progressPercent}%</span>
+        </span>
       </button>
     </Tooltip>
   );
