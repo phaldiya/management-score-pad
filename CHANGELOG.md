@@ -1,3 +1,14 @@
+# [1.7.0](https://github.com/phaldiya/management-score-pad/compare/v1.6.0...v1.7.0) (2026-03-26)
+
+
+### Features
+
+* **game:** add beforeunload warning and delete play e2e tests ([f5d912b](https://github.com/phaldiya/management-score-pad/commit/f5d912ba358b3342266cf2eb3b59790318614919))
+* **scoreboard:** add delete last play with confirmation dialog ([e184368](https://github.com/phaldiya/management-score-pad/commit/e1843683ed5095627a6ddcc0d8edfd743a73443f))
+* **scoreboard:** add progress indicator to action button ([d484cea](https://github.com/phaldiya/management-score-pad/commit/d484ceadbc112fdba8fe279de881b94b7bc51875))
+* **scoreboard:** add round details popup for completed plays ([b00ba81](https://github.com/phaldiya/management-score-pad/commit/b00ba81a9b721396b720bb50b3d4aac9173a2054))
+* **ui:** make tooltips follow mouse cursor ([cb1b44a](https://github.com/phaldiya/management-score-pad/commit/cb1b44a9a2b65c71b7e119a82faffbfd53b7b3b0))
+
 # [1.6.0](https://github.com/phaldiya/management-score-pad/compare/v1.5.1...v1.6.0) (2026-03-23)
 
 
