@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/phaldiya/management-score-pad/compare/v1.7.0...v1.7.1) (2026-04-03)
+
+
+### Bug Fixes
+
+* **security:** add overrides for transitive dependency vulnerabilities ([48ebb9b](https://github.com/phaldiya/management-score-pad/commit/48ebb9b26541c91eb170384595babe0d7688cfc8))
+
 # [1.7.0](https://github.com/phaldiya/management-score-pad/compare/v1.6.0...v1.7.0) (2026-03-26)
 
 
