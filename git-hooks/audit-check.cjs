@@ -15,6 +15,7 @@ try {
 // Known upstream vulnerabilities that cannot be fixed (bundled transitive deps)
 const IGNORED_ADVISORIES = [
   'GHSA-qffp-2rhf-9h96', // tar <=7.5.9 bundled in npm@11.11.0 (via @semantic-release/npm)
+  'GHSA-f886-m6hf-6m8v', // brace-expansion <5.0.5 bundled in npm (via @semantic-release/npm)
 ];
 
 const rows = [];
