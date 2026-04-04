@@ -215,6 +215,25 @@ test.describe('Game Play Flow', () => {
     await expect(cells.nth(1)).toContainText('0');
   });
 
+  test('nailed bids show green score with confetti, missed bids show red score without', async ({ page }) => {
+    await setupGame(page);
+    // Bids: 2+0+13 = 15 (valid for 17 cards)
+    await placeBids(page, [2, 0, 13]);
+    // Results: 2+0+15 = 17 → Alice=20 (nailed), Bob=10 (nailed), Charlie=0 (missed)
+    await enterResults(page, [2, 0, 15]);
+
+    const scoreCells = page.locator('tbody tr').first().locator('td');
+    // Alice (cell 1) nailed bid → green score, green background, has mini confetti
+    await expect(scoreCells.nth(1).locator('div.text-green-700')).toHaveCount(1);
+    await expect(scoreCells.nth(1)).toHaveClass(/bg-green-50/);
+    await expect(scoreCells.nth(1).locator('.mini-confetti-piece').first()).toBeAttached();
+
+    // Charlie (cell 3) missed bid → red score, red background, no confetti
+    await expect(scoreCells.nth(3).locator('div.text-red-600')).toHaveCount(1);
+    await expect(scoreCells.nth(3)).toHaveClass(/bg-red-50/);
+    await expect(scoreCells.nth(3).locator('.mini-confetti-piece')).toHaveCount(0);
+  });
+
   test('crown shows next to leader after round', async ({ page }) => {
     await setupGame(page);
     // Bids: 2+0+13 = 15 (valid for 17 cards)
