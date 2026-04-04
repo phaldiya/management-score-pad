@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.tsx';
 import { DEFAULT_AVATAR } from '../../lib/avatars.ts';
 import { clearActiveGame, loadActiveGame } from '../../lib/storage.ts';
+import { useDragReorder } from '../../lib/useDragReorder.ts';
 import type { AppState } from '../../types/index.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
-import { AppIcon, PlusIcon, TrashIcon } from '../shared/Icons.tsx';
+import { AppIcon, GripIcon, PlusIcon, TrashIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
 import RestoreGamePopup from './RestoreGamePopup.tsx';
@@ -21,6 +22,7 @@ export default function SetupPage() {
   ]);
   const [savedGame, setSavedGame] = useState<AppState | null>(null);
   const [pickerOpen, setPickerOpen] = useState<number | null>(null);
+  const { dragIndex, overIndex, getDragProps, getHandleProps } = useDragReorder(players, setPlayers);
 
   useEffect(() => {
     const saved = loadActiveGame();
@@ -126,8 +128,20 @@ export default function SetupPage() {
 
           <div className="space-y-3">
             {players.map((player, index) => (
-              <div key={index}>
+              <div
+                key={index}
+                {...getDragProps(index)}
+                className={`rounded-lg transition-all ${dragIndex === index ? 'opacity-40' : ''} ${overIndex === index && dragIndex !== index ? 'border-blue-500 border-t-2' : ''}`}
+              >
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="cursor-grab touch-none text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+                    aria-label={`Drag to reorder ${player.name || `Player ${index + 1}`}`}
+                    {...getHandleProps(index)}
+                  >
+                    <GripIcon className="h-5 w-5" />
+                  </button>
                   <Tooltip text="Change avatar">
                     <button
                       type="button"

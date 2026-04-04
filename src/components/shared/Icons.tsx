@@ -184,6 +184,19 @@ export function CrossIcon({ className = 'h-4 w-4' }: IconProps) {
   );
 }
 
+export function GripIcon({ className = 'h-5 w-5' }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <circle cx="9" cy="5" r="1.5" />
+      <circle cx="15" cy="5" r="1.5" />
+      <circle cx="9" cy="12" r="1.5" />
+      <circle cx="15" cy="12" r="1.5" />
+      <circle cx="9" cy="19" r="1.5" />
+      <circle cx="15" cy="19" r="1.5" />
+    </svg>
+  );
+}
+
 export function PencilIcon({ className = 'h-4 w-4' }: IconProps) {
   return (
     <svg

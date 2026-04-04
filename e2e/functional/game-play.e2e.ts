@@ -56,30 +56,38 @@ test.describe('Game Play Flow', () => {
     await expect(page.getByRole('button', { name: 'Start First Play' })).toBeVisible();
   });
 
-  test('can reorder players before first play (arrow buttons work)', async ({ page }) => {
+  test('can reorder players with arrow keys before first play', async ({ page }) => {
     await setupGame(page);
 
-    // Verify reorder arrows are visible
-    await expect(page.getByRole('button', { name: 'Move Alice right' })).toBeVisible();
-
-    // Move Alice right (swap with Bob)
-    await page.getByRole('button', { name: 'Move Alice right' }).click();
+    // Focus Alice's column header and press ArrowRight to swap with Bob
+    const aliceHeader = page.locator('th', { hasText: 'Alice' });
+    await aliceHeader.focus();
+    await page.keyboard.press('ArrowRight');
 
     // Now Bob should be first, Alice second
     const headers = page.locator('thead th');
     await expect(headers.nth(1)).toContainText('Bob');
     await expect(headers.nth(2)).toContainText('Alice');
+
+    // Press ArrowRight again to move Alice to third position
+    await page.keyboard.press('ArrowRight');
+    await expect(headers.nth(3)).toContainText('Alice');
+
+    // Press ArrowLeft to move Alice back to second
+    await page.keyboard.press('ArrowLeft');
+    await expect(headers.nth(2)).toContainText('Alice');
   });
 
-  test('reorder arrows hidden after first play starts', async ({ page }) => {
+  test('arrow key reorder disabled after first play starts', async ({ page }) => {
     await setupGame(page);
-    // Start first round with bids
-    // 3 players, first card count is 17 (floor(52/3)=17), bids: 5,5,5 (total=15 ≠ 17)
     await placeBids(page, [5, 5, 5]);
 
-    // Reorder arrows should be gone
-    await expect(page.getByRole('button', { name: /Move .* left/ })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Move .* right/ })).toHaveCount(0);
+    // Grip handles should not be visible
+    await expect(page.getByLabel(/Drag to reorder/)).toHaveCount(0);
+
+    // Headers should not be focusable (no tabIndex)
+    const aliceHeader = page.locator('thead th', { hasText: 'Alice' });
+    await expect(aliceHeader).not.toHaveAttribute('tabindex');
   });
 
   test('opens bid popup and places valid bids', async ({ page }) => {
