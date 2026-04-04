@@ -26,7 +26,9 @@ export default function PlayScore({ playerData, phase }: PlayScoreProps) {
       className={`h-16 min-w-20 border border-gray-200 px-2 py-1 ${bgColor} ${justCompleted ? 'animate-cell-highlight' : ''}`}
     >
       <div className="flex h-full flex-col items-center justify-center">
-        <div className="inline-flex items-start font-bold text-gray-900 text-lg leading-tight">
+        <div
+          className={`inline-flex items-start font-bold text-lg leading-tight ${phase === 'completed' ? (score && score > 0 ? 'text-green-700' : 'text-red-600') : 'text-gray-900'}`}
+        >
           {phase === 'completed' ? justCompleted ? <AnimatedNumber value={score ?? 0} /> : score : '-'}
           {isDealer && (
             <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="-mt-0.5 ml-0.5 h-3 w-3" />

@@ -154,6 +154,36 @@ export function UndoIcon({ className = 'h-4 w-4' }: IconProps) {
   );
 }
 
+export function CheckIcon({ className = 'h-4 w-4' }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={3}
+      className={className}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+export function CrossIcon({ className = 'h-4 w-4' }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={3}
+      className={className}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
+
 export function PencilIcon({ className = 'h-4 w-4' }: IconProps) {
   return (
     <svg
