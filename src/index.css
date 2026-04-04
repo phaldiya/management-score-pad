@@ -43,6 +43,66 @@ button {
   background: var(--color-text-secondary);
 }
 
+/* Score transition animations */
+@keyframes score-flash {
+  0% {
+    color: inherit;
+    transform: scale(1);
+    text-shadow: none;
+  }
+  30% {
+    color: #facc15;
+    transform: scale(1.6);
+    text-shadow: 0 0 12px rgba(250, 204, 21, 0.8);
+  }
+  100% {
+    color: inherit;
+    transform: scale(1);
+    text-shadow: none;
+  }
+}
+.animate-score-flash {
+  animation: score-flash 1s ease-out;
+  display: inline-block;
+}
+
+@keyframes cell-highlight {
+  0% {
+    background-color: inherit;
+  }
+  15% {
+    background-color: #fef08a;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+.animate-cell-highlight {
+  animation: cell-highlight 1.2s ease-out;
+}
+
+@keyframes crown-pop {
+  0% {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  40% {
+    transform: translateX(-50%) scale(2);
+    opacity: 1;
+  }
+  70% {
+    transform: translateX(-50%) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+.animate-crown-pop {
+  animation: crown-pop 0.8s ease-out;
+}
+
 /* Winner animations */
 @keyframes winner-bounce {
   0%,

@@ -1,6 +1,9 @@
+import { useEffect, useRef } from 'react';
+
 import { useAppContext } from '../../context/AppContext.tsx';
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
+import AnimatedNumber from '../shared/AnimatedNumber.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
 
@@ -18,6 +21,32 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
     lastCompletedIndex >= 0 ? players.map((p) => getCumulativeScore(rounds, p.id, lastCompletedIndex)) : [];
   const maxScore = scores.length > 0 ? Math.max(...scores) : 0;
   const hasScores = maxScore > 0;
+
+  const prevScoresRef = useRef<number[]>([]);
+  const prevLeadersRef = useRef<boolean[]>([]);
+  const flashKeysRef = useRef<number[]>(players.map(() => 0));
+  const crownKeysRef = useRef<number[]>(players.map(() => 0));
+
+  useEffect(() => {
+    const prevScores = prevScoresRef.current;
+    const prevLeaders = prevLeadersRef.current;
+
+    for (let i = 0; i < players.length; i++) {
+      const newScore = scores[i] ?? 0;
+      const wasLeader = prevLeaders[i] ?? false;
+      const isLeader = hasScores && newScore === maxScore;
+
+      if (prevScores.length > 0 && newScore !== (prevScores[i] ?? 0)) {
+        flashKeysRef.current[i] = (flashKeysRef.current[i] ?? 0) + 1;
+      }
+      if (!wasLeader && isLeader) {
+        crownKeysRef.current[i] = (crownKeysRef.current[i] ?? 0) + 1;
+      }
+    }
+
+    prevScoresRef.current = scores.map((s) => s ?? 0);
+    prevLeadersRef.current = players.map((_, i) => hasScores && (scores[i] ?? 0) === maxScore);
+  });
 
   return (
     <thead>
@@ -81,7 +110,12 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
                   <span className="relative hidden sm:inline">
                     <PlayerAvatar avatar={player.avatar} name={player.name} size={isLeader ? 'xs' : 'sm'} />
                     {isLeader && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs leading-none">&#x1F451;</span>
+                      <span
+                        key={crownKeysRef.current[index]}
+                        className={`absolute -top-2 left-1/2 -translate-x-1/2 text-xs leading-none ${crownKeysRef.current[index] > 0 ? 'animate-crown-pop' : ''}`}
+                      >
+                        &#x1F451;
+                      </span>
                     )}
                   </span>
                   <div>
@@ -89,7 +123,12 @@ export default function ScoreboardHeader({ players, rounds }: ScoreboardHeaderPr
                       {player.name}
                       {isLeader && <sup className="pl-0.5 text-yellow-300">*</sup>}
                     </div>
-                    <div className="font-medium text-blue-200 text-xs">{cumScore}</div>
+                    <div
+                      key={flashKeysRef.current[index]}
+                      className={`font-medium text-blue-200 text-xs ${flashKeysRef.current[index] > 0 ? 'animate-score-flash' : ''}`}
+                    >
+                      <AnimatedNumber value={cumScore} />
+                    </div>
                   </div>
                 </div>
               )}
