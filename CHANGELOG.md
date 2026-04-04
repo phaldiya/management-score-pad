@@ -1,3 +1,19 @@
+# [1.8.0](https://github.com/phaldiya/management-score-pad/compare/v1.7.1...v1.8.0) (2026-04-04)
+
+
+### Bug Fixes
+
+* **security:** add serialize-javascript override for PWA dependency ([f3ccc70](https://github.com/phaldiya/management-score-pad/commit/f3ccc70a516301b3009564b5c4eac8a8af684a43))
+
+
+### Features
+
+* add PWA support for offline usage and home screen install ([8a50ffd](https://github.com/phaldiya/management-score-pad/commit/8a50ffd46a0f15a0df86a60e054899cdc4230549))
+* **scoreboard:** add animated score transitions ([f6dd822](https://github.com/phaldiya/management-score-pad/commit/f6dd8224dfa7135e5f91c4f19abb5f900b1a2cf0))
+* **scoreboard:** add mini confetti burst on nailed bids ([d4589d7](https://github.com/phaldiya/management-score-pad/commit/d4589d71bc62e9e9c127e7a191ff8aaddb6de0e8))
+* **scoreboard:** use colored score numbers for colorblind accessibility ([17da7f8](https://github.com/phaldiya/management-score-pad/commit/17da7f8ed4cc137b3140d0fe75ddbc306fcfe306))
+* **ui:** add drag-to-reorder players on setup and game pages ([cf0bde3](https://github.com/phaldiya/management-score-pad/commit/cf0bde336a6d2840253178d0e815bf4852c81b3a))
+
 ## [1.7.1](https://github.com/phaldiya/management-score-pad/compare/v1.7.0...v1.7.1) (2026-04-03)
 
 
