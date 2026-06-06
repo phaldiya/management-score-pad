@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/phaldiya/management-score-pad/compare/v1.8.0...v1.9.0) (2026-06-06)
+
+
+### Features
+
+* random player avatars with recall and downloadable winner card ([b4bec11](https://github.com/phaldiya/management-score-pad/commit/b4bec116e3cf00e8e958f1aa153346914c9a7d2e))
+
 # [1.8.0](https://github.com/phaldiya/management-score-pad/compare/v1.7.1...v1.8.0) (2026-04-04)
 
 
