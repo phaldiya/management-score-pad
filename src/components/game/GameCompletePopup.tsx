@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { toPng } from 'html-to-image';
+import { useEffect, useRef, useState } from 'react';
 
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
-import { CloseIcon } from '../shared/Icons.tsx';
+import { CloseIcon, DownloadIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
 
@@ -38,8 +39,19 @@ function spawnConfetti(container: HTMLDivElement) {
   }
 }
 
+function toFileName(names: string[]): string {
+  const safe = names
+    .join('-')
+    .replace(/[^a-z0-9-]+/gi, '_')
+    .replace(/^_+|_+$/g, '');
+  return `management-score-pad-${safe || 'winners'}.png`;
+}
+
 export default function GameCompletePopup({ players, rounds, onClose, onNewGame }: GameCompletePopupProps) {
   const confettiRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
 
   const lastIndex = rounds.length - 1;
   const standings = players
@@ -58,6 +70,23 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
     }
   }, []);
 
+  const handleDownload = async () => {
+    if (!cardRef.current || downloading) return;
+    setDownloadError(false);
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, backgroundColor: '#ffffff', cacheBust: true });
+      const link = document.createElement('a');
+      link.download = toFileName(winners.map((w) => w.player.name));
+      link.href = dataUrl;
+      link.click();
+    } catch {
+      setDownloadError(true);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <>
       <div ref={confettiRef} className="pointer-events-none fixed inset-0 z-[60] overflow-hidden" aria-hidden="true" />
@@ -68,23 +97,26 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
         aria-modal="true"
         aria-labelledby="game-complete-title"
       >
-        <div className="w-full max-w-[min(28rem,calc(100vw-40px))] animate-fade-slide-up rounded-lg bg-white shadow-xl">
-          <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-            <h2 id="game-complete-title" className="font-bold text-gray-900 text-lg">
-              Game Complete!
-            </h2>
-            <Tooltip text="Close (Esc)">
-              <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
-                <CloseIcon />
-              </button>
-            </Tooltip>
-          </div>
+        <div className="relative w-full max-w-[min(28rem,calc(100vw-40px))] animate-fade-slide-up overflow-hidden rounded-lg bg-white shadow-xl">
+          <Tooltip text="Close (Esc)">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-3 right-3 z-10 text-gray-500 hover:text-gray-900"
+              aria-label="Close"
+            >
+              <CloseIcon />
+            </button>
+          </Tooltip>
 
-          <div className="p-4">
+          {/* Captured region for the downloadable PNG (excludes close + action buttons). */}
+          <div ref={cardRef} className="bg-white px-6 pt-7 pb-5">
             <div className="mb-4 flex animate-winner-bounce flex-col items-center gap-1 py-2">
               <span className="animate-crown-float text-5xl">&#x1F451;</span>
               <span className="text-gray-500 text-sm">Congratulations</span>
-              <span className="font-bold text-2xl text-gray-900">{winners.map((w) => w.player.name).join(' & ')}</span>
+              <h2 id="game-complete-title" className="text-center font-bold text-2xl text-gray-900">
+                {winners.map((w) => w.player.name).join(' & ')}
+              </h2>
               <span className="font-bold text-amber-500 text-lg">{topScore} pts</span>
             </div>
 
@@ -119,14 +151,32 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
               })}
             </div>
 
+            <p className="mt-5 text-center text-[11px] text-gray-400 uppercase tracking-wider">Management Score Pad</p>
+          </div>
+
+          <div className="flex gap-2 border-gray-200 border-t px-4 py-3">
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <DownloadIcon className="h-4 w-4" />
+              {downloading ? 'Preparing…' : 'Download PNG'}
+            </button>
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-4 w-full rounded-lg bg-blue-600 py-2 font-medium text-white hover:bg-blue-700"
+              className="flex-1 rounded-lg bg-blue-600 py-2 font-medium text-white hover:bg-blue-700"
             >
               Start New Game
             </button>
           </div>
+          {downloadError && (
+            <p className="px-4 pb-3 text-center text-red-600 text-xs" role="alert">
+              Could not generate image. Please try again.
+            </p>
+          )}
         </div>
       </div>
     </>

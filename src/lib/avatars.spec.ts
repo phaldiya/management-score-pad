@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALL_AVATARS, AVATAR_CATEGORIES, DEFAULT_AVATAR, getAvatarDataUri } from './avatars.ts';
+import { ALL_AVATARS, AVATAR_CATEGORIES, DEFAULT_AVATAR, getAvatarDataUri, getRandomAvatar } from './avatars.ts';
 
 describe('avatars', () => {
   describe('AVATAR_CATEGORIES', () => {
@@ -96,6 +96,27 @@ describe('avatars', () => {
       const a = getAvatarDataUri('bottts:Alpha');
       const b = getAvatarDataUri('bottts:Beta');
       expect(a).not.toBe(b);
+    });
+  });
+
+  describe('getRandomAvatar', () => {
+    it('returns an avatar from ALL_AVATARS', () => {
+      for (let i = 0; i < 50; i++) {
+        expect(ALL_AVATARS).toContain(getRandomAvatar());
+      }
+    });
+
+    it('never returns an excluded avatar when alternatives exist', () => {
+      const exclude = ALL_AVATARS.slice(0, ALL_AVATARS.length - 1);
+      const only = ALL_AVATARS[ALL_AVATARS.length - 1];
+      for (let i = 0; i < 20; i++) {
+        expect(getRandomAvatar(exclude)).toBe(only);
+      }
+    });
+
+    it('falls back to the full pool when everything is excluded', () => {
+      const result = getRandomAvatar(ALL_AVATARS);
+      expect(ALL_AVATARS).toContain(result);
     });
   });
 });

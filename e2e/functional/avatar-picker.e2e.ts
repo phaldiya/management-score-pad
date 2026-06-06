@@ -109,14 +109,19 @@ test.describe("Avatar Picker", () => {
     await avatarButtons.nth(1).click();
     await page.locator(".grid button").nth(40).click(); // first Pixel Art
 
+    // Set player 3 to a Lorelei avatar
+    await avatarButtons.nth(2).click();
+    await page.locator(".grid button").nth(60).click(); // first Lorelei
+
     // Get avatar srcs
     const src1 = await avatarButtons.nth(0).locator("img").getAttribute("src");
     const src2 = await avatarButtons.nth(1).locator("img").getAttribute("src");
     const src3 = await avatarButtons.nth(2).locator("img").getAttribute("src");
 
-    // All three should be different (player 3 still has default)
+    // All three explicitly-chosen avatars should be different
     expect(src1).not.toEqual(src2);
     expect(src2).not.toEqual(src3);
+    expect(src1).not.toEqual(src3);
   });
 
   test("chosen avatars persist into game scoreboard header", async ({

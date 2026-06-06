@@ -15,5 +15,5 @@ interface PlayerAvatarProps {
 
 export default function PlayerAvatar({ avatar, name, size = 'sm' }: PlayerAvatarProps) {
   const src = getAvatarDataUri(avatar || DEFAULT_AVATAR);
-  return <img src={src} alt={name} className={`${SIZES[size]} rounded-full object-cover`} />;
+  return <img data-avatar="" src={src} alt={name} className={`${SIZES[size]} rounded-full object-cover`} />;
 }

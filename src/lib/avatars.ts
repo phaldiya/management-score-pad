@@ -58,3 +58,13 @@ export const AVATAR_CATEGORIES = [
 
 export const ALL_AVATARS = AVATAR_CATEGORIES.flatMap((c) => c.avatars);
 export const DEFAULT_AVATAR = 'bottts:Zoe';
+
+/**
+ * Pick a random avatar from ALL_AVATARS, preferring one not in `exclude`.
+ * Falls back to the full pool when every avatar is excluded.
+ */
+export function getRandomAvatar(exclude: readonly string[] = []): string {
+  const pool = ALL_AVATARS.filter((a) => !exclude.includes(a));
+  const choices = pool.length > 0 ? pool : ALL_AVATARS;
+  return choices[Math.floor(Math.random() * choices.length)];
+}

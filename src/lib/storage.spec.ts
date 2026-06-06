@@ -2,7 +2,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { completedRound } from '../../tests/helpers/fixtures.ts';
 import { createTestState } from '../../tests/helpers/testReducer.ts';
-import { clearActiveGame, loadActiveGame, saveGameState } from './storage.ts';
+import {
+  clearActiveGame,
+  getStoredAvatar,
+  loadActiveGame,
+  loadAvatarMap,
+  rememberAvatars,
+  saveGameState,
+} from './storage.ts';
 
 describe('storage spec', () => {
   afterEach(() => {
@@ -59,6 +66,56 @@ describe('storage spec', () => {
     const raw1 = localStorage.getItem('management-score-pad-game-1');
     expect(raw1).not.toBeNull();
     expect(JSON.parse(raw1!)).toEqual(state1);
+  });
+});
+
+describe('avatar store', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it('remembers and recalls an avatar by name', () => {
+    rememberAvatars([{ name: 'Alice', avatar: 'croodles:Kai' }]);
+    expect(getStoredAvatar('Alice')).toBe('croodles:Kai');
+  });
+
+  it('recall is case-insensitive and trims whitespace', () => {
+    rememberAvatars([{ name: 'Alice', avatar: 'lorelei:Luna' }]);
+    expect(getStoredAvatar('  ALICE ')).toBe('lorelei:Luna');
+  });
+
+  it('returns null for an unknown or blank name', () => {
+    expect(getStoredAvatar('Nobody')).toBeNull();
+    expect(getStoredAvatar('   ')).toBeNull();
+  });
+
+  it('stores all avatars under a single localStorage key', () => {
+    rememberAvatars([
+      { name: 'Alice', avatar: 'bottts:Zoe' },
+      { name: 'Bob', avatar: 'pixelArt:Max' },
+    ]);
+    const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i));
+    expect(keys).toEqual(['management-score-pad-avatars']);
+    expect(loadAvatarMap()).toEqual({ alice: 'bottts:Zoe', bob: 'pixelArt:Max' });
+  });
+
+  it('merges new entries and overwrites an existing name', () => {
+    rememberAvatars([{ name: 'Alice', avatar: 'bottts:Zoe' }]);
+    rememberAvatars([
+      { name: 'Alice', avatar: 'bottts:Kai' },
+      { name: 'Bob', avatar: 'lorelei:Sky' },
+    ]);
+    expect(loadAvatarMap()).toEqual({ alice: 'bottts:Kai', bob: 'lorelei:Sky' });
+  });
+
+  it('ignores blank names when remembering', () => {
+    rememberAvatars([{ name: '   ', avatar: 'bottts:Zoe' }]);
+    expect(loadAvatarMap()).toEqual({});
+  });
+
+  it('loadAvatarMap returns empty object on corrupt data', () => {
+    localStorage.setItem('management-score-pad-avatars', '{broken');
+    expect(loadAvatarMap()).toEqual({});
   });
 });
 

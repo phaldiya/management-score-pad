@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { useAppContext } from '../../context/AppContext.tsx';
-import { DEFAULT_AVATAR } from '../../lib/avatars.ts';
+import { getRandomAvatar } from '../../lib/avatars.ts';
+import { getStoredAvatar, rememberAvatars } from '../../lib/storage.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
 import { PlusIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
@@ -10,20 +11,36 @@ import { Tooltip } from '../shared/Tooltip.tsx';
 export default function AddPlayerInline() {
   const { state, dispatch } = useAppContext();
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
+  const [avatar, setAvatar] = useState(() => getRandomAvatar(state.players.map((p) => p.avatar)));
+  const [avatarManual, setAvatarManual] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const trimmed = name.trim();
   const isDuplicate = trimmed.length > 0 && state.players.some((p) => p.name.toLowerCase() === trimmed.toLowerCase());
   const canAdd = trimmed.length > 0 && !isDuplicate;
 
+  const updateName = (value: string) => {
+    setName(value);
+    if (!avatarManual) {
+      const recalled = getStoredAvatar(value);
+      if (recalled) setAvatar(recalled);
+    }
+  };
+
+  const selectAvatar = (next: string) => {
+    setAvatar(next);
+    setAvatarManual(true);
+  };
+
   const handleAdd = () => {
     if (!canAdd) return;
     const newPlayer = { id: crypto.randomUUID(), name: trimmed, avatar };
+    rememberAvatars([newPlayer]);
     dispatch({ type: 'SET_PLAYERS', players: [...state.players, newPlayer] });
     dispatch({ type: 'START_GAME' });
     setName('');
-    setAvatar(DEFAULT_AVATAR);
+    setAvatar(getRandomAvatar([...state.players.map((p) => p.avatar), avatar]));
+    setAvatarManual(false);
   };
 
   return (
@@ -42,7 +59,7 @@ export default function AddPlayerInline() {
         {pickerOpen && (
           <AvatarPicker
             selected={avatar}
-            onSelect={setAvatar}
+            onSelect={selectAvatar}
             onClose={() => setPickerOpen(false)}
             playerName={name.trim() || `Player ${state.players.length + 1}`}
           />
@@ -54,7 +71,7 @@ export default function AddPlayerInline() {
           aria-invalid={isDuplicate || undefined}
           aria-describedby={isDuplicate ? 'add-player-error' : undefined}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => updateName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           className={`w-40 rounded-lg border px-3 py-1.5 text-gray-900 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-1 ${
             isDuplicate

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppContext } from '../../context/AppContext.tsx';
-import { DEFAULT_AVATAR } from '../../lib/avatars.ts';
-import { clearActiveGame, loadActiveGame } from '../../lib/storage.ts';
+import { getRandomAvatar } from '../../lib/avatars.ts';
+import { clearActiveGame, getStoredAvatar, loadActiveGame, rememberAvatars } from '../../lib/storage.ts';
 import { useDragReorder } from '../../lib/useDragReorder.ts';
 import type { AppState } from '../../types/index.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
@@ -12,14 +12,25 @@ import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
 import RestoreGamePopup from './RestoreGamePopup.tsx';
 
+interface DraftPlayer {
+  name: string;
+  avatar: string;
+  // True once the user manually picks an avatar, which suppresses name-based recall.
+  manual: boolean;
+}
+
+function createInitialPlayers(count: number): DraftPlayer[] {
+  const players: DraftPlayer[] = [];
+  for (let i = 0; i < count; i++) {
+    players.push({ name: '', avatar: getRandomAvatar(players.map((p) => p.avatar)), manual: false });
+  }
+  return players;
+}
+
 export default function SetupPage() {
   const { dispatch } = useAppContext();
   const navigate = useNavigate();
-  const [players, setPlayers] = useState<{ name: string; avatar: string }[]>([
-    { name: '', avatar: DEFAULT_AVATAR },
-    { name: '', avatar: DEFAULT_AVATAR },
-    { name: '', avatar: DEFAULT_AVATAR },
-  ]);
+  const [players, setPlayers] = useState<DraftPlayer[]>(() => createInitialPlayers(3));
   const [savedGame, setSavedGame] = useState<AppState | null>(null);
   const [pickerOpen, setPickerOpen] = useState<number | null>(null);
   const { dragIndex, overIndex, getDragProps, getHandleProps } = useDragReorder(players, setPlayers);
@@ -49,18 +60,20 @@ export default function SetupPage() {
 
   const updateName = (index: number, value: string) => {
     const updated = [...players];
-    updated[index] = { ...updated[index], name: value };
+    // Recall a previously stored avatar for this name unless the user picked one manually.
+    const recalled = updated[index].manual ? null : getStoredAvatar(value);
+    updated[index] = { ...updated[index], name: value, avatar: recalled ?? updated[index].avatar };
     setPlayers(updated);
   };
 
   const updateAvatar = (index: number, avatar: string) => {
     const updated = [...players];
-    updated[index] = { ...updated[index], avatar };
+    updated[index] = { ...updated[index], avatar, manual: true };
     setPlayers(updated);
   };
 
   const addPlayer = () => {
-    setPlayers([...players, { name: '', avatar: DEFAULT_AVATAR }]);
+    setPlayers([...players, { name: '', avatar: getRandomAvatar(players.map((p) => p.avatar)), manual: false }]);
   };
 
   const removePlayer = (index: number) => {
@@ -101,6 +114,7 @@ export default function SetupPage() {
       name: p.name.trim(),
       avatar: p.avatar,
     }));
+    rememberAvatars(gamePlayers);
     dispatch({ type: 'SET_PLAYERS', players: gamePlayers });
     dispatch({ type: 'START_GAME' });
     navigate('/game');

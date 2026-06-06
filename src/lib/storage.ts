@@ -2,6 +2,44 @@ import type { AppState } from '../types/index.ts';
 
 const ACTIVE_KEY = 'management-score-pad-active';
 
+// Single store key holding a { normalizedName: avatarId } map so a returning
+// player keeps the avatar they were last assigned.
+const AVATAR_MAP_KEY = 'management-score-pad-avatars';
+
+function avatarMapKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+export function loadAvatarMap(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(AVATAR_MAP_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function getStoredAvatar(name: string): string | null {
+  const key = avatarMapKey(name);
+  if (!key) return null;
+  return loadAvatarMap()[key] ?? null;
+}
+
+export function rememberAvatars(players: { name: string; avatar: string }[]): void {
+  try {
+    const map = loadAvatarMap();
+    for (const p of players) {
+      const key = avatarMapKey(p.name);
+      if (key) map[key] = p.avatar;
+    }
+    localStorage.setItem(AVATAR_MAP_KEY, JSON.stringify(map));
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
 function gameKey(gameId: string): string {
   return `management-score-pad-${gameId}`;
 }

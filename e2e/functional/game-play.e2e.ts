@@ -393,5 +393,13 @@ test.describe('Game Play Flow', () => {
     // Game complete popup should appear
     await expect(page.getByText('Final Standings')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Start New Game' })).toBeVisible();
+
+    // Winner card can be downloaded as a PNG
+    const downloadButton = page.getByRole('button', { name: 'Download PNG' });
+    await expect(downloadButton).toBeVisible();
+    const downloadPromise = page.waitForEvent('download');
+    await downloadButton.click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/\.png$/);
   });
 });
