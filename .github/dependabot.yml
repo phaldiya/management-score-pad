@@ -18,7 +18,7 @@ updates:
           - 'minor'
     ignore:
       - dependency-name: 'node'
-        versions: ['>=23.x']
+        versions: ['>=24.x']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
