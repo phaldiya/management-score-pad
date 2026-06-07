@@ -1,3 +1,15 @@
+# [1.10.0](https://github.com/phaldiya/management-score-pad/compare/v1.9.0...v1.10.0) (2026-06-07)
+
+
+### Bug Fixes
+
+* **winner:** render highlight as border for PNG export and date the filename ([22215ac](https://github.com/phaldiya/management-score-pad/commit/22215ac61184bce3505d8c3f9794f2ac06f79d03))
+
+
+### Features
+
+* **game:** improve play popups, scoreboard freeze, and mobile header ([36d0638](https://github.com/phaldiya/management-score-pad/commit/36d06380e2af2e9702df2be3acdf036a3b12f3ff))
+
 # [1.9.0](https://github.com/phaldiya/management-score-pad/compare/v1.8.0...v1.9.0) (2026-06-06)
 
 
