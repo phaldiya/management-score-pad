@@ -40,11 +40,10 @@ function spawnConfetti(container: HTMLDivElement) {
 }
 
 function toFileName(names: string[]): string {
-  const safe = names
-    .join('-')
-    .replace(/[^a-z0-9-]+/gi, '_')
-    .replace(/^_+|_+$/g, '');
-  return `management-score-pad-${safe || 'winners'}.png`;
+  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  // Single winner uses their name; a tie falls back to "winners".
+  const who = names.length === 1 ? names[0].replace(/[^a-z0-9-]+/gi, '_').replace(/^_+|_+$/g, '') : 'winners';
+  return `management-${date}-${who || 'winners'}.png`;
 }
 
 export default function GameCompletePopup({ players, rounds, onClose, onNewGame }: GameCompletePopupProps) {
@@ -129,8 +128,8 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
                 return (
                   <div
                     key={s.player.id}
-                    className={`flex items-center justify-between rounded-lg px-4 py-3 ${
-                      s.score === topScore ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-gray-50'
+                    className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 ${
+                      s.score === topScore ? 'border-amber-400 bg-amber-50' : 'border-transparent bg-gray-50'
                     }`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
