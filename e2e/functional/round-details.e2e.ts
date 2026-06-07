@@ -77,7 +77,7 @@ test.describe('Round Details Popup', () => {
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
 
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).toBeVisible();
     });
 
     test('close button closes details popup', async ({ page }) => {
@@ -85,10 +85,10 @@ test.describe('Round Details Popup', () => {
       await playRound(page, BIDS, RESULTS);
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).toBeVisible();
 
       await page.getByRole('button', { name: 'Close' }).click();
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).not.toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).not.toBeVisible();
     });
 
     test('Escape key closes details popup', async ({ page }) => {
@@ -96,10 +96,10 @@ test.describe('Round Details Popup', () => {
       await playRound(page, BIDS, RESULTS);
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).toBeVisible();
 
       await page.keyboard.press('Escape');
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).not.toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).not.toBeVisible();
     });
   });
 
@@ -109,7 +109,7 @@ test.describe('Round Details Popup', () => {
       await playRound(page, BIDS, RESULTS);
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      const dialog = page.getByRole('dialog', { name: 'Play 1 Details' });
+      const dialog = page.getByRole('dialog', { name: /Play 1 / });
 
       await expect(dialog.getByText('Alice')).toBeVisible();
       await expect(dialog.getByText('Bob')).toBeVisible();
@@ -121,7 +121,7 @@ test.describe('Round Details Popup', () => {
       await playRound(page, BIDS, RESULTS);
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      const dialog = page.getByRole('dialog', { name: 'Play 1 Details' });
+      const dialog = page.getByRole('dialog', { name: /Play 1 / });
 
       await expect(dialog.getByText('Player')).toBeVisible();
       await expect(dialog.getByText('Bid')).toBeVisible();
@@ -136,7 +136,7 @@ test.describe('Round Details Popup', () => {
       await playRound(page, BIDS, RESULTS);
 
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      const dialog = page.getByRole('dialog', { name: 'Play 1 Details' });
+      const dialog = page.getByRole('dialog', { name: /Play 1 / });
 
       // Alice matched: green background
       const aliceRow = dialog.locator('div.grid.rounded-lg', { hasText: 'Alice' });
@@ -154,12 +154,12 @@ test.describe('Round Details Popup', () => {
 
       // View round 1
       await page.getByRole('button', { name: /View play 1 details/ }).click();
-      await expect(page.getByRole('heading', { name: 'Play 1 Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 1 / })).toBeVisible();
       await page.keyboard.press('Escape');
 
       // View round 2
       await page.getByRole('button', { name: /View play 2 details/ }).click();
-      await expect(page.getByRole('heading', { name: 'Play 2 Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Play 2 / })).toBeVisible();
     });
 
     test('shows cumulative totals across rounds', async ({ page }) => {
@@ -171,7 +171,7 @@ test.describe('Round Details Popup', () => {
 
       // Open round 2 details — Alice's total should be 90
       await page.getByRole('button', { name: /View play 2 details/ }).click();
-      const dialog = page.getByRole('dialog', { name: 'Play 2 Details' });
+      const dialog = page.getByRole('dialog', { name: /Play 2 / });
       const aliceRow = dialog.locator('div.grid.rounded-lg', { hasText: 'Alice' });
       await expect(aliceRow).toContainText('90');
     });

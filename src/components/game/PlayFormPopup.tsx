@@ -132,14 +132,8 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
   const hasFocused = useRef(false);
   const rootError = (form.formState.errors as Record<string, { message?: string }>)[`${prefix}_${players[0].id}`];
 
-  const title =
-    mode === 'bid'
-      ? `Play ${gameNumber} - Place Bids`
-      : mode === 'result'
-        ? `Play ${gameNumber} - Enter Results`
-        : isEditingBids
-          ? `Play ${gameNumber} - Edit Bids`
-          : `Play ${gameNumber} - Details`;
+  const action =
+    mode === 'bid' ? 'Place Bids' : mode === 'result' ? 'Enter Results' : isEditingBids ? 'Edit Bids' : 'Details';
 
   const sectionLabel = activeMode === 'bid' ? 'Bids' : mode === 'result' ? 'Results (hands won)' : 'Bids';
 
@@ -154,10 +148,13 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
     >
       <div className="w-full max-w-[min(32rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <PlayCard cardCount={cardCount} trump={trump} size="xs" />
-            <h2 id="play-form-title" className="font-bold text-gray-900 text-lg">
-              {title}
+            <h2 id="play-form-title" className="leading-tight">
+              <span className="block font-bold text-gray-900 text-lg">{action}</span>
+              <span className="block font-normal text-gray-500 text-xs">
+                Play {gameNumber} &middot; {cardCount} {cardCount === 1 ? 'card' : 'cards'}
+              </span>
             </h2>
           </div>
           <Tooltip text="Close (Esc)">
@@ -167,24 +164,19 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
           </Tooltip>
         </div>
 
-        <Wrapper onSubmit={onFormSubmit} className="p-4">
-          <div className="flex gap-6">
-            <div className="hidden flex-col items-center justify-center sm:flex">
-              <PlayCard cardCount={cardCount} trump={trump} />
-              <p className="mt-2 text-gray-700 text-sm">{cardCount} cards</p>
+        <Wrapper onSubmit={onFormSubmit} className="@container p-4">
+          {(mode === 'bid' || isEditingBids) && (
+            <div className="mb-3 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+              <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="h-8 w-8" />
+              <div className="flex flex-col">
+                <span className="font-semibold text-[10px] text-amber-600 uppercase tracking-wider">Dealer</span>
+                <span className="font-bold text-gray-900 text-sm">{dealerName}</span>
+              </div>
             </div>
+          )}
 
+          <div className="flex gap-6">
             <div className="flex-1 space-y-3">
-              {(mode === 'bid' || isEditingBids) && (
-                <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-                  <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="h-8 w-8" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-[10px] text-amber-600 uppercase tracking-wider">Dealer</span>
-                    <span className="font-bold text-gray-900 text-sm">{dealerName}</span>
-                  </div>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-gray-700 text-xs uppercase tracking-wider">{sectionLabel}</span>
@@ -313,6 +305,16 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                   )}
                 </>
               )}
+            </div>
+
+            <div className="@md:mr-4 @sm:mr-2 @sm:flex hidden shrink-0 flex-col items-center justify-center">
+              {/* Trump grows to fill available width, capped at the xl card on wide popups. */}
+              <div className="@md:hidden">
+                <PlayCard cardCount={cardCount} trump={trump} />
+              </div>
+              <div className="@md:block hidden">
+                <PlayCard cardCount={cardCount} trump={trump} size="xl" />
+              </div>
             </div>
           </div>
 

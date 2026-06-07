@@ -94,12 +94,9 @@ export default function Header() {
     <>
       <header className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
         <div className="flex items-center gap-2">
-          <div className="flex flex-col items-center sm:block">
-            <AppIcon className="h-8 w-8" />
-            <span className="block font-semibold text-[8px] text-gray-600 leading-tight sm:hidden">Management</span>
-          </div>
+          <AppIcon className="h-8 w-8" />
           <h1 className="font-bold text-gray-900 text-lg">
-            <span className="hidden sm:inline">Management </span>Score Pad
+            Management<span className="hidden sm:inline"> Score Pad</span>
           </h1>
         </div>
         <div className="flex items-center gap-2">

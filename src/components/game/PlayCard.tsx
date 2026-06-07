@@ -5,7 +5,7 @@ import { SuitIcon } from '../shared/Icons.tsx';
 interface PlayCardProps {
   cardCount: number;
   trump: Suit;
-  size?: 'xs' | 'sm' | 'lg';
+  size?: 'xs' | 'sm' | 'lg' | 'xl';
   highlight?: boolean;
 }
 
@@ -35,6 +35,16 @@ export default function PlayCard({ cardCount, trump, size = 'lg', highlight }: P
           <SuitIcon suit={trump} className="h-4 w-4" />
         </span>
         <span className={`absolute right-0.5 bottom-0 rotate-180 font-bold text-[10px] ${textColor}`}>{cardCount}</span>
+      </div>
+    );
+  }
+
+  if (size === 'xl') {
+    return (
+      <div className="relative flex h-48 w-32 flex-col items-center justify-center rounded-xl border-2 border-gray-300 bg-white shadow-md">
+        <span className={`absolute top-2 left-2.5 font-bold text-base ${textColor}`}>{cardCount}</span>
+        <SuitIcon suit={trump} className="h-16 w-16" />
+        <span className={`absolute right-2.5 bottom-2 rotate-180 font-bold text-base ${textColor}`}>{cardCount}</span>
       </div>
     );
   }

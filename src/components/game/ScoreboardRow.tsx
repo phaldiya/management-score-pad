@@ -15,7 +15,7 @@ export default function ScoreboardRow({ round, players, onPlayCardClick, onUndo 
   return (
     <tr className={round.phase === 'in_progress' ? 'animate-pulse ring-2 ring-amber-400 ring-inset' : ''}>
       <td
-        className={`w-[49px] border border-gray-200 bg-gray-100 sm:sticky sm:left-0 sm:z-10 ${onUndo ? 'overflow-visible' : ''} ${onPlayCardClick ? 'cursor-pointer' : ''}`}
+        className={`sticky left-0 z-10 w-[49px] border border-gray-200 bg-gray-100 ${onUndo ? 'overflow-visible' : ''} ${onPlayCardClick ? 'cursor-pointer' : ''}`}
         onClick={onPlayCardClick}
         onKeyDown={
           onPlayCardClick

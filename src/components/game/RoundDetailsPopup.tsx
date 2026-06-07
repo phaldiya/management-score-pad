@@ -31,10 +31,13 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
     >
       <div className="w-full max-w-[min(28rem,calc(100vw-40px))] rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-gray-200 border-b px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <PlayCard cardCount={round.cardCount} trump={round.trump} size="xs" />
-            <h2 id="round-details-title" className="font-bold text-gray-900">
-              Play {round.gameNumber} Details
+            <h2 id="round-details-title" className="leading-tight">
+              <span className="block font-bold text-gray-900 text-lg">Details</span>
+              <span className="block font-normal text-gray-500 text-xs">
+                Play {round.gameNumber} &middot; {round.cardCount} {round.cardCount === 1 ? 'card' : 'cards'}
+              </span>
             </h2>
           </div>
           <button type="button" onClick={onClose} className="text-gray-600 hover:text-gray-900" aria-label="Close">
@@ -73,7 +76,7 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
                   <span className="flex h-6 w-8 items-center justify-center rounded bg-blue-100 font-medium text-blue-700 text-xs">
                     {pd.bid}
                   </span>
-                  <span className="flex h-6 w-8 items-center justify-center rounded bg-emerald-100 font-medium text-emerald-700 text-xs">
+                  <span className="flex h-6 w-8 items-center justify-center rounded bg-gray-100 font-medium text-gray-700 text-xs">
                     {pd.result}
                   </span>
                   <span
