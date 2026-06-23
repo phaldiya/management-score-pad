@@ -97,6 +97,13 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
   const watchedValues = form.watch();
   const total = players.reduce((sum, p) => sum + (Number(watchedValues[`${prefix}_${p.id}`]) || 0), 0);
 
+  // Tap-to-increment: faster than typing on mobile, and keeps the value clamped to [0, cardCount].
+  const adjust = (name: string, delta: number) => {
+    const current = Number(form.getValues(name)) || 0;
+    const next = Math.min(cardCount, Math.max(0, current + delta));
+    form.setValue(name, next, { shouldValidate: true, shouldDirty: true });
+  };
+
   const dealerId = mode === 'bid' ? props.dealerId : props.round.playerData.find((d) => d.isDealer)?.playerId;
   const dealerIndex = players.findIndex((p) => p.id === dealerId);
   const ordered = [...players.slice(dealerIndex + 1), ...players.slice(0, dealerIndex + 1)];
@@ -219,62 +226,101 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                       </span>
 
                       {(mode === 'bid' || isEditingBids) && (
-                        <input
-                          type="number"
-                          min={0}
-                          max={cardCount}
-                          aria-label={`Bid for ${p.name}`}
-                          ref={(el) => {
-                            registerRef?.(el);
-                            if (idx === 0 && !hasFocused.current && el) {
-                              el.focus();
-                              hasFocused.current = true;
-                            }
-                          }}
-                          {...rest}
-                          onFocus={(e) => e.currentTarget.select()}
-                          onInput={(e) => {
-                            const input = e.currentTarget;
-                            const val = Number(input.value);
-                            if (val > cardCount) input.value = String(cardCount);
-                            if (val < 0) input.value = '0';
-                          }}
-                          className="w-20 rounded border border-gray-300 px-2 py-1 text-center text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
+                        <div className="flex items-stretch">
+                          <button
+                            type="button"
+                            aria-label={`Decrease bid for ${p.name}`}
+                            onClick={() => adjust(`${prefix}_${p.id}`, -1)}
+                            className="flex w-9 items-center justify-center rounded-l border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                          >
+                            &minus;
+                          </button>
+                          <input
+                            type="number"
+                            min={0}
+                            max={cardCount}
+                            aria-label={`Bid for ${p.name}`}
+                            ref={(el) => {
+                              registerRef?.(el);
+                              if (idx === 0 && !hasFocused.current && el) {
+                                el.focus();
+                                hasFocused.current = true;
+                              }
+                            }}
+                            {...rest}
+                            onFocus={(e) => e.currentTarget.select()}
+                            onInput={(e) => {
+                              const input = e.currentTarget;
+                              const val = Number(input.value);
+                              if (val > cardCount) input.value = String(cardCount);
+                              if (val < 0) input.value = '0';
+                            }}
+                            className="w-12 border-gray-300 border-y px-1 py-1 text-center text-sm focus:relative focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                          <button
+                            type="button"
+                            aria-label={`Increase bid for ${p.name}`}
+                            onClick={() => adjust(`${prefix}_${p.id}`, 1)}
+                            className="flex w-9 items-center justify-center rounded-r border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                          >
+                            +
+                          </button>
+                        </div>
                       )}
 
                       {mode !== 'bid' && !isEditingBids && (
-                        <div className="flex items-stretch">
-                          <span className="flex w-8 items-center justify-center rounded-l border border-blue-300 border-r-0 bg-blue-50 font-medium text-blue-700 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="flex h-8 w-8 items-center justify-center rounded border border-blue-200 bg-blue-50 font-medium text-blue-700 text-xs"
+                            title={`Bid: ${pd?.bid}`}
+                          >
                             {pd?.bid}
                           </span>
                           {mode === 'details' ? (
-                            <span className="w-16 rounded-r border border-gray-300 px-2 py-1 text-center text-gray-400 text-sm">
+                            <span className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-gray-400 text-sm">
                               &mdash;
                             </span>
                           ) : (
-                            <input
-                              type="number"
-                              min={0}
-                              max={cardCount}
-                              aria-label={`Result for ${p.name}`}
-                              ref={(el) => {
-                                registerRef?.(el);
-                                if (idx === 0 && el && !hasFocused.current) {
-                                  hasFocused.current = true;
-                                  el.focus();
-                                }
-                              }}
-                              {...rest}
-                              onFocus={(e) => e.currentTarget.select()}
-                              onInput={(e) => {
-                                const input = e.currentTarget;
-                                const val = Number(input.value);
-                                if (val > cardCount) input.value = String(cardCount);
-                                if (val < 0) input.value = '0';
-                              }}
-                              className="w-16 rounded-r border border-gray-300 px-2 py-1 text-center text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
+                            <div className="flex items-stretch">
+                              <button
+                                type="button"
+                                aria-label={`Decrease result for ${p.name}`}
+                                onClick={() => adjust(`${prefix}_${p.id}`, -1)}
+                                className="flex w-9 items-center justify-center rounded-l border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                              >
+                                &minus;
+                              </button>
+                              <input
+                                type="number"
+                                min={0}
+                                max={cardCount}
+                                aria-label={`Result for ${p.name}`}
+                                ref={(el) => {
+                                  registerRef?.(el);
+                                  if (idx === 0 && el && !hasFocused.current) {
+                                    hasFocused.current = true;
+                                    el.focus();
+                                  }
+                                }}
+                                {...rest}
+                                onFocus={(e) => e.currentTarget.select()}
+                                onInput={(e) => {
+                                  const input = e.currentTarget;
+                                  const val = Number(input.value);
+                                  if (val > cardCount) input.value = String(cardCount);
+                                  if (val < 0) input.value = '0';
+                                }}
+                                className="w-12 border-gray-300 border-y px-1 py-1 text-center text-sm focus:relative focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                              <button
+                                type="button"
+                                aria-label={`Increase result for ${p.name}`}
+                                onClick={() => adjust(`${prefix}_${p.id}`, 1)}
+                                className="flex w-9 items-center justify-center rounded-r border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                              >
+                                +
+                              </button>
+                            </div>
                           )}
                         </div>
                       )}
