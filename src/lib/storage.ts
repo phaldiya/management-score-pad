@@ -1,6 +1,9 @@
 import type { AppState } from '../types/index.ts';
+import { getCumulativeScore } from './scoreCalculation.ts';
 
 const ACTIVE_KEY = 'management-score-pad-active';
+const HISTORY_KEY = 'management-score-pad-history';
+const MAX_HISTORY = 50;
 
 // Single store key holding a { normalizedName: avatarId } map so a returning
 // player keeps the avatar they were last assigned.
@@ -73,6 +76,73 @@ export function clearActiveGame(): void {
       localStorage.removeItem(gameKey(activeId));
     }
     localStorage.removeItem(ACTIVE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export interface GameHistoryPlayer {
+  name: string;
+  avatar: string;
+  score: number;
+}
+
+export interface GameHistoryEntry {
+  id: string;
+  completedAt: string;
+  totalGames: number;
+  players: GameHistoryPlayer[];
+  winnerNames: string[];
+}
+
+export function loadGameHistory(): GameHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as GameHistoryEntry[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+// Records a finished game in history, newest first, replacing any prior entry
+// with the same gameId so re-completing a round does not create duplicates.
+export function saveCompletedGame(state: AppState): void {
+  if (!state.gameId || state.players.length === 0) return;
+  try {
+    const lastIndex = state.rounds.length - 1;
+    const players: GameHistoryPlayer[] = state.players.map((p) => ({
+      name: p.name,
+      avatar: p.avatar,
+      score: getCumulativeScore(state.rounds, p.id, lastIndex),
+    }));
+    const topScore = Math.max(...players.map((p) => p.score));
+    const entry: GameHistoryEntry = {
+      id: state.gameId,
+      completedAt: new Date().toISOString(),
+      totalGames: state.totalGames,
+      players,
+      winnerNames: players.filter((p) => p.score === topScore).map((p) => p.name),
+    };
+    const existing = loadGameHistory().filter((e) => e.id !== entry.id);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify([entry, ...existing].slice(0, MAX_HISTORY)));
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
+export function deleteHistoryEntry(id: string): void {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(loadGameHistory().filter((e) => e.id !== id)));
+  } catch {
+    // ignore
+  }
+}
+
+export function clearGameHistory(): void {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
   } catch {
     // ignore
   }

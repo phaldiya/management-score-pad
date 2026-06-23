@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useAppContext } from '../../context/AppContext.tsx';
 import { printScoreboard } from '../../lib/exportPdf.ts';
+import { rememberAvatars } from '../../lib/storage.ts';
+import GameHistoryPopup from '../game/GameHistoryPopup.tsx';
 import { GameRulesPopup } from '../shared/GameRulesPopup.tsx';
-import { AppIcon, BookIcon, CloseIcon, KeyboardIcon, ShareIcon } from '../shared/Icons.tsx';
+import { AppIcon, BookIcon, CloseIcon, HistoryIcon, KeyboardIcon, ShareIcon } from '../shared/Icons.tsx';
 import { KeyboardShortcutsPopup } from '../shared/KeyboardShortcutsPopup.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
 import { TransferGamePopup } from '../shared/TransferGamePopup.tsx';
 
 export default function Header() {
   const { state, dispatch } = useAppContext();
+  const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showRules, setShowRules] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const hasRoundsInProgress = state.rounds.length > 0 && state.rounds.some((r) => r.phase !== 'completed');
   const hasCompletedRounds = state.rounds.some((r) => r.phase === 'completed');
@@ -27,9 +32,25 @@ export default function Header() {
     }
   }, [gameInProgress, dispatch]);
 
+  const handleRematchFromHistory = useCallback(
+    (players: { name: string; avatar: string }[]) => {
+      const gamePlayers = players.map((p) => ({ id: crypto.randomUUID(), name: p.name, avatar: p.avatar }));
+      rememberAvatars(gamePlayers);
+      dispatch({ type: 'SET_PLAYERS', players: gamePlayers });
+      dispatch({ type: 'START_GAME' });
+      setShowHistory(false);
+      navigate('/game');
+    },
+    [dispatch, navigate],
+  );
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (showHistory) {
+          setShowHistory(false);
+          return;
+        }
         if (showTransfer) {
           setShowTransfer(false);
           return;
@@ -84,6 +105,7 @@ export default function Header() {
     showShortcuts,
     showRules,
     showTransfer,
+    showHistory,
     state.gamePhase,
     state.players,
     state.rounds,
@@ -120,6 +142,16 @@ export default function Header() {
               <KeyboardIcon className="h-4 w-4" />
             </button>
           </Tooltip>
+          <Tooltip text="Game history">
+            <button
+              type="button"
+              className="rounded bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+              onClick={() => setShowHistory(true)}
+              aria-label="Game history"
+            >
+              <HistoryIcon className="h-4 w-4" />
+            </button>
+          </Tooltip>
           {state.gamePhase === 'playing' && (
             <Tooltip text="Transfer game (Shift+S)">
               <button
@@ -151,6 +183,13 @@ export default function Header() {
       {showRules && <GameRulesPopup onClose={() => setShowRules(false)} />}
       {showShortcuts && <KeyboardShortcutsPopup onClose={() => setShowShortcuts(false)} />}
       {showTransfer && <TransferGamePopup onClose={() => setShowTransfer(false)} />}
+      {showHistory && (
+        <GameHistoryPopup
+          gameInProgress={gameInProgress}
+          onRematch={handleRematchFromHistory}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
 
       {showConfirm && (
         <div

@@ -120,6 +120,21 @@ export function BookIcon({ className = 'h-5 w-5' }: IconProps) {
   );
 }
 
+export function HistoryIcon({ className = 'h-5 w-5' }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      className={className}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-2.636-6.364M21 3v4.5h-4.5" />
+    </svg>
+  );
+}
+
 export function ShareIcon({ className = 'h-5 w-5' }: IconProps) {
   return (
     <svg

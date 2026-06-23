@@ -12,6 +12,7 @@ interface GameCompletePopupProps {
   rounds: GameRound[];
   onClose: () => void;
   onNewGame: () => void;
+  onRematch: () => void;
 }
 
 const CONFETTI_COLORS = ['#f59e0b', '#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#ec4899', '#14b8a6'];
@@ -46,7 +47,7 @@ function toFileName(names: string[]): string {
   return `management-${date}-${who || 'winners'}.png`;
 }
 
-export default function GameCompletePopup({ players, rounds, onClose, onNewGame }: GameCompletePopupProps) {
+export default function GameCompletePopup({ players, rounds, onClose, onNewGame, onRematch }: GameCompletePopupProps) {
   const confettiRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
@@ -153,22 +154,31 @@ export default function GameCompletePopup({ players, rounds, onClose, onNewGame 
             <p className="mt-5 text-center text-[11px] text-gray-400 uppercase tracking-wider">Management Score Pad</p>
           </div>
 
-          <div className="flex gap-2 border-gray-200 border-t px-4 py-3">
+          <div className="border-gray-200 border-t px-4 py-3">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onRematch}
+                className="flex-1 rounded-lg bg-blue-600 py-2 font-medium text-white hover:bg-blue-700"
+              >
+                Rematch
+              </button>
+              <button
+                type="button"
+                onClick={onNewGame}
+                className="flex-1 rounded-lg border border-gray-300 py-2 font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600"
+              >
+                New Game
+              </button>
+            </div>
             <button
               type="button"
               onClick={handleDownload}
               disabled={downloading}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <DownloadIcon className="h-4 w-4" />
               {downloading ? 'Preparing…' : 'Download PNG'}
-            </button>
-            <button
-              type="button"
-              onClick={onNewGame}
-              className="flex-1 rounded-lg bg-blue-600 py-2 font-medium text-white hover:bg-blue-700"
-            >
-              Start New Game
             </button>
           </div>
           {downloadError && (

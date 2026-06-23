@@ -2,7 +2,7 @@ import { createContext, type ReactNode, useContext, useEffect, useReducer } from
 
 import { generateCardSequence, getMaxCardsPerPlayer, getTotalGames, getTrumpForGame } from '../lib/gameLogic.ts';
 import { computeRoundScores } from '../lib/scoreCalculation.ts';
-import { clearActiveGame, loadActiveGame, saveGameState } from '../lib/storage.ts';
+import { clearActiveGame, loadActiveGame, saveCompletedGame, saveGameState } from '../lib/storage.ts';
 import type { AppAction, AppState } from '../types/index.ts';
 
 export const initialState: AppState = {
@@ -80,7 +80,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       current.playerData = computeRoundScores(updatedPlayerData);
       current.phase = 'completed';
       rounds[state.currentRoundIndex] = current;
-      return { ...state, rounds };
+      const newState = { ...state, rounds };
+      const completedCount = rounds.filter((r) => r.phase === 'completed').length;
+      if (completedCount === state.totalGames) {
+        saveCompletedGame(newState);
+      }
+      return newState;
     }
 
     case 'UPDATE_BIDS': {

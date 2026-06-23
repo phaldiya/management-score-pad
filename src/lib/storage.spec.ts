@@ -1,13 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { completedRound } from '../../tests/helpers/fixtures.ts';
+import { completedRound, testPlayers } from '../../tests/helpers/fixtures.ts';
 import { createTestState } from '../../tests/helpers/testReducer.ts';
 import {
   clearActiveGame,
+  clearGameHistory,
+  deleteHistoryEntry,
   getStoredAvatar,
   loadActiveGame,
   loadAvatarMap,
+  loadGameHistory,
   rememberAvatars,
+  saveCompletedGame,
   saveGameState,
 } from './storage.ts';
 
@@ -149,5 +153,59 @@ describe('storage – smoke', () => {
     expect(loadActiveGame()).toBeNull();
     expect(localStorage.getItem('management-score-pad-active')).toBeNull();
     expect(localStorage.getItem('management-score-pad-test-game-3')).toBeNull();
+  });
+});
+
+describe('game history', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  const finishedState = (gameId: string) =>
+    createTestState({ gameId, players: testPlayers, rounds: [completedRound], totalGames: 1 });
+
+  it('loadGameHistory returns [] when nothing saved', () => {
+    expect(loadGameHistory()).toEqual([]);
+  });
+
+  it('loadGameHistory returns [] on invalid JSON', () => {
+    localStorage.setItem('management-score-pad-history', '{not an array');
+    expect(loadGameHistory()).toEqual([]);
+  });
+
+  it('saveCompletedGame records players, scores, and winners', () => {
+    saveCompletedGame(finishedState('hist-1'));
+    const history = loadGameHistory();
+    expect(history).toHaveLength(1);
+    expect(history[0].id).toBe('hist-1');
+    // completedRound scores: Alice 30, Bob 0, Charlie 10 -> Alice wins.
+    expect(history[0].players.find((p) => p.name === 'Alice')?.score).toBe(30);
+    expect(history[0].winnerNames).toEqual(['Alice']);
+  });
+
+  it('saveCompletedGame ignores a state without a gameId', () => {
+    saveCompletedGame(createTestState({ gameId: null, players: testPlayers, rounds: [completedRound] }));
+    expect(loadGameHistory()).toEqual([]);
+  });
+
+  it('saveCompletedGame dedupes by gameId and keeps newest first', () => {
+    saveCompletedGame(finishedState('hist-1'));
+    saveCompletedGame(finishedState('hist-2'));
+    saveCompletedGame(finishedState('hist-1'));
+    const history = loadGameHistory();
+    expect(history.map((e) => e.id)).toEqual(['hist-1', 'hist-2']);
+  });
+
+  it('deleteHistoryEntry removes a single entry', () => {
+    saveCompletedGame(finishedState('hist-1'));
+    saveCompletedGame(finishedState('hist-2'));
+    deleteHistoryEntry('hist-1');
+    expect(loadGameHistory().map((e) => e.id)).toEqual(['hist-2']);
+  });
+
+  it('clearGameHistory removes all entries', () => {
+    saveCompletedGame(finishedState('hist-1'));
+    clearGameHistory();
+    expect(loadGameHistory()).toEqual([]);
   });
 });

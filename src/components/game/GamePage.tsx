@@ -170,6 +170,10 @@ export default function GamePage() {
           rounds={rounds}
           onClose={() => setPopup('none')}
           onNewGame={() => dispatch({ type: 'RESET_GAME' })}
+          onRematch={() => {
+            dispatch({ type: 'START_GAME' });
+            setPopup('none');
+          }}
         />
       )}
 
