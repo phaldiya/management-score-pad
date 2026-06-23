@@ -1,13 +1,17 @@
-import { expect, type Locator, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Player avatars are assigned randomly, so they are masked out of every
- * screenshot to keep visual snapshots deterministic. The avatar-picker grid
- * (which renders a fixed catalog) is intentionally not masked.
+ * Avatars are auto-picked with Math.random at setup, which would vary every run.
+ * Pin Math.random to a constant before the app loads so getRandomAvatar always
+ * takes the first still-available avatar — deterministic regardless of how many
+ * times Math.random is called, so players get fixed (and distinct) avatars and
+ * screenshots stay stable without masking.
  */
-function avatarMask(page: Page): { mask: Locator[] } {
-  return { mask: [page.locator('img[data-avatar]')] };
-}
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0;
+  });
+});
 
 /** Set up a game with the given players and navigate to the game page. */
 async function setupGame(page: Page, players: string[]) {
@@ -80,7 +84,7 @@ test.describe('Avatar Picker', () => {
     await page.locator('.grid button').nth(0).click();
     await page.getByRole('button', { name: 'Change avatar for Alice' }).click();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('avatar-picker-open.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('avatar-picker-open.png');
   });
 });
 
@@ -90,7 +94,7 @@ test.describe('Visual Regression', () => {
     await page.evaluate(() => localStorage.clear());
     await page.reload();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('setup-default.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('setup-default.png');
   });
 
   test('setup page with players filled', async ({ page }) => {
@@ -101,7 +105,7 @@ test.describe('Visual Regression', () => {
     await page.getByPlaceholder('Player 2').fill('Bob');
     await page.getByPlaceholder('Player 3').fill('Charlie');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('setup-players-filled.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('setup-players-filled.png');
   });
 
   test('setup page with duplicate error', async ({ page }) => {
@@ -112,7 +116,7 @@ test.describe('Visual Regression', () => {
     await page.getByPlaceholder('Player 2').fill('alice');
     await page.getByPlaceholder('Player 3').fill('Bob');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('setup-duplicate-error.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('setup-duplicate-error.png');
   });
 
   test('game page empty scoreboard', async ({ page }) => {
@@ -125,7 +129,7 @@ test.describe('Visual Regression', () => {
     await page.getByRole('button', { name: /Start Game/ }).click();
     await expect(page).toHaveURL(/#\/game/);
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-empty-scoreboard.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-empty-scoreboard.png');
   });
 
   test('game page after one completed round', async ({ page }) => {
@@ -155,7 +159,7 @@ test.describe('Visual Regression', () => {
 
     await expect(page.getByRole('button', { name: /Next Play/ })).toBeVisible();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-one-round-completed.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-one-round-completed.png');
   });
 });
 
@@ -165,7 +169,7 @@ test.describe('Game Rules', () => {
     await page.getByRole('button', { name: 'Game rules' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-rules-setup-tab.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-rules-setup-tab.png');
   });
 
   test('game rules gameplay tab', async ({ page }) => {
@@ -174,7 +178,7 @@ test.describe('Game Rules', () => {
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('tab', { name: 'Gameplay' }).click();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-rules-gameplay-tab.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-rules-gameplay-tab.png');
   });
 
   test('game rules scoring tab', async ({ page }) => {
@@ -183,7 +187,7 @@ test.describe('Game Rules', () => {
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('tab', { name: 'Scoring' }).click();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-rules-scoring-tab.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-rules-scoring-tab.png');
   });
 });
 
@@ -200,13 +204,13 @@ test.describe('Max Players & Layout', () => {
       await page.getByPlaceholder(`Player ${i + 1}`).fill(names[i]);
     }
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('setup-6-players-max.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('setup-6-players-max.png');
   });
 
   test('game scoreboard with 6 players', async ({ page }) => {
     await setupGame(page, ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank']);
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('game-scoreboard-6-players.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('game-scoreboard-6-players.png');
   });
 
   test('bid popup with 6 players', async ({ page }) => {
@@ -214,7 +218,7 @@ test.describe('Max Players & Layout', () => {
     await page.getByRole('button', { name: 'Start First Play' }).click();
     await expect(page.getByText('Place Bids')).toBeVisible();
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('bid-popup-6-players.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('bid-popup-6-players.png');
   });
 });
 
@@ -222,7 +226,7 @@ test.describe('Winner Screen', () => {
   test('scoreboard with Game Complete button (3 players)', async ({ page }) => {
     await playFullGame(page, ['Alice', 'Bob', 'Charlie']);
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('winner-scoreboard-complete.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('winner-scoreboard-complete.png');
   });
 
   test('winner popup with 3 players', async ({ page }) => {
@@ -230,7 +234,7 @@ test.describe('Winner Screen', () => {
     await page.getByRole('button', { name: 'Game Complete!' }).click();
     await page.waitForTimeout(500);
     await page.evaluate(() => document.querySelectorAll('.confetti-piece').forEach((el) => el.remove()));
-    await expect(page).toHaveScreenshot('winner-popup-3-players.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('winner-popup-3-players.png');
   });
 
   test('winner popup with 6 players', async ({ page }) => {
@@ -238,6 +242,6 @@ test.describe('Winner Screen', () => {
     await page.getByRole('button', { name: 'Game Complete!' }).click();
     await page.waitForTimeout(500);
     await page.evaluate(() => document.querySelectorAll('.confetti-piece').forEach((el) => el.remove()));
-    await expect(page).toHaveScreenshot('winner-popup-6-players.png', avatarMask(page));
+    await expect(page).toHaveScreenshot('winner-popup-6-players.png');
   });
 });

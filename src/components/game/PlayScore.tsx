@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { PlayerRoundData, RoundPhase } from '../../types/index.ts';
 import AnimatedNumber from '../shared/AnimatedNumber.tsx';
+import { CheckIcon, CrossIcon } from '../shared/Icons.tsx';
 
 const CONFETTI_COLORS = ['#f59e0b', '#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#ec4899'];
 
@@ -95,11 +96,18 @@ export default function PlayScore({ playerData, phase, isLeader = false }: PlayS
       {showConfetti && <MiniConfetti />}
       <div className="flex h-full flex-col items-center justify-center">
         <div
-          className={`inline-flex items-start font-bold text-lg leading-tight ${phase === 'completed' ? (made ? 'text-green-700' : 'text-red-600') : 'text-gray-900'}`}
+          className={`inline-flex items-center font-bold text-lg leading-tight ${phase === 'completed' ? (made ? 'text-green-700' : 'text-red-600') : 'text-gray-900'}`}
         >
+          {/* Shape cue so made/missed does not rely on color alone (WCAG 1.4.1). */}
+          {phase === 'completed' &&
+            (made ? (
+              <CheckIcon className="mr-0.5 h-3.5 w-3.5 shrink-0" />
+            ) : (
+              <CrossIcon className="mr-0.5 h-3.5 w-3.5 shrink-0" />
+            ))}
           {phase === 'completed' ? animateScore ? <AnimatedNumber value={score ?? 0} /> : score : '-'}
           {isDealer && (
-            <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="-mt-0.5 ml-0.5 h-3 w-3" />
+            <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="ml-0.5 h-3 w-3 self-start" />
           )}
         </div>
         <div className="mt-1.5 flex items-center gap-1 text-xs leading-tight">

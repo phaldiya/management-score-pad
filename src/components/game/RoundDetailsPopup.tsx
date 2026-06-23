@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
-import { CloseIcon } from '../shared/Icons.tsx';
+import { CheckIcon, CloseIcon, CrossIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import PlayCard from './PlayCard.tsx';
 
@@ -80,8 +80,9 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
                     {pd.result}
                   </span>
                   <span
-                    className={`flex h-6 w-10 items-center justify-center rounded font-bold text-sm ${matched ? 'text-green-700' : 'text-red-500'}`}
+                    className={`flex h-6 w-12 items-center justify-center gap-0.5 rounded font-bold text-sm ${matched ? 'text-green-700' : 'text-red-500'}`}
                   >
+                    {matched ? <CheckIcon className="h-3 w-3 shrink-0" /> : <CrossIcon className="h-3 w-3 shrink-0" />}
                     {pd.score}
                   </span>
                   <span className="flex h-6 w-10 items-center justify-center font-medium text-gray-600 text-xs">
