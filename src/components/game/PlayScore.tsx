@@ -45,9 +45,10 @@ function MiniConfetti() {
 interface PlayScoreProps {
   playerData: PlayerRoundData;
   phase: RoundPhase;
+  isLeader?: boolean;
 }
 
-export default function PlayScore({ playerData, phase }: PlayScoreProps) {
+export default function PlayScore({ playerData, phase, isLeader = false }: PlayScoreProps) {
   const { bid, result, score, isDealer } = playerData;
   const prevPhaseRef = useRef(phase);
 
@@ -74,9 +75,16 @@ export default function PlayScore({ playerData, phase }: PlayScoreProps) {
     }
   }, [phase, score]);
 
-  let bgColor = 'bg-yellow-50';
+  // Non-leader cells are softened so the active row (amber ring) and the
+  // leader's column (a touch more saturated) read at a glance.
+  const made = score != null && score > 0;
+  let bgColor = isLeader ? 'bg-amber-100/70' : 'bg-amber-50/60';
   if (phase === 'completed') {
-    bgColor = score && score > 0 ? 'bg-green-50' : 'bg-red-50';
+    if (made) {
+      bgColor = isLeader ? 'bg-green-100/70' : 'bg-green-50/50';
+    } else {
+      bgColor = isLeader ? 'bg-red-100/60' : 'bg-red-50/50';
+    }
   }
 
   const resultDisplay = phase === 'completed' ? result : '-';
@@ -87,7 +95,7 @@ export default function PlayScore({ playerData, phase }: PlayScoreProps) {
       {showConfetti && <MiniConfetti />}
       <div className="flex h-full flex-col items-center justify-center">
         <div
-          className={`inline-flex items-start font-bold text-lg leading-tight ${phase === 'completed' ? (score && score > 0 ? 'text-green-700' : 'text-red-600') : 'text-gray-900'}`}
+          className={`inline-flex items-start font-bold text-lg leading-tight ${phase === 'completed' ? (made ? 'text-green-700' : 'text-red-600') : 'text-gray-900'}`}
         >
           {phase === 'completed' ? animateScore ? <AnimatedNumber value={score ?? 0} /> : score : '-'}
           {isDealer && (

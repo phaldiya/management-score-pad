@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 import type { GameRound, Player } from '../../types/index.ts';
 import { TrashIcon } from '../shared/Icons.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
@@ -7,13 +9,17 @@ import PlayScore from './PlayScore.tsx';
 interface ScoreboardRowProps {
   round: GameRound;
   players: Player[];
+  leaderIds?: Set<string>;
   onPlayCardClick?: () => void;
   onUndo?: () => void;
 }
 
-export default function ScoreboardRow({ round, players, onPlayCardClick, onUndo }: ScoreboardRowProps) {
+const ScoreboardRow = forwardRef<HTMLTableRowElement, ScoreboardRowProps>(function ScoreboardRow(
+  { round, players, leaderIds, onPlayCardClick, onUndo },
+  ref,
+) {
   return (
-    <tr className={round.phase === 'in_progress' ? 'animate-pulse ring-2 ring-amber-400 ring-inset' : ''}>
+    <tr ref={ref} className={round.phase === 'in_progress' ? 'animate-pulse ring-2 ring-amber-400 ring-inset' : ''}>
       <td
         className={`sticky left-0 z-10 w-[49px] border border-gray-200 bg-gray-100 ${onUndo ? 'overflow-visible' : ''} ${onPlayCardClick ? 'cursor-pointer' : ''}`}
         onClick={onPlayCardClick}
@@ -72,8 +78,10 @@ export default function ScoreboardRow({ round, players, onPlayCardClick, onUndo 
       {players.map((player) => {
         const pd = round.playerData.find((d) => d.playerId === player.id);
         if (!pd) return <td key={player.id} className="border border-gray-200" />;
-        return <PlayScore key={player.id} playerData={pd} phase={round.phase} />;
+        return <PlayScore key={player.id} playerData={pd} phase={round.phase} isLeader={leaderIds?.has(player.id)} />;
       })}
     </tr>
   );
-}
+});
+
+export default ScoreboardRow;
