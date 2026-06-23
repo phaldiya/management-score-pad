@@ -1,3 +1,15 @@
+# [1.11.0](https://github.com/phaldiya/management-score-pad/compare/v1.10.0...v1.11.0) (2026-06-23)
+
+
+### Features
+
+* **game:** add dealer-rotation indicator ([024e5b5](https://github.com/phaldiya/management-score-pad/commit/024e5b5ec0df4892497c1b81354b89caa85a71dc))
+* **game:** add game history and rematch ([a005c54](https://github.com/phaldiya/management-score-pad/commit/a005c546ed0d113810419f39ff7e7c412a7d0f43))
+* **game:** animate active trump card in bid and result popups ([4499d8a](https://github.com/phaldiya/management-score-pad/commit/4499d8ae6db69b6aebeb2b3e66b8ab031697d189))
+* **game:** lighten tints, highlight leader, add insights strip and auto-scroll ([793d5a0](https://github.com/phaldiya/management-score-pad/commit/793d5a0cfa1ffd33c1b1d3d2bf4da9f43a18f808))
+* **game:** show made/missed with a ✓/✗ glyph, not color alone ([4c7549f](https://github.com/phaldiya/management-score-pad/commit/4c7549f18907bd11bc8355b609d9f59efff83724))
+* **pwa:** check for updates hourly in long-lived sessions ([8c43584](https://github.com/phaldiya/management-score-pad/commit/8c4358490dd5b82d8ecb85b2c06649828bdc750c))
+
 # [1.10.0](https://github.com/phaldiya/management-score-pad/compare/v1.9.0...v1.10.0) (2026-06-07)
 
 
