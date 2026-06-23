@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/phaldiya/management-score-pad/compare/v1.11.0...v1.12.0) (2026-06-23)
+
+
+### Features
+
+* **game:** add −/+ steppers for tap-to-increment bid and result entry ([f9c35e7](https://github.com/phaldiya/management-score-pad/commit/f9c35e73847dd9f5a0de269f583426b4d943f77f))
+
 # [1.11.0](https://github.com/phaldiya/management-score-pad/compare/v1.10.0...v1.11.0) (2026-06-23)
 
 
