@@ -96,7 +96,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'UNDO_LAST_ROUND': {
       const lastRound = state.rounds[state.rounds.length - 1];
-      if (!lastRound || lastRound.phase !== 'completed') return state;
+      if (lastRound?.phase !== 'completed') return state;
       return {
         ...state,
         rounds: state.rounds.slice(0, -1),

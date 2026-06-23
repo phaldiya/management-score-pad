@@ -10,7 +10,7 @@ export function getCumulativeScore(rounds: GameRound[], playerId: string, upToIn
   let total = 0;
   for (let i = 0; i <= upToIndex; i++) {
     const round = rounds[i];
-    if (!round || round.phase !== 'completed') continue;
+    if (round?.phase !== 'completed') continue;
     const pd = round.playerData.find((p) => p.playerId === playerId);
     if (pd?.score != null) {
       total += pd.score;
