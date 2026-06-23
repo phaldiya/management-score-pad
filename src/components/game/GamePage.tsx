@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.tsx';
 import { getTrumpForGame } from '../../lib/gameLogic.ts';
 import { CloseIcon, SuitIcon } from '../shared/Icons.tsx';
+import DealerIndicator from './DealerIndicator.tsx';
 import GameCompletePopup from './GameCompletePopup.tsx';
 import NextGameButton from './NextGameButton.tsx';
 import PlayFormPopup from './PlayFormPopup.tsx';
@@ -102,6 +103,14 @@ export default function GamePage() {
       />
 
       <div className="border-gray-200 border-t bg-white p-4">
+        <DealerIndicator
+          players={players}
+          currentRound={currentRound}
+          currentRoundIndex={currentRoundIndex}
+          nextGameIndex={nextGameIndex}
+          completedCount={completedCount}
+          totalGames={totalGames}
+        />
         <NextGameButton
           currentRound={currentRound}
           totalGames={totalGames}
