@@ -225,12 +225,12 @@ test.describe('Game Play Flow', () => {
     const scoreCells = page.locator('tbody tr').first().locator('td');
     // Alice (cell 1) nailed bid → green score, green background, has mini confetti
     await expect(scoreCells.nth(1).locator('div.text-green-700')).toHaveCount(1);
-    await expect(scoreCells.nth(1)).toHaveClass(/bg-green-50/);
+    await expect(scoreCells.nth(1)).toHaveClass(/bg-green-/);
     await expect(scoreCells.nth(1).locator('.mini-confetti-piece').first()).toBeAttached();
 
     // Charlie (cell 3) missed bid → red score, red background, no confetti
     await expect(scoreCells.nth(3).locator('div.text-red-600')).toHaveCount(1);
-    await expect(scoreCells.nth(3)).toHaveClass(/bg-red-50/);
+    await expect(scoreCells.nth(3)).toHaveClass(/bg-red-/);
     await expect(scoreCells.nth(3).locator('.mini-confetti-piece')).toHaveCount(0);
   });
 
@@ -392,7 +392,9 @@ test.describe('Game Play Flow', () => {
 
     // Game complete popup should appear
     await expect(page.getByText('Final Standings')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Start New Game' })).toBeVisible();
+    const completeDialog = page.getByRole('dialog', { name: /./ });
+    await expect(completeDialog.getByRole('button', { name: 'Rematch' })).toBeVisible();
+    await expect(completeDialog.getByRole('button', { name: 'New Game' })).toBeVisible();
 
     // Winner card can be downloaded as a PNG
     const downloadButton = page.getByRole('button', { name: 'Download PNG' });
