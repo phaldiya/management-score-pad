@@ -215,22 +215,21 @@ describe('reducer spec', () => {
     { count: 4, expectedMax: 13, expectedTotal: 25 },
     { count: 5, expectedMax: 10, expectedTotal: 19 },
     { count: 6, expectedMax: 8, expectedTotal: 15 },
-  ])('START_GAME with $count players gives maxCards=$expectedMax, totalGames=$expectedTotal', ({
-    count,
-    expectedMax,
-    expectedTotal,
-  }) => {
-    const players = Array.from({ length: count }, (_, i) => ({
-      id: `p${i + 1}`,
-      name: `Player ${i + 1}`,
-      avatar: 'bottts:Zoe',
-    }));
-    const state = createTestState({ players });
-    const result = appReducer(state, { type: 'START_GAME' });
-    expect(result.maxCardsPerPlayer).toBe(expectedMax);
-    expect(result.totalGames).toBe(expectedTotal);
-    expect(result.cardSequence).toHaveLength(expectedTotal);
-  });
+  ])(
+    'START_GAME with $count players gives maxCards=$expectedMax, totalGames=$expectedTotal',
+    ({ count, expectedMax, expectedTotal }) => {
+      const players = Array.from({ length: count }, (_, i) => ({
+        id: `p${i + 1}`,
+        name: `Player ${i + 1}`,
+        avatar: 'bottts:Zoe',
+      }));
+      const state = createTestState({ players });
+      const result = appReducer(state, { type: 'START_GAME' });
+      expect(result.maxCardsPerPlayer).toBe(expectedMax);
+      expect(result.totalGames).toBe(expectedTotal);
+      expect(result.cardSequence).toHaveLength(expectedTotal);
+    },
+  );
 
   it('START_ROUND does not mutate previous state object', () => {
     const state = createTestState({

@@ -22,11 +22,12 @@ describe('gameLogic spec', () => {
     expect(getTotalGames(1)).toBe(1);
   });
 
-  it.each([
-    1, 2, 3, 5, 7, 13, 17, 26, 52,
-  ])('cross-function invariant: getTotalGames(%i) === generateCardSequence(%i).length', (n) => {
-    expect(getTotalGames(n)).toBe(generateCardSequence(n).length);
-  });
+  it.each([1, 2, 3, 5, 7, 13, 17, 26, 52])(
+    'cross-function invariant: getTotalGames(%i) === generateCardSequence(%i).length',
+    (n) => {
+      expect(getTotalGames(n)).toBe(generateCardSequence(n).length);
+    },
+  );
 
   it('isSuitRed returns true for diamonds', () => {
     expect(isSuitRed('diamonds')).toBe(true);
