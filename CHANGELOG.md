@@ -1,3 +1,11 @@
+## [1.12.1](https://github.com/phaldiya/management-score-pad/compare/v1.12.0...v1.12.1) (2026-07-18)
+
+
+### Bug Fixes
+
+* **dealer:** move dealer icon away from avatar in DealerIndicator ([df0e9df](https://github.com/phaldiya/management-score-pad/commit/df0e9dfb6fb74c0d476a13bc5e7f7369e57a5feb))
+* **game:** animate trump card in active round details view ([d77223d](https://github.com/phaldiya/management-score-pad/commit/d77223d88a8d9a83250759ed5b2644cc7b1de236))
+
 # [1.12.0](https://github.com/phaldiya/management-score-pad/compare/v1.11.0...v1.12.0) (2026-06-23)
 
 
