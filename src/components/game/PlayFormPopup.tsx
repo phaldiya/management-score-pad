@@ -144,8 +144,9 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
 
   const sectionLabel = activeMode === 'bid' ? 'Bids' : mode === 'result' ? 'Results (hands won)' : 'Bids';
 
-  // Animate the trump card only while entering the live play (bid/result), not when viewing past details.
-  const isActivePlay = mode === 'bid' || mode === 'result';
+  // Animate the trump card during live play (bid/result) and when viewing the still-active round's details.
+  const isActivePlay =
+    mode === 'bid' || mode === 'result' || (mode === 'details' && props.round.phase === 'in_progress');
 
   const Wrapper = mode !== 'details' || isEditingBids ? 'form' : 'div';
 
