@@ -60,7 +60,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
     "@playwright/test": "^1.61.1",
-    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^10.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.1.1",
