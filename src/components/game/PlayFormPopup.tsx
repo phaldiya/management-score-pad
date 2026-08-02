@@ -259,7 +259,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                       {mode !== 'bid' && !isEditingBids && (
                         <div className="flex items-center gap-2">
                           <span
-                            className="flex h-8 w-8 items-center justify-center rounded border border-blue-200 bg-blue-50 font-medium text-blue-700 text-xs"
+                            className="flex h-8 w-8 items-center justify-center rounded border border-blue-200 bg-blue-50 font-bold text-blue-700 text-xs"
                             title={`Bid: ${pd?.bid}`}
                           >
                             {pd?.bid}
