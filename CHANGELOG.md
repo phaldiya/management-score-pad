@@ -1,3 +1,16 @@
+# [1.13.0](https://github.com/phaldiya/management-score-pad/compare/v1.12.1...v1.13.0) (2026-08-02)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies, migrate to react-router 8 and dicebear 10 ([eebfc3a](https://github.com/phaldiya/management-score-pad/commit/eebfc3a1e5937668404519a6a4390fae24945692))
+* **game:** align round details columns with headers via subgrid ([43f6975](https://github.com/phaldiya/management-score-pad/commit/43f6975039b12340caa90a30c53d71324305e931))
+
+
+### Features
+
+* **game:** make bid/result stepper display-only with colored +/- buttons ([bec9134](https://github.com/phaldiya/management-score-pad/commit/bec91346be0c94b94693f6c5a33c9bb988079e5c))
+
 ## [1.12.1](https://github.com/phaldiya/management-score-pad/compare/v1.12.0...v1.12.1) (2026-07-18)
 
 
