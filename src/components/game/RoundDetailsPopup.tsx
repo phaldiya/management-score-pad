@@ -46,8 +46,8 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
         </div>
 
         <div className="p-4">
-          <div className="space-y-2">
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-3 gap-y-0.5 text-xs">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-3 gap-y-2">
+            <div className="col-span-5 grid grid-cols-subgrid px-2 text-xs">
               <span className="font-semibold text-gray-500 uppercase tracking-wider">Player</span>
               <span className="text-center font-semibold text-gray-500 uppercase tracking-wider">Bid</span>
               <span className="text-center font-semibold text-gray-500 uppercase tracking-wider">Won</span>
@@ -64,7 +64,7 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
               return (
                 <div
                   key={player.id}
-                  className={`grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-3 rounded-lg px-2 py-2 ${matched ? 'bg-green-50' : 'bg-red-50'}`}
+                  className={`col-span-5 grid grid-cols-subgrid items-center rounded-lg px-2 py-2 ${matched ? 'bg-green-50' : 'bg-red-50'}`}
                 >
                   <div className="flex items-center gap-1.5 truncate">
                     <PlayerAvatar avatar={player.avatar} name={player.name} size="xs" />
@@ -73,19 +73,19 @@ export default function RoundDetailsPopup({ round, rounds, players, onClose }: R
                       <img src={`${import.meta.env.BASE_URL}dealer.png`} alt="Dealer" className="h-4 w-4 shrink-0" />
                     )}
                   </div>
-                  <span className="flex h-6 w-8 items-center justify-center rounded bg-blue-100 font-medium text-blue-700 text-xs">
+                  <span className="flex h-6 w-8 items-center justify-center justify-self-center rounded bg-blue-100 font-medium text-blue-700 text-xs">
                     {pd.bid}
                   </span>
-                  <span className="flex h-6 w-8 items-center justify-center rounded bg-gray-100 font-medium text-gray-700 text-xs">
+                  <span className="flex h-6 w-8 items-center justify-center justify-self-center rounded bg-gray-100 font-medium text-gray-700 text-xs">
                     {pd.result}
                   </span>
                   <span
-                    className={`flex h-6 w-12 items-center justify-center gap-0.5 rounded font-bold text-sm ${matched ? 'text-green-700' : 'text-red-500'}`}
+                    className={`flex h-6 w-12 items-center justify-center gap-0.5 justify-self-center rounded font-bold text-sm ${matched ? 'text-green-700' : 'text-red-500'}`}
                   >
                     {matched ? <CheckIcon className="h-3 w-3 shrink-0" /> : <CrossIcon className="h-3 w-3 shrink-0" />}
                     {pd.score}
                   </span>
-                  <span className="flex h-6 w-10 items-center justify-center font-medium text-gray-600 text-xs">
+                  <span className="flex h-6 w-10 items-center justify-center justify-self-center font-medium text-gray-600 text-xs">
                     {cumulative}
                   </span>
                 </div>
