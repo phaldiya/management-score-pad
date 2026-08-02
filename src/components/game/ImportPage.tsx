@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { useAppContext } from '../../context/AppContext.tsx';
 import { decompressState } from '../../lib/transfer.ts';

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 import { useAppContext } from '../../context/AppContext.tsx';
 import { getTrumpForGame } from '../../lib/gameLogic.ts';

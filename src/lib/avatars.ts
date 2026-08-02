@@ -1,7 +1,15 @@
-import { bottts, croodles, lorelei, pixelArt } from '@dicebear/collection';
-import { createAvatar, type Style } from '@dicebear/core';
+import { Avatar, Style } from '@dicebear/core';
+import botttsDefinition from '@dicebear/styles/bottts.json';
+import croodlesDefinition from '@dicebear/styles/croodles.json';
+import loreleiDefinition from '@dicebear/styles/lorelei.json';
+import pixelArtDefinition from '@dicebear/styles/pixel-art.json';
 
-const STYLES = { bottts, croodles, lorelei, pixelArt } as const;
+const STYLES = {
+  bottts: new Style(botttsDefinition),
+  croodles: new Style(croodlesDefinition),
+  lorelei: new Style(loreleiDefinition),
+  pixelArt: new Style(pixelArtDefinition),
+} as const;
 type StyleName = keyof typeof STYLES;
 
 // Avatar ID format: "style:seed" e.g. "bottts:Zoe"
@@ -17,11 +25,7 @@ export function getAvatarDataUri(id: string): string {
   let uri = cache.get(id);
   if (uri) return uri;
   const { style, seed } = parse(id);
-  // Each DiceBear style has different option types; cast to Style<object> for uniform handling
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const styleDef = STYLES[style] ?? STYLES.bottts;
-  // biome-ignore lint/suspicious/noExplicitAny: DiceBear styles have incompatible option types
-  uri = createAvatar(styleDef as Style<any>, { seed, size: 64 }).toDataUri();
+  uri = new Avatar(STYLES[style] ?? STYLES.bottts, { seed, size: 64 }).toDataUri();
   cache.set(id, uri);
   return uri;
 }

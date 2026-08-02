@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 import GamePage from './components/game/GamePage.tsx';
 import ImportPage from './components/game/ImportPage.tsx';
