@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { setStepperValue } from '../helpers.ts';
+
 /** Set up a 3-player game and navigate to the game page. */
 async function setupGame(page: Page, players = ['Alice', 'Bob', 'Charlie']) {
   await page.goto('/');
@@ -21,10 +23,10 @@ async function placeBids(page: Page, bids: number[], players = ['Alice', 'Bob', 
   // Wait for popup
   await expect(page.getByText('Place Bids')).toBeVisible();
 
-  // Fill each player's bid by finding the input next to their name
+  // Set each player's bid via the stepper next to their name
   for (let i = 0; i < bids.length && i < players.length; i++) {
     const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-    await row.locator('input[type="number"]').fill(String(bids[i]));
+    await setStepperValue(row.locator('input[type="number"]'), bids[i]);
   }
 
   await page.getByRole('button', { name: 'Play!' }).click();
@@ -37,7 +39,7 @@ async function enterResults(page: Page, results: number[], players = ['Alice', '
 
   for (let i = 0; i < results.length && i < players.length; i++) {
     const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-    await row.locator('input[type="number"]').fill(String(results[i]));
+    await setStepperValue(row.locator('input[type="number"]'), results[i]);
   }
 
   await page.getByRole('button', { name: 'Submit Results' }).click();
@@ -96,10 +98,10 @@ test.describe('Game Play Flow', () => {
     await page.getByRole('button', { name: 'Start First Play' }).click();
     await expect(page.getByText('Place Bids')).toBeVisible();
 
-    // Fill valid bids (total ≠ card count of 17): 5 + 5 + 5 = 15
+    // Set valid bids (total ≠ card count of 17): 5 + 5 + 5 = 15
     for (const name of ['Alice', 'Bob', 'Charlie']) {
       const row = page.locator('div.flex.items-center.gap-2', { hasText: name });
-      await row.locator('input[type="number"]').fill('5');
+      await setStepperValue(row.locator('input[type="number"]'), 5);
     }
 
     await page.getByRole('button', { name: 'Play!' }).click();
@@ -120,7 +122,7 @@ test.describe('Game Play Flow', () => {
     const invalidBids = [10, 5, 2];
     for (let i = 0; i < players.length; i++) {
       const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-      await row.locator('input[type="number"]').fill(String(invalidBids[i]));
+      await setStepperValue(row.locator('input[type="number"]'), invalidBids[i]);
     }
 
     // Should show the warning
@@ -142,9 +144,9 @@ test.describe('Game Play Flow', () => {
 
     // Results must total 17: 10 + 5 + 2 = 17
     const resultInputs = page.locator('input[type="number"]');
-    await resultInputs.nth(0).fill('10');
-    await resultInputs.nth(1).fill('5');
-    await resultInputs.nth(2).fill('2');
+    await setStepperValue(resultInputs.nth(0), 10);
+    await setStepperValue(resultInputs.nth(1), 5);
+    await setStepperValue(resultInputs.nth(2), 2);
 
     await page.getByRole('button', { name: 'Submit Results' }).click();
 
@@ -162,9 +164,9 @@ test.describe('Game Play Flow', () => {
 
     // Results total 10 ≠ 17
     const resultInputs = page.locator('input[type="number"]');
-    await resultInputs.nth(0).fill('5');
-    await resultInputs.nth(1).fill('3');
-    await resultInputs.nth(2).fill('2');
+    await setStepperValue(resultInputs.nth(0), 5);
+    await setStepperValue(resultInputs.nth(1), 3);
+    await setStepperValue(resultInputs.nth(2), 2);
 
     // Inline indicator should warn that total doesn't match
     await expect(page.getByText('must equal card count!')).toBeVisible();
@@ -249,36 +251,51 @@ test.describe('Game Play Flow', () => {
     await expect(page.locator('thead').getByText('👑')).toBeVisible();
   });
 
-  test('bid popup: focus stays on current input after typing (no jump to first)', async ({ page }) => {
+  test('bid popup: input is read-only, value changes only via +/- buttons', async ({ page }) => {
     await setupGame(page);
     await page.getByRole('button', { name: 'Start First Play' }).click();
     await expect(page.getByText('Place Bids')).toBeVisible();
 
-    const inputs = page.locator('input[type="number"]');
+    const input = page.getByLabel('Bid for Charlie', { exact: true });
+    await expect(input).toHaveJSProperty('readOnly', true);
 
-    // Type into the third player's input
-    await inputs.nth(2).click();
-    await inputs.nth(2).fill('3');
+    // Typing must not change the value
+    await input.click();
+    await input.press('5');
+    await expect(input).toHaveValue('0');
 
-    // The third input should still be focused, not the first
-    await expect(inputs.nth(2)).toBeFocused();
+    const plus = page.getByRole('button', { name: 'Increase bid for Charlie' });
+    await plus.click();
+    await plus.click();
+    await expect(input).toHaveValue('2');
+
+    await page.getByRole('button', { name: 'Decrease bid for Charlie' }).click();
+    await expect(input).toHaveValue('1');
   });
 
-  test('results popup: focus stays on current input after typing (no jump to first)', async ({ page }) => {
+  test('results popup: input is read-only, value changes only via +/- buttons', async ({ page }) => {
     await setupGame(page);
     await placeBids(page, [5, 5, 5]);
 
     await page.getByRole('button', { name: 'Enter Results' }).click();
     await expect(page.getByRole('heading', { name: /Enter Results/ })).toBeVisible();
 
-    const inputs = page.locator('input[type="number"]');
+    const input = page.getByLabel('Result for Charlie', { exact: true });
+    await expect(input).toHaveJSProperty('readOnly', true);
 
-    // Type into the third player's input
-    await inputs.nth(2).click();
-    await inputs.nth(2).fill('5');
+    // Typing must not change the value
+    await input.click();
+    await input.press('7');
+    await expect(input).toHaveValue('0');
 
-    // The third input should still be focused, not the first
-    await expect(inputs.nth(2)).toBeFocused();
+    await page.getByRole('button', { name: 'Increase result for Charlie' }).click();
+    await expect(input).toHaveValue('1');
+
+    // Minus clamps at 0
+    const minus = page.getByRole('button', { name: 'Decrease result for Charlie' });
+    await minus.click();
+    await minus.click();
+    await expect(input).toHaveValue('0');
   });
 
   test('edit bids from details popup', async ({ page }) => {
@@ -301,8 +318,9 @@ test.describe('Game Play Flow', () => {
     await expect(inputs).toHaveCount(3);
 
     // Change bids: 3+4+8=15 (valid, ≠ 17)
+    const newBids = [3, 4, 8];
     for (let i = 0; i < 3; i++) {
-      await inputs.nth(i).fill(['3', '4', '8'][i]);
+      await setStepperValue(inputs.nth(i), newBids[i]);
     }
 
     // Submit
@@ -335,9 +353,9 @@ test.describe('Game Play Flow', () => {
 
     // Set bids that total 17 (= card count): 10+5+2=17
     const inputs = page.locator('input[type="number"]');
-    await inputs.nth(0).fill('10');
-    await inputs.nth(1).fill('5');
-    await inputs.nth(2).fill('2');
+    await setStepperValue(inputs.nth(0), 10);
+    await setStepperValue(inputs.nth(1), 5);
+    await setStepperValue(inputs.nth(2), 2);
 
     // Should show warning
     await expect(page.getByText('cannot equal card count')).toBeVisible();

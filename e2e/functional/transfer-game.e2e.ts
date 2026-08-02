@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { setStepperValue } from '../helpers.ts';
+
 /** Compress current localStorage game state into a transfer URL path. */
 async function getTransferUrl(page: Page): Promise<string> {
   return page.evaluate(async () => {
@@ -52,15 +54,15 @@ async function setupGameWithOneRound(page: Page) {
   await page.getByRole('button', { name: 'Start First Play' }).click();
   for (const name of ['Alice', 'Bob', 'Charlie']) {
     const row = page.locator('div.flex.items-center.gap-2', { hasText: name });
-    await row.locator('input[type="number"]').fill('5');
+    await setStepperValue(row.locator('input[type="number"]'), 5);
   }
   await page.getByRole('button', { name: 'Play!' }).click();
 
   await page.getByRole('button', { name: 'Enter Results' }).click();
   const resultInputs = page.locator('input[type="number"]');
-  await resultInputs.nth(0).fill('10');
-  await resultInputs.nth(1).fill('5');
-  await resultInputs.nth(2).fill('2');
+  await setStepperValue(resultInputs.nth(0), 10);
+  await setStepperValue(resultInputs.nth(1), 5);
+  await setStepperValue(resultInputs.nth(2), 2);
   await page.getByRole('button', { name: 'Submit Results' }).click();
 
   await expect(page.getByRole('button', { name: /Next Play/ })).toBeVisible();

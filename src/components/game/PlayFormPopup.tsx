@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -90,7 +90,6 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
         editDefaults[`bid_${pd.playerId}`] = pd.bid;
       }
       form.reset(editDefaults);
-      hasFocused.current = false;
     }
   }, [isEditingBids, mode, props, form]);
 
@@ -136,7 +135,6 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
             })
           : undefined;
 
-  const hasFocused = useRef(false);
   const rootError = (form.formState.errors as Record<string, { message?: string }>)[`${prefix}_${players[0].id}`];
 
   const action =
@@ -204,7 +202,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                     </Tooltip>
                   )}
                 </div>
-                {ordered.map((p, idx) => {
+                {ordered.map((p) => {
                   const pd = mode !== 'bid' ? props.round.playerData.find((d) => d.playerId === p.id) : undefined;
                   const isDealer = mode === 'bid' ? p.id === dealerId : pd?.isDealer;
 
@@ -232,7 +230,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                             type="button"
                             aria-label={`Decrease bid for ${p.name}`}
                             onClick={() => adjust(`${prefix}_${p.id}`, -1)}
-                            className="flex w-9 items-center justify-center rounded-l border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                            className="flex w-9 items-center justify-center rounded-l border border-red-200 bg-red-50 font-bold text-lg text-red-600 hover:bg-red-100 active:bg-red-200"
                           >
                             &minus;
                           </button>
@@ -240,29 +238,18 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                             type="number"
                             min={0}
                             max={cardCount}
+                            readOnly
+                            tabIndex={-1}
                             aria-label={`Bid for ${p.name}`}
-                            ref={(el) => {
-                              registerRef?.(el);
-                              if (idx === 0 && !hasFocused.current && el) {
-                                el.focus();
-                                hasFocused.current = true;
-                              }
-                            }}
+                            ref={(el) => registerRef?.(el)}
                             {...rest}
-                            onFocus={(e) => e.currentTarget.select()}
-                            onInput={(e) => {
-                              const input = e.currentTarget;
-                              const val = Number(input.value);
-                              if (val > cardCount) input.value = String(cardCount);
-                              if (val < 0) input.value = '0';
-                            }}
-                            className="w-12 border-gray-300 border-y px-1 py-1 text-center text-sm focus:relative focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-12 cursor-default border-gray-300 border-y px-1 py-1 text-center font-bold text-sm focus:outline-none"
                           />
                           <button
                             type="button"
                             aria-label={`Increase bid for ${p.name}`}
                             onClick={() => adjust(`${prefix}_${p.id}`, 1)}
-                            className="flex w-9 items-center justify-center rounded-r border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                            className="flex w-9 items-center justify-center rounded-r border border-green-200 bg-green-50 font-bold text-green-600 text-lg hover:bg-green-100 active:bg-green-200"
                           >
                             +
                           </button>
@@ -287,7 +274,7 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                                 type="button"
                                 aria-label={`Decrease result for ${p.name}`}
                                 onClick={() => adjust(`${prefix}_${p.id}`, -1)}
-                                className="flex w-9 items-center justify-center rounded-l border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                                className="flex w-9 items-center justify-center rounded-l border border-red-200 bg-red-50 font-bold text-lg text-red-600 hover:bg-red-100 active:bg-red-200"
                               >
                                 &minus;
                               </button>
@@ -295,29 +282,18 @@ export default function PlayFormPopup(props: PlayFormPopupProps) {
                                 type="number"
                                 min={0}
                                 max={cardCount}
+                                readOnly
+                                tabIndex={-1}
                                 aria-label={`Result for ${p.name}`}
-                                ref={(el) => {
-                                  registerRef?.(el);
-                                  if (idx === 0 && el && !hasFocused.current) {
-                                    hasFocused.current = true;
-                                    el.focus();
-                                  }
-                                }}
+                                ref={(el) => registerRef?.(el)}
                                 {...rest}
-                                onFocus={(e) => e.currentTarget.select()}
-                                onInput={(e) => {
-                                  const input = e.currentTarget;
-                                  const val = Number(input.value);
-                                  if (val > cardCount) input.value = String(cardCount);
-                                  if (val < 0) input.value = '0';
-                                }}
-                                className="w-12 border-gray-300 border-y px-1 py-1 text-center text-sm focus:relative focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-12 cursor-default border-gray-300 border-y px-1 py-1 text-center font-bold text-sm focus:outline-none"
                               />
                               <button
                                 type="button"
                                 aria-label={`Increase result for ${p.name}`}
                                 onClick={() => adjust(`${prefix}_${p.id}`, 1)}
-                                className="flex w-9 items-center justify-center rounded-r border border-gray-300 bg-gray-50 font-bold text-gray-600 text-lg hover:bg-gray-100 active:bg-gray-200"
+                                className="flex w-9 items-center justify-center rounded-r border border-green-200 bg-green-50 font-bold text-green-600 text-lg hover:bg-green-100 active:bg-green-200"
                               >
                                 +
                               </button>

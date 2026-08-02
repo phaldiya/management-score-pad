@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { setStepperValue } from '../helpers.ts';
+
 /**
  * Avatars are auto-picked with Math.random at setup, which would vary every run.
  * Pin Math.random to a constant before the app loads so getRandomAvatar always
@@ -54,7 +56,7 @@ async function playFullGame(page: Page, players: string[]) {
     await expect(page.getByText('Place Bids')).toBeVisible();
     for (let i = 0; i < bids.length; i++) {
       const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-      await row.locator('input[type="number"]').fill(String(bids[i]));
+      await setStepperValue(row.locator('input[type="number"]'), bids[i]);
     }
     await page.getByRole('button', { name: 'Play!' }).click();
 
@@ -63,7 +65,7 @@ async function playFullGame(page: Page, players: string[]) {
     await expect(page.getByRole('heading', { name: /Enter Results/ })).toBeVisible();
     const resultInputs = page.locator('input[type="number"]');
     for (let i = 0; i < results.length; i++) {
-      await resultInputs.nth(i).fill(String(results[i]));
+      await setStepperValue(resultInputs.nth(i), results[i]);
     }
     await page.getByRole('button', { name: 'Submit Results' }).click();
   }
@@ -145,16 +147,16 @@ test.describe('Visual Regression', () => {
     await page.getByRole('button', { name: 'Start First Play' }).click();
     for (const name of ['Alice', 'Bob', 'Charlie']) {
       const row = page.locator('div.flex.items-center.gap-2', { hasText: name });
-      await row.locator('input[type="number"]').fill('5');
+      await setStepperValue(row.locator('input[type="number"]'), 5);
     }
     await page.getByRole('button', { name: 'Play!' }).click();
 
     // Enter results: 10+5+2=17
     await page.getByRole('button', { name: 'Enter Results' }).click();
     const resultInputs = page.locator('input[type="number"]');
-    await resultInputs.nth(0).fill('10');
-    await resultInputs.nth(1).fill('5');
-    await resultInputs.nth(2).fill('2');
+    await setStepperValue(resultInputs.nth(0), 10);
+    await setStepperValue(resultInputs.nth(1), 5);
+    await setStepperValue(resultInputs.nth(2), 2);
     await page.getByRole('button', { name: 'Submit Results' }).click();
 
     await expect(page.getByRole('button', { name: /Next Play/ })).toBeVisible();

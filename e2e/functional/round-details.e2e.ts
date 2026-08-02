@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { setStepperValue } from '../helpers.ts';
+
 /** Set up a 3-player game and navigate to the game page. */
 async function setupGame(page: Page, players = ['Alice', 'Bob', 'Charlie']) {
   await page.goto('/');
@@ -19,7 +21,7 @@ async function placeBids(page: Page, bids: number[], players = ['Alice', 'Bob', 
   await expect(page.getByText('Place Bids')).toBeVisible();
   for (let i = 0; i < bids.length && i < players.length; i++) {
     const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-    await row.locator('input[type="number"]').fill(String(bids[i]));
+    await setStepperValue(row.locator('input[type="number"]'), bids[i]);
   }
   await page.getByRole('button', { name: 'Play!' }).click();
 }
@@ -30,7 +32,7 @@ async function enterResults(page: Page, results: number[], players = ['Alice', '
   await expect(page.getByRole('heading', { name: /Enter Results/ })).toBeVisible();
   for (let i = 0; i < results.length && i < players.length; i++) {
     const row = page.locator('div.flex.items-center.gap-2', { hasText: players[i] });
-    await row.locator('input[type="number"]').fill(String(results[i]));
+    await setStepperValue(row.locator('input[type="number"]'), results[i]);
   }
   await page.getByRole('button', { name: 'Submit Results' }).click();
 }
