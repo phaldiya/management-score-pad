@@ -1,7 +1,8 @@
-import type { GameRound, PlayerRoundData } from '../types/index.ts';
+import type { GameMode, GameRound, PlayerRoundData } from '../types/index.ts';
 
-export function calculateScore(bid: number, result: number): number {
+export function calculateScore(bid: number, result: number, mode: GameMode = 'classic'): number {
   if (bid !== result) return 0;
+  if (mode === 'advance') return 10 + bid;
   if (bid === 0) return 10;
   return bid * 10;
 }
@@ -19,9 +20,9 @@ export function getCumulativeScore(rounds: GameRound[], playerId: string, upToIn
   return total;
 }
 
-export function computeRoundScores(playerData: PlayerRoundData[]): PlayerRoundData[] {
+export function computeRoundScores(playerData: PlayerRoundData[], mode: GameMode = 'classic'): PlayerRoundData[] {
   return playerData.map((pd) => ({
     ...pd,
-    score: pd.result != null ? calculateScore(pd.bid, pd.result) : null,
+    score: pd.result != null ? calculateScore(pd.bid, pd.result, mode) : null,
   }));
 }

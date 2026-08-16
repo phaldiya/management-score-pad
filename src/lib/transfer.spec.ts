@@ -12,6 +12,7 @@ import { buildTransferUrl, compressState, decompressState, generateQrDataUrl } f
 const mockState: AppState = {
   gameId: 'test-game-123',
   gamePhase: 'playing',
+  gameMode: 'classic',
   players: [
     { id: 'p1', name: 'Alice', avatar: 'bottts:seed1' },
     { id: 'p2', name: 'Bob', avatar: 'croodles:seed2' },
@@ -101,6 +102,28 @@ describe('transfer', () => {
       const withGarbage = `${encoded}\nJoin game: Alice, Bob, Charlie`;
       const decoded = await decompressState(withGarbage);
       expect(decoded).toEqual(mockState);
+    });
+
+    it('defaults gameMode to classic for payloads from before game modes existed', async () => {
+      const { gameMode: _omitted, ...legacyState } = mockState;
+      const legacy = { v: 1, state: legacyState };
+      const json = JSON.stringify(legacy);
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(json);
+      let binary = '';
+      for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+      }
+      const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const decoded = await decompressState(encoded);
+      expect(decoded.gameMode).toBe('classic');
+    });
+
+    it('round-trips advance gameMode', async () => {
+      const advanceState: AppState = { ...mockState, gameMode: 'advance' };
+      const encoded = await compressState(advanceState);
+      const decoded = await decompressState(encoded);
+      expect(decoded.gameMode).toBe('advance');
     });
 
     it('rejects wrong version', async () => {

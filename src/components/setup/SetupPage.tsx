@@ -7,6 +7,7 @@ import { clearActiveGame, getStoredAvatar, loadActiveGame, rememberAvatars } fro
 import { useDragReorder } from '../../lib/useDragReorder.ts';
 import type { AppState } from '../../types/index.ts';
 import AvatarPicker from '../shared/AvatarPicker.tsx';
+import { GameModeToggle } from '../shared/GameModeToggle.tsx';
 import { AppIcon, GripIcon, PlusIcon, TrashIcon } from '../shared/Icons.tsx';
 import PlayerAvatar from '../shared/PlayerAvatar.tsx';
 import { Tooltip } from '../shared/Tooltip.tsx';
@@ -28,7 +29,7 @@ function createInitialPlayers(count: number): DraftPlayer[] {
 }
 
 export default function SetupPage() {
-  const { dispatch } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const navigate = useNavigate();
   const [players, setPlayers] = useState<DraftPlayer[]>(() => createInitialPlayers(3));
   const [savedGame, setSavedGame] = useState<AppState | null>(null);
@@ -125,14 +126,16 @@ export default function SetupPage() {
       {savedGame && <RestoreGamePopup savedState={savedGame} onRestore={handleRestore} onStartNew={handleStartNew} />}
 
       <div className="flex w-full max-w-3xl items-center gap-8">
-        <div className="hidden shrink-0 items-center justify-center self-stretch md:flex">
-          <AppIcon className="h-80 w-80" />
+        <div className="hidden shrink-0 flex-col items-center justify-center gap-4 self-stretch md:flex">
+          <AppIcon className="h-80 w-80" advanced={state.gameMode === 'advance'} badgeClassName="h-6 w-6" />
+          <GameModeToggle showHint />
         </div>
 
         <div className="w-full max-w-md">
           <div className="mb-6 md:hidden">
             <div className="flex flex-col items-center gap-2 text-center">
-              <AppIcon className="h-20 w-20" />
+              <AppIcon className="h-20 w-20" advanced={state.gameMode === 'advance'} badgeClassName="h-5 w-5" />
+              <GameModeToggle showHint />
               <h2 className="font-bold text-2xl text-gray-900">Management (Judgement)</h2>
             </div>
           </div>
@@ -177,6 +180,8 @@ export default function SetupPage() {
                   <input
                     type="text"
                     maxLength={8}
+                    // biome-ignore lint/a11y/noAutofocus: focusing the first name field is the expected entry point
+                    autoFocus={index === 0}
                     placeholder={`Player ${index + 1}`}
                     aria-label={`Player ${index + 1} name`}
                     aria-invalid={duplicateIndices.has(index) || tooShortIndices.has(index) || undefined}

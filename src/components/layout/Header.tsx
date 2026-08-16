@@ -116,7 +116,7 @@ export default function Header() {
     <>
       <header className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
         <div className="flex items-center gap-2">
-          <AppIcon className="h-8 w-8" />
+          <AppIcon className="h-8 w-8" advanced={state.gameMode === 'advance'} />
           <h1 className="font-bold text-gray-900 text-lg">
             Management<span className="hidden sm:inline"> Score Pad</span>
           </h1>

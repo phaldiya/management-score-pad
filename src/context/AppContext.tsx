@@ -2,12 +2,20 @@ import { createContext, type ReactNode, useContext, useEffect, useReducer } from
 
 import { generateCardSequence, getMaxCardsPerPlayer, getTotalGames, getTrumpForGame } from '../lib/gameLogic.ts';
 import { computeRoundScores } from '../lib/scoreCalculation.ts';
-import { clearActiveGame, loadActiveGame, saveCompletedGame, saveGameState } from '../lib/storage.ts';
+import {
+  clearActiveGame,
+  loadActiveGame,
+  loadGameMode,
+  saveCompletedGame,
+  saveGameMode,
+  saveGameState,
+} from '../lib/storage.ts';
 import type { AppAction, AppState } from '../types/index.ts';
 
 export const initialState: AppState = {
   gameId: null,
   gamePhase: 'setup',
+  gameMode: 'classic',
   players: [],
   rounds: [],
   currentRoundIndex: -1,
@@ -77,7 +85,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           result: resultEntry?.result ?? 0,
         };
       });
-      current.playerData = computeRoundScores(updatedPlayerData);
+      current.playerData = computeRoundScores(updatedPlayerData, state.gameMode);
       current.phase = 'completed';
       rounds[state.currentRoundIndex] = current;
       const newState = { ...state, rounds };
@@ -86,6 +94,18 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         saveCompletedGame(newState);
       }
       return newState;
+    }
+
+    case 'SET_GAME_MODE': {
+      if (action.mode === state.gameMode) return state;
+      saveGameMode(action.mode);
+      // Re-score completed rounds so the scoreboard stays consistent with the new mode.
+      const rounds = state.rounds.map((round) =>
+        round.phase === 'completed'
+          ? { ...round, playerData: computeRoundScores(round.playerData, action.mode) }
+          : round,
+      );
+      return { ...state, gameMode: action.mode, rounds };
     }
 
     case 'UPDATE_BIDS': {
@@ -118,10 +138,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'RESET_GAME':
       clearActiveGame();
-      return { ...initialState };
+      return { ...initialState, gameMode: state.gameMode };
 
     case 'LOAD_STATE':
-      return { ...action.state };
+      // Older saved games predate gameMode — treat them as classic.
+      return { ...action.state, gameMode: action.state.gameMode ?? 'classic' };
 
     default:
       return state;
@@ -134,7 +155,8 @@ const AppContext = createContext<{
 } | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  // A new session starts in the mode the user last played.
+  const [state, dispatch] = useReducer(appReducer, initialState, (s) => ({ ...s, gameMode: loadGameMode() }));
 
   useEffect(() => {
     const saved = loadActiveGame();

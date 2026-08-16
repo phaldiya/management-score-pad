@@ -46,7 +46,7 @@ export function TransferGamePopup({ onClose }: TransferGamePopupProps) {
         if (cancelled) return;
         setUrl(transferUrl);
 
-        const qr = await generateQrDataUrl(transferUrl);
+        const qr = await generateQrDataUrl(transferUrl, state.gameMode === 'advance');
         if (cancelled) return;
         setQrDataUrl(qr);
       } catch {

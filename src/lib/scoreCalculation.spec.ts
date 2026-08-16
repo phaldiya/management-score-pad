@@ -172,4 +172,38 @@ describe('scoreCalculation – deep', () => {
       expect(calculateScore(n, n)).toBe(n * 10);
     });
   });
+
+  describe('advance mode', () => {
+    it('exact bid met → 10 + bid', () => {
+      expect(calculateScore(3, 3, 'advance')).toBe(13);
+    });
+
+    it.each([1, 2, 3, 4, 5])('bid=%i result=%i → 10+%i', (n) => {
+      expect(calculateScore(n, n, 'advance')).toBe(10 + n);
+    });
+
+    it('zero bid (nil) met → 10', () => {
+      expect(calculateScore(0, 0, 'advance')).toBe(10);
+    });
+
+    it('bid missed (over) → 0', () => {
+      expect(calculateScore(3, 5, 'advance')).toBe(0);
+    });
+
+    it('bid missed (under) → 0', () => {
+      expect(calculateScore(3, 2, 'advance')).toBe(0);
+    });
+
+    it('computeRoundScores applies advance scoring', () => {
+      const playerData = [
+        { playerId: 'p1', bid: 2, result: 2, score: null, isDealer: true },
+        { playerId: 'p2', bid: 0, result: 0, score: null, isDealer: false },
+        { playerId: 'p3', bid: 3, result: 1, score: null, isDealer: false },
+      ];
+      const scored = computeRoundScores(playerData, 'advance');
+      expect(scored[0].score).toBe(12);
+      expect(scored[1].score).toBe(10);
+      expect(scored[2].score).toBe(0);
+    });
+  });
 });

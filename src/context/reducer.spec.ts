@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { testPlayers } from '../../tests/helpers/fixtures.ts';
 import { applyActions, createTestState } from '../../tests/helpers/testReducer.ts';
 import { getCumulativeScore } from '../lib/scoreCalculation.ts';
+import type { AppState } from '../types/index.ts';
 import { appReducer, initialState } from './AppContext.tsx';
 
 describe('reducer spec', () => {
@@ -959,5 +960,158 @@ describe('reducer – deep', () => {
       expect(state.rounds[1].gameNumber).toBe(2);
       expect(state.rounds[2].gameNumber).toBe(3);
     });
+  });
+});
+
+describe('game mode', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  const inProgressRound = () => ({
+    gameIndex: 0,
+    gameNumber: 1,
+    cardCount: 17,
+    trump: 'spades' as const,
+    phase: 'in_progress' as const,
+    playerData: [
+      { playerId: 'p1', bid: 3, result: null, score: null, isDealer: true },
+      { playerId: 'p2', bid: 0, result: null, score: null, isDealer: false },
+      { playerId: 'p3', bid: 2, result: null, score: null, isDealer: false },
+    ],
+  });
+
+  it('initialState defaults to classic', () => {
+    expect(initialState.gameMode).toBe('classic');
+  });
+
+  it('SET_GAME_MODE switches the mode', () => {
+    const state = appReducer(createTestState(), { type: 'SET_GAME_MODE', mode: 'advance' });
+    expect(state.gameMode).toBe('advance');
+  });
+
+  it('SET_GAME_MODE with the current mode returns the same state reference', () => {
+    const state = createTestState({ gameMode: 'advance' });
+    expect(appReducer(state, { type: 'SET_GAME_MODE', mode: 'advance' })).toBe(state);
+  });
+
+  it('SET_GAME_MODE persists the choice for future sessions', () => {
+    appReducer(createTestState(), { type: 'SET_GAME_MODE', mode: 'advance' });
+    expect(localStorage.getItem('management-score-pad-mode')).toBe('advance');
+  });
+
+  it('SET_GAME_MODE re-scores completed rounds under the new mode', () => {
+    let state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    state = appReducer(state, {
+      type: 'COMPLETE_ROUND',
+      results: [
+        { playerId: 'p1', result: 3 },
+        { playerId: 'p2', result: 0 },
+        { playerId: 'p3', result: 1 },
+      ],
+    });
+    // Classic: 30, 10, 0
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([30, 10, 0]);
+
+    state = appReducer(state, { type: 'SET_GAME_MODE', mode: 'advance' });
+    // Advance: 10+3=13, 10, 0
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([13, 10, 0]);
+
+    state = appReducer(state, { type: 'SET_GAME_MODE', mode: 'classic' });
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([30, 10, 0]);
+  });
+
+  it('SET_GAME_MODE leaves in-progress rounds unscored', () => {
+    const state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    const result = appReducer(state, { type: 'SET_GAME_MODE', mode: 'advance' });
+    expect(result.rounds[0].phase).toBe('in_progress');
+    expect(result.rounds[0].playerData.every((p) => p.score === null)).toBe(true);
+  });
+
+  it('COMPLETE_ROUND scores with advance rules when gameMode is advance', () => {
+    let state = createTestState({
+      gameId: 'g1',
+      gameMode: 'advance',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    state = appReducer(state, {
+      type: 'COMPLETE_ROUND',
+      results: [
+        { playerId: 'p1', result: 3 },
+        { playerId: 'p2', result: 0 },
+        { playerId: 'p3', result: 1 },
+      ],
+    });
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([13, 10, 0]);
+  });
+
+  it('START_GAME keeps the chosen game mode', () => {
+    const state = applyActions(createTestState({ gameMode: 'advance' }), [
+      { type: 'SET_PLAYERS', players: testPlayers },
+      { type: 'START_GAME' },
+    ]);
+    expect(state.gameMode).toBe('advance');
+  });
+
+  it('RESET_GAME preserves the game mode for the next game', () => {
+    let state = applyActions(createTestState({ gameMode: 'advance' }), [
+      { type: 'SET_PLAYERS', players: testPlayers },
+      { type: 'START_GAME' },
+    ]);
+    state = appReducer(state, { type: 'RESET_GAME' });
+    expect(state.gameMode).toBe('advance');
+    expect(state.gamePhase).toBe('setup');
+    expect(state.players).toEqual([]);
+  });
+
+  it('LOAD_STATE defaults a missing gameMode to classic (pre-game-mode saves)', () => {
+    const { gameMode: _omitted, ...legacy } = createTestState({ gameId: 'legacy', gamePhase: 'playing' });
+    const state = appReducer(initialState, { type: 'LOAD_STATE', state: legacy as AppState });
+    expect(state.gameMode).toBe('classic');
+  });
+
+  it('LOAD_STATE keeps a stored advance mode', () => {
+    const saved = createTestState({ gameId: 'adv', gamePhase: 'playing', gameMode: 'advance' });
+    const state = appReducer(initialState, { type: 'LOAD_STATE', state: saved });
+    expect(state.gameMode).toBe('advance');
+  });
+
+  it('LOAD_STATE overrides a selected advance mode with the loaded game’s classic mode', () => {
+    const current = createTestState({ gameMode: 'advance' });
+    const saved = createTestState({ gameId: 'restored', gamePhase: 'playing', gameMode: 'classic' });
+    const state = appReducer(current, { type: 'LOAD_STATE', state: saved });
+    expect(state.gameMode).toBe('classic');
+  });
+
+  it('LOAD_STATE overrides a selected classic mode with the loaded game’s advance mode', () => {
+    const current = createTestState({ gameMode: 'classic' });
+    const saved = createTestState({ gameId: 'restored', gamePhase: 'playing', gameMode: 'advance' });
+    const state = appReducer(current, { type: 'LOAD_STATE', state: saved });
+    expect(state.gameMode).toBe('advance');
+  });
+
+  it('LOAD_STATE of a legacy save overrides a selected advance mode with classic', () => {
+    const current = createTestState({ gameMode: 'advance' });
+    const { gameMode: _omitted, ...legacy } = createTestState({ gameId: 'legacy', gamePhase: 'playing' });
+    const state = appReducer(current, { type: 'LOAD_STATE', state: legacy as AppState });
+    expect(state.gameMode).toBe('classic');
   });
 });

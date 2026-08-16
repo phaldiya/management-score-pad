@@ -4,6 +4,8 @@ export type GamePhase = 'setup' | 'playing';
 
 export type RoundPhase = 'bidding' | 'in_progress' | 'completed';
 
+export type GameMode = 'classic' | 'advance';
+
 export interface Player {
   id: string;
   name: string;
@@ -30,6 +32,7 @@ export interface GameRound {
 export interface AppState {
   gameId: string | null;
   gamePhase: GamePhase;
+  gameMode: GameMode;
   players: Player[];
   rounds: GameRound[];
   currentRoundIndex: number;
@@ -45,6 +48,7 @@ export type AppAction =
   | { type: 'COMPLETE_ROUND'; results: { playerId: string; result: number }[] }
   | { type: 'REORDER_PLAYERS'; fromIndex: number; toIndex: number }
   | { type: 'UPDATE_BIDS'; bids: { playerId: string; bid: number }[] }
+  | { type: 'SET_GAME_MODE'; mode: GameMode }
   | { type: 'UNDO_LAST_ROUND' }
   | { type: 'RESET_GAME' }
   | { type: 'LOAD_STATE'; state: AppState };

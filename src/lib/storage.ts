@@ -1,9 +1,28 @@
-import type { AppState } from '../types/index.ts';
+import type { AppState, GameMode } from '../types/index.ts';
 import { getCumulativeScore } from './scoreCalculation.ts';
 
 const ACTIVE_KEY = 'management-score-pad-active';
 const HISTORY_KEY = 'management-score-pad-history';
+const GAME_MODE_KEY = 'management-score-pad-mode';
 const MAX_HISTORY = 50;
+
+// Remembered across sessions so a new game defaults to the last mode played.
+export function saveGameMode(mode: GameMode): void {
+  try {
+    localStorage.setItem(GAME_MODE_KEY, mode);
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
+export function loadGameMode(): GameMode {
+  try {
+    const raw = localStorage.getItem(GAME_MODE_KEY);
+    return raw === 'advance' ? 'advance' : 'classic';
+  } catch {
+    return 'classic';
+  }
+}
 
 // Single store key holding a { normalizedName: avatarId } map so a returning
 // player keeps the avatar they were last assigned.
@@ -63,7 +82,9 @@ export function loadActiveGame(): AppState | null {
     if (!activeId) return null;
     const raw = localStorage.getItem(gameKey(activeId));
     if (!raw) return null;
-    return JSON.parse(raw) as AppState;
+    // Saves from before game modes existed lack gameMode — treat them as classic.
+    const parsed = JSON.parse(raw) as AppState;
+    return { ...parsed, gameMode: parsed.gameMode ?? 'classic' };
   } catch {
     return null;
   }

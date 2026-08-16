@@ -10,8 +10,10 @@ import {
   loadActiveGame,
   loadAvatarMap,
   loadGameHistory,
+  loadGameMode,
   rememberAvatars,
   saveCompletedGame,
+  saveGameMode,
   saveGameState,
 } from './storage.ts';
 
@@ -207,5 +209,40 @@ describe('game history', () => {
     saveCompletedGame(finishedState('hist-1'));
     clearGameHistory();
     expect(loadGameHistory()).toEqual([]);
+  });
+});
+
+describe('game mode persistence', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('loadGameMode defaults to classic when nothing saved', () => {
+    expect(loadGameMode()).toBe('classic');
+  });
+
+  it('saveGameMode / loadGameMode round-trips', () => {
+    saveGameMode('advance');
+    expect(loadGameMode()).toBe('advance');
+    saveGameMode('classic');
+    expect(loadGameMode()).toBe('classic');
+  });
+
+  it('loadGameMode falls back to classic on an unrecognized stored value', () => {
+    localStorage.setItem('management-score-pad-mode', 'turbo');
+    expect(loadGameMode()).toBe('classic');
+  });
+
+  it('loadActiveGame defaults gameMode to classic for saves from before game modes existed', () => {
+    const { gameMode: _omitted, ...legacy } = createTestState({ gameId: 'legacy-1', gamePhase: 'playing' });
+    localStorage.setItem('management-score-pad-legacy-1', JSON.stringify(legacy));
+    localStorage.setItem('management-score-pad-active', 'legacy-1');
+    expect(loadActiveGame()?.gameMode).toBe('classic');
+  });
+
+  it('loadActiveGame preserves a saved advance gameMode', () => {
+    const state = createTestState({ gameId: 'adv-1', gamePhase: 'playing', gameMode: 'advance' });
+    saveGameState(state);
+    expect(loadActiveGame()?.gameMode).toBe('advance');
   });
 });

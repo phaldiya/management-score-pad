@@ -31,6 +31,8 @@ const GameRoundSchema = z.object({
 const AppStateSchema = z.object({
   gameId: z.string().nullable(),
   gamePhase: z.enum(['setup', 'playing']),
+  // QR codes generated before game modes existed omit this — default to classic.
+  gameMode: z.enum(['classic', 'advance']).default('classic'),
   players: z.array(PlayerSchema),
   rounds: z.array(GameRoundSchema),
   currentRoundIndex: z.number(),
@@ -171,7 +173,34 @@ function loadImage(src: string, width: number, height: number): Promise<HTMLImag
   });
 }
 
-export async function generateQrDataUrl(url: string): Promise<string | null> {
+function drawAdvanceBadge(ctx: CanvasRenderingContext2D, logoOffset: number, logoSize: number): void {
+  // Same relative position as the AppIcon badge: center at 81% across, 12% down the logo box.
+  const cx = logoOffset + logoSize * 0.81;
+  const cy = logoOffset + logoSize * 0.12;
+  const badgeRadius = logoSize * 0.14;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeRadius + 2 * QR_SCALE, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(2, badgeRadius * 0.3);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx - badgeRadius * 0.5, cy);
+  ctx.lineTo(cx + badgeRadius * 0.5, cy);
+  ctx.moveTo(cx, cy - badgeRadius * 0.5);
+  ctx.lineTo(cx, cy + badgeRadius * 0.5);
+  ctx.stroke();
+}
+
+export async function generateQrDataUrl(url: string, advanced = false): Promise<string | null> {
   if (url.length > QR_URL_MAX_LENGTH) {
     return null;
   }
@@ -207,6 +236,9 @@ export async function generateQrDataUrl(url: string): Promise<string | null> {
       const logoSrc = `${import.meta.env.BASE_URL}favicon.svg`;
       const logo = await loadImage(logoSrc, logoSize, logoSize);
       ctx.drawImage(logo, logoOffset, logoOffset, logoSize, logoSize);
+      if (advanced) {
+        drawAdvanceBadge(ctx, logoOffset, logoSize);
+      }
     } catch {
       // Logo failed to load — QR code still works without it
     }

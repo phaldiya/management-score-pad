@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useRef } from 'react';
 
 import { getCumulativeScore } from '../../lib/scoreCalculation.ts';
 import type { GameRound, Player } from '../../types/index.ts';
+import { GameModeToggle } from '../shared/GameModeToggle.tsx';
 import AddPlayerInline from './AddPlayerInline.tsx';
 import GameStatsPanel from './GameStatsPanel.tsx';
 import ScoreboardHeader from './ScoreboardHeader.tsx';
@@ -87,6 +88,9 @@ const Scoreboard = forwardRef<HTMLTableElement, ScoreboardProps>(function Scoreb
               Use the <span className="inline-block rounded bg-gray-100 px-1.5 font-medium text-gray-700">&larr;</span>{' '}
               <span className="inline-block rounded bg-gray-100 px-1.5 font-medium text-gray-700">&rarr;</span> arrows
               to reorder players in clockwise seating order.
+            </div>
+            <div className="mt-4 flex items-start justify-center gap-2 text-gray-700 text-sm">
+              Game mode: <GameModeToggle showHint />
             </div>
           </div>
         </div>
