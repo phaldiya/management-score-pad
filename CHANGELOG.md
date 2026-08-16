@@ -1,3 +1,15 @@
+# [1.14.0](https://github.com/phaldiya/management-score-pad/compare/v1.13.0...v1.14.0) (2026-08-16)
+
+
+### Bug Fixes
+
+* **deps:** override nanoid to >=3.3.18 to resolve security advisory ([b2a99b3](https://github.com/phaldiya/management-score-pad/commit/b2a99b319ce0dac40546b538ef04d0d90db683d9))
+
+
+### Features
+
+* **game:** add Advance scoring mode ([c5ce611](https://github.com/phaldiya/management-score-pad/commit/c5ce611572560015df241b1ec07c5244d74415aa))
+
 # [1.13.0](https://github.com/phaldiya/management-score-pad/compare/v1.12.1...v1.13.0) (2026-08-02)
 
 
