@@ -1,4 +1,4 @@
-import type { Suit } from '../../types/index.ts';
+import type { GameMode, Suit } from '../../types/index.ts';
 
 interface IconProps {
   className?: string;
@@ -77,23 +77,30 @@ export function TrashIcon({ className = 'h-5 w-5' }: IconProps) {
   );
 }
 
+const MODE_BADGES: Record<Exclude<GameMode, 'classic'>, { bg: string; title: string; path: string }> = {
+  advance: { bg: 'bg-green-500', title: 'Advance mode', path: 'M12 5v14m-7-7h14' },
+  // ± glyph — Pro adds negative marking on top of Advance.
+  pro: { bg: 'bg-purple-600', title: 'Pro mode', path: 'M12 3v10m-5-5h10M7 19h10' },
+};
+
 export function AppIcon({
   className = 'h-8 w-8',
-  advanced = false,
+  mode = 'classic',
   badgeClassName = 'h-3.5 w-3.5',
-}: IconProps & { advanced?: boolean; badgeClassName?: string }) {
+}: IconProps & { mode?: GameMode; badgeClassName?: string }) {
+  const badge = mode === 'classic' ? null : MODE_BADGES[mode];
   return (
     <span className={`relative inline-block ${className}`}>
       <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Management Score Pad" className="h-full w-full" />
-      {advanced && (
+      {badge && (
         <span
           // The card artwork is inset within the SVG viewBox — offsets anchor the badge to its visible corner.
-          className={`absolute top-[10%] right-[17%] flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-green-500 text-white ring-2 ring-white ${badgeClassName}`}
-          data-testid="advance-mode-badge"
-          title="Advance mode"
+          className={`absolute top-[10%] right-[17%] flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-white ring-2 ring-white ${badge.bg} ${badgeClassName}`}
+          data-testid={`${mode}-mode-badge`}
+          title={badge.title}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4} className="h-[65%] w-[65%]">
-            <path strokeLinecap="round" d="M12 5v14m-7-7h14" />
+            <path strokeLinecap="round" d={badge.path} />
           </svg>
         </span>
       )}

@@ -126,6 +126,13 @@ describe('transfer', () => {
       expect(decoded.gameMode).toBe('advance');
     });
 
+    it('round-trips pro gameMode', async () => {
+      const proState: AppState = { ...mockState, gameMode: 'pro' };
+      const encoded = await compressState(proState);
+      const decoded = await decompressState(encoded);
+      expect(decoded.gameMode).toBe('pro');
+    });
+
     it('rejects wrong version', async () => {
       const bad = { v: 99, state: mockState };
       const json = JSON.stringify(bad);

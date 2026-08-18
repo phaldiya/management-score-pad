@@ -18,7 +18,7 @@ export function saveGameMode(mode: GameMode): void {
 export function loadGameMode(): GameMode {
   try {
     const raw = localStorage.getItem(GAME_MODE_KEY);
-    return raw === 'advance' ? 'advance' : 'classic';
+    return raw === 'advance' || raw === 'pro' ? raw : 'classic';
   } catch {
     return 'classic';
   }

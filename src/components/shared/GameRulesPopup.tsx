@@ -179,7 +179,7 @@ function ScoringTab() {
         <h3 className="mb-1 font-semibold text-gray-900">Scoring</h3>
         <p className="mb-2 text-gray-600">
           Meet your exact bid to score; missing your bid (winning more or fewer tricks than predicted) scores 0 for that
-          round.
+          round &mdash; or costs you points in Pro mode.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
@@ -194,13 +194,22 @@ function ScoringTab() {
                     </span>
                   </span>
                 </th>
-                <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pl-2 align-top">
+                <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pr-2 pl-2 align-top">
                   <span className="font-semibold text-green-600">Advance</span>
+                </th>
+                <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pl-2 align-top">
+                  <span className="font-semibold text-purple-600">Pro</span>
                 </th>
               </tr>
               <tr className="border-gray-200 border-b">
                 <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
                   Situation
+                </th>
+                <th scope="col" className="border-gray-200 border-l py-1 pr-2 pl-2 font-medium text-gray-700">
+                  Points
+                </th>
+                <th scope="col" className="py-1 pr-2 font-medium text-gray-700">
+                  Examples
                 </th>
                 <th scope="col" className="border-gray-200 border-l py-1 pr-2 pl-2 font-medium text-gray-700">
                   Points
@@ -226,6 +235,12 @@ function ScoringTab() {
                   Bid 5 &rarr; <strong>50</strong>
                 </td>
                 <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">10 + bid</td>
+                <td className="py-1.5 pr-2 text-gray-700">
+                  Bid 2 &rarr; <strong>12</strong>
+                  <br />
+                  Bid 5 &rarr; <strong>15</strong>
+                </td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">10 + bid</td>
                 <td className="py-1.5 text-gray-700">
                   Bid 2 &rarr; <strong>12</strong>
                   <br />
@@ -234,6 +249,10 @@ function ScoringTab() {
               </tr>
               <tr className="bg-green-50">
                 <td className="py-1.5 pr-2 text-gray-700">Bid zero (Nil) met</td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">10</td>
+                <td className="py-1.5 pr-2 text-gray-700">
+                  Bid 0, won 0 &rarr; <strong>10</strong>
+                </td>
                 <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">10</td>
                 <td className="py-1.5 pr-2 text-gray-700">
                   Bid 0, won 0 &rarr; <strong>10</strong>
@@ -250,8 +269,27 @@ function ScoringTab() {
                   Bid 3, won 5 &rarr; <strong>0</strong>
                 </td>
                 <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">0</td>
-                <td className="py-1.5 text-gray-700">
+                <td className="py-1.5 pr-2 text-gray-700">
                   Bid 3, won 5 &rarr; <strong>0</strong>
+                </td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">&minus;bid</td>
+                <td className="py-1.5 text-gray-700">
+                  Bid 3, won 5 &rarr; <strong>&minus;3</strong>
+                </td>
+              </tr>
+              <tr className="bg-red-50">
+                <td className="py-1.5 pr-2 text-gray-700">Bid zero (Nil) missed</td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">0</td>
+                <td className="py-1.5 pr-2 text-gray-700">
+                  Bid 0, won 2 &rarr; <strong>0</strong>
+                </td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">0</td>
+                <td className="py-1.5 pr-2 text-gray-700">
+                  Bid 0, won 2 &rarr; <strong>0</strong>
+                </td>
+                <td className="border-gray-200 border-l py-1.5 pr-2 pl-2 text-gray-700">&minus;1</td>
+                <td className="py-1.5 text-gray-700">
+                  Bid 0, won 2 &rarr; <strong>&minus;1</strong>
                 </td>
               </tr>
             </tbody>
@@ -259,7 +297,9 @@ function ScoringTab() {
         </div>
         <p className="mt-2 text-[11px] text-gray-500">
           In <strong>Classic</strong>, a single high bid can swing the game &mdash; risky bids are worth chasing. In{' '}
-          <strong>Advance</strong>, every met bid is worth nearly the same, so steady accurate bidding wins.
+          <strong>Advance</strong>, every met bid is worth nearly the same, so steady accurate bidding wins.{' '}
+          <strong>Pro</strong> plays like Advance but punishes missed bids &mdash; the bigger the miss, the bigger the
+          loss.
         </p>
       </section>
 

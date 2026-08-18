@@ -1,8 +1,12 @@
 import type { GameMode, GameRound, PlayerRoundData } from '../types/index.ts';
 
 export function calculateScore(bid: number, result: number, mode: GameMode = 'classic'): number {
-  if (bid !== result) return 0;
-  if (mode === 'advance') return 10 + bid;
+  if (bid !== result) {
+    // Pro adds negative marking on top of Advance: a missed bid costs the bid, a missed nil costs 1.
+    if (mode === 'pro') return bid === 0 ? -1 : -bid;
+    return 0;
+  }
+  if (mode === 'advance' || mode === 'pro') return 10 + bid;
   if (bid === 0) return 10;
   return bid * 10;
 }

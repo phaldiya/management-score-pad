@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
 import { z } from 'zod';
 
-import type { AppState } from '../types/index.ts';
+import type { AppState, GameMode } from '../types/index.ts';
 
 const TRANSFER_VERSION = 1;
 
@@ -32,7 +32,7 @@ const AppStateSchema = z.object({
   gameId: z.string().nullable(),
   gamePhase: z.enum(['setup', 'playing']),
   // QR codes generated before game modes existed omit this — default to classic.
-  gameMode: z.enum(['classic', 'advance']).default('classic'),
+  gameMode: z.enum(['classic', 'advance', 'pro']).default('classic'),
   players: z.array(PlayerSchema),
   rounds: z.array(GameRoundSchema),
   currentRoundIndex: z.number(),
@@ -173,7 +173,12 @@ function loadImage(src: string, width: number, height: number): Promise<HTMLImag
   });
 }
 
-function drawAdvanceBadge(ctx: CanvasRenderingContext2D, logoOffset: number, logoSize: number): void {
+function drawModeBadge(
+  ctx: CanvasRenderingContext2D,
+  logoOffset: number,
+  logoSize: number,
+  mode: 'advance' | 'pro',
+): void {
   // Same relative position as the AppIcon badge: center at 81% across, 12% down the logo box.
   const cx = logoOffset + logoSize * 0.81;
   const cy = logoOffset + logoSize * 0.12;
@@ -184,7 +189,7 @@ function drawAdvanceBadge(ctx: CanvasRenderingContext2D, logoOffset: number, log
   ctx.arc(cx, cy, badgeRadius + 2 * QR_SCALE, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = '#22c55e';
+  ctx.fillStyle = mode === 'pro' ? '#9333ea' : '#22c55e';
   ctx.beginPath();
   ctx.arc(cx, cy, badgeRadius, 0, Math.PI * 2);
   ctx.fill();
@@ -193,14 +198,24 @@ function drawAdvanceBadge(ctx: CanvasRenderingContext2D, logoOffset: number, log
   ctx.lineWidth = Math.max(2, badgeRadius * 0.3);
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(cx - badgeRadius * 0.5, cy);
-  ctx.lineTo(cx + badgeRadius * 0.5, cy);
-  ctx.moveTo(cx, cy - badgeRadius * 0.5);
-  ctx.lineTo(cx, cy + badgeRadius * 0.5);
+  if (mode === 'pro') {
+    // ± glyph: plus in the upper half, minus below.
+    ctx.moveTo(cx - badgeRadius * 0.45, cy - badgeRadius * 0.25);
+    ctx.lineTo(cx + badgeRadius * 0.45, cy - badgeRadius * 0.25);
+    ctx.moveTo(cx, cy - badgeRadius * 0.7);
+    ctx.lineTo(cx, cy + badgeRadius * 0.2);
+    ctx.moveTo(cx - badgeRadius * 0.45, cy + badgeRadius * 0.6);
+    ctx.lineTo(cx + badgeRadius * 0.45, cy + badgeRadius * 0.6);
+  } else {
+    ctx.moveTo(cx - badgeRadius * 0.5, cy);
+    ctx.lineTo(cx + badgeRadius * 0.5, cy);
+    ctx.moveTo(cx, cy - badgeRadius * 0.5);
+    ctx.lineTo(cx, cy + badgeRadius * 0.5);
+  }
   ctx.stroke();
 }
 
-export async function generateQrDataUrl(url: string, advanced = false): Promise<string | null> {
+export async function generateQrDataUrl(url: string, mode: GameMode = 'classic'): Promise<string | null> {
   if (url.length > QR_URL_MAX_LENGTH) {
     return null;
   }
@@ -236,8 +251,8 @@ export async function generateQrDataUrl(url: string, advanced = false): Promise<
       const logoSrc = `${import.meta.env.BASE_URL}favicon.svg`;
       const logo = await loadImage(logoSrc, logoSize, logoSize);
       ctx.drawImage(logo, logoOffset, logoOffset, logoSize, logoSize);
-      if (advanced) {
-        drawAdvanceBadge(ctx, logoOffset, logoSize);
+      if (mode !== 'classic') {
+        drawModeBadge(ctx, logoOffset, logoSize, mode);
       }
     } catch {
       // Logo failed to load — QR code still works without it

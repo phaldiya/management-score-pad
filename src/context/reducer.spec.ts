@@ -1063,6 +1063,55 @@ describe('game mode', () => {
     expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([13, 10, 0]);
   });
 
+  it('COMPLETE_ROUND scores with pro rules when gameMode is pro', () => {
+    let state = createTestState({
+      gameId: 'g1',
+      gameMode: 'pro',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    state = appReducer(state, {
+      type: 'COMPLETE_ROUND',
+      results: [
+        { playerId: 'p1', result: 3 },
+        { playerId: 'p2', result: 2 },
+        { playerId: 'p3', result: 3 },
+      ],
+    });
+    // p1 met bid 3 → 13; p2 missed nil → −1; p3 missed bid 2 → −2
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([13, -1, -2]);
+  });
+
+  it('SET_GAME_MODE re-scores completed rounds with pro negative marking', () => {
+    let state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17, 16],
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    state = appReducer(state, {
+      type: 'COMPLETE_ROUND',
+      results: [
+        { playerId: 'p1', result: 3 },
+        { playerId: 'p2', result: 1 },
+        { playerId: 'p3', result: 3 },
+      ],
+    });
+    // Classic: p1 met bid 3 → 30; p2 missed nil → 0; p3 missed bid 2 → 0
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([30, 0, 0]);
+
+    state = appReducer(state, { type: 'SET_GAME_MODE', mode: 'pro' });
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([13, -1, -2]);
+
+    state = appReducer(state, { type: 'SET_GAME_MODE', mode: 'classic' });
+    expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([30, 0, 0]);
+  });
+
   it('START_GAME keeps the chosen game mode', () => {
     const state = applyActions(createTestState({ gameMode: 'advance' }), [
       { type: 'SET_PLAYERS', players: testPlayers },

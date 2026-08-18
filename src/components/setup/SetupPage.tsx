@@ -127,14 +127,14 @@ export default function SetupPage() {
 
       <div className="flex w-full max-w-3xl items-center gap-8">
         <div className="hidden shrink-0 flex-col items-center justify-center gap-4 self-stretch md:flex">
-          <AppIcon className="h-80 w-80" advanced={state.gameMode === 'advance'} badgeClassName="h-6 w-6" />
+          <AppIcon className="h-80 w-80" mode={state.gameMode} badgeClassName="h-6 w-6" />
           <GameModeToggle showHint />
         </div>
 
         <div className="w-full max-w-md">
           <div className="mb-6 md:hidden">
             <div className="flex flex-col items-center gap-2 text-center">
-              <AppIcon className="h-20 w-20" advanced={state.gameMode === 'advance'} badgeClassName="h-5 w-5" />
+              <AppIcon className="h-20 w-20" mode={state.gameMode} badgeClassName="h-5 w-5" />
               <GameModeToggle showHint />
               <h2 className="font-bold text-2xl text-gray-900">Management (Judgement)</h2>
             </div>

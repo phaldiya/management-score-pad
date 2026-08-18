@@ -4,7 +4,7 @@ export type GamePhase = 'setup' | 'playing';
 
 export type RoundPhase = 'bidding' | 'in_progress' | 'completed';
 
-export type GameMode = 'classic' | 'advance';
+export type GameMode = 'classic' | 'advance' | 'pro';
 
 export interface Player {
   id: string;

@@ -206,4 +206,46 @@ describe('scoreCalculation – deep', () => {
       expect(scored[2].score).toBe(0);
     });
   });
+
+  describe('pro mode', () => {
+    it('exact bid met → 10 + bid', () => {
+      expect(calculateScore(3, 3, 'pro')).toBe(13);
+    });
+
+    it.each([1, 2, 3, 4, 5])('bid=%i result=%i → 10+%i', (n) => {
+      expect(calculateScore(n, n, 'pro')).toBe(10 + n);
+    });
+
+    it('zero bid (nil) met → 10', () => {
+      expect(calculateScore(0, 0, 'pro')).toBe(10);
+    });
+
+    it('bid missed (over) → −bid', () => {
+      expect(calculateScore(3, 5, 'pro')).toBe(-3);
+    });
+
+    it('bid missed (under) → −bid', () => {
+      expect(calculateScore(3, 2, 'pro')).toBe(-3);
+    });
+
+    it.each([1, 2, 3, 4, 5])('missed bid=%i → −%i regardless of result', (n) => {
+      expect(calculateScore(n, n + 1, 'pro')).toBe(-n);
+    });
+
+    it('zero bid (nil) missed → −1', () => {
+      expect(calculateScore(0, 2, 'pro')).toBe(-1);
+    });
+
+    it('computeRoundScores applies pro scoring', () => {
+      const playerData = [
+        { playerId: 'p1', bid: 2, result: 2, score: null, isDealer: true },
+        { playerId: 'p2', bid: 0, result: 1, score: null, isDealer: false },
+        { playerId: 'p3', bid: 3, result: 1, score: null, isDealer: false },
+      ];
+      const scored = computeRoundScores(playerData, 'pro');
+      expect(scored[0].score).toBe(12);
+      expect(scored[1].score).toBe(-1);
+      expect(scored[2].score).toBe(-3);
+    });
+  });
 });

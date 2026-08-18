@@ -105,8 +105,10 @@ test.describe('Game Mode', () => {
   test('setup page defaults to Classic with scoring rules shown', async ({ page }) => {
     const classic = page.getByRole('button', { name: 'Classic' }).first();
     const advance = page.getByRole('button', { name: 'Advance' }).first();
+    const pro = page.getByRole('button', { name: 'Pro' }).first();
     await expect(classic).toHaveAttribute('aria-pressed', 'true');
     await expect(advance).toHaveAttribute('aria-pressed', 'false');
+    await expect(pro).toHaveAttribute('aria-pressed', 'false');
     await expect(page.getByText('Exact bid scores bid × 10').first()).toBeVisible();
   });
 
@@ -118,6 +120,18 @@ test.describe('Game Mode', () => {
     await expect(page.getByRole('button', { name: 'Advance' }).first()).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText('Exact bid scores 10 + bid').first()).toBeVisible();
     await expect(page.getByTestId('advance-mode-badge').first()).toBeVisible();
+  });
+
+  test('switching to Pro updates rules and shows the ± badge on the app icon', async ({ page }) => {
+    await expect(page.getByTestId('pro-mode-badge')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Pro' }).first().click();
+
+    await expect(page.getByRole('button', { name: 'Pro' }).first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Missed bid scores −bid').first()).toBeVisible();
+    await expect(page.getByText('Missed zero bid scores −1').first()).toBeVisible();
+    await expect(page.getByTestId('pro-mode-badge').first()).toBeVisible();
+    await expect(page.getByTestId('advance-mode-badge')).toHaveCount(0);
   });
 
   test('game mode is stored with the game state and restored on reload', async ({ page }) => {
@@ -144,6 +158,7 @@ test.describe('Game Mode', () => {
     await playRound(page, BIDS, RESULTS);
     await expect(page.getByRole('button', { name: 'Classic' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Advance' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Pro' })).toHaveCount(0);
   });
 
   test('classic mode scores bid × 10', async ({ page }) => {
@@ -170,6 +185,20 @@ test.describe('Game Mode', () => {
     await expect(cells.nth(1)).toContainText('15');
     await expect(cells.nth(2)).toContainText('15');
     await expect(cells.nth(3)).toContainText('0');
+  });
+
+  test('pro mode scores 10 + bid and deducts missed bids', async ({ page }) => {
+    await page.getByRole('button', { name: 'Pro' }).first().click();
+    await startGame(page);
+    // Bids total 10 ≠ 17 ✓; results total 17 ✓.
+    await playRound(page, [0, 5, 5], [1, 5, 11]);
+
+    // Alice missed nil → −1; Bob met bid 5 → 15; Charlie missed bid 5 → −5.
+    const row = page.locator('tbody tr').first();
+    const cells = row.locator('td');
+    await expect(cells.nth(1)).toContainText('-1');
+    await expect(cells.nth(2)).toContainText('15');
+    await expect(cells.nth(3)).toContainText('-5');
   });
 
   test('restoring a stored game overrides the selected game mode', async ({ page }) => {

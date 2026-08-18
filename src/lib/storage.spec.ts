@@ -224,6 +224,8 @@ describe('game mode persistence', () => {
   it('saveGameMode / loadGameMode round-trips', () => {
     saveGameMode('advance');
     expect(loadGameMode()).toBe('advance');
+    saveGameMode('pro');
+    expect(loadGameMode()).toBe('pro');
     saveGameMode('classic');
     expect(loadGameMode()).toBe('classic');
   });
@@ -244,5 +246,11 @@ describe('game mode persistence', () => {
     const state = createTestState({ gameId: 'adv-1', gamePhase: 'playing', gameMode: 'advance' });
     saveGameState(state);
     expect(loadActiveGame()?.gameMode).toBe('advance');
+  });
+
+  it('loadActiveGame preserves a saved pro gameMode', () => {
+    const state = createTestState({ gameId: 'pro-1', gamePhase: 'playing', gameMode: 'pro' });
+    saveGameState(state);
+    expect(loadActiveGame()?.gameMode).toBe('pro');
   });
 });
