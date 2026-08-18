@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/phaldiya/management-score-pad/compare/v1.14.0...v1.15.0) (2026-08-18)
+
+
+### Features
+
+* **game:** add Pro scoring mode ([17dac76](https://github.com/phaldiya/management-score-pad/commit/17dac7672e1c5aa2398bdaa5f57e4bb7eb04977a))
+
 # [1.14.0](https://github.com/phaldiya/management-score-pad/compare/v1.13.0...v1.14.0) (2026-08-16)
 
 
