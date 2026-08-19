@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { isSuitRed } from '../../lib/gameLogic.ts';
-import { CloseIcon, SuitIcon } from './Icons.tsx';
+import type { GameMode } from '../../types/index.ts';
+import { AppIcon, CloseIcon, SuitIcon } from './Icons.tsx';
 
 interface GameRulesPopupProps {
   onClose: () => void;
+  onSecretModeSwitch?: (mode: GameMode) => void;
 }
 
 const SUITS = ['spades', 'hearts', 'clubs', 'diamonds'] as const;
@@ -171,7 +173,21 @@ function GameplayTab() {
   );
 }
 
-function ScoringTab() {
+function ScoringTab({ onSecretModeSwitch }: { onSecretModeSwitch?: (mode: GameMode) => void }) {
+  const headerTaps = useRef<Partial<Record<GameMode, number[]>>>({});
+
+  // Hidden feature: 3 quick taps on a mode's column header switch the game to that mode.
+  const handleModeHeaderTap = (mode: GameMode) => {
+    if (!onSecretModeSwitch) return;
+    const now = Date.now();
+    const taps = [...(headerTaps.current[mode] ?? []).filter((t) => now - t < 1500), now];
+    headerTaps.current[mode] = taps;
+    if (taps.length >= 3) {
+      headerTaps.current[mode] = [];
+      onSecretModeSwitch(mode);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Scoring */}
@@ -187,18 +203,37 @@ function ScoringTab() {
               <tr>
                 <td />
                 <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pr-2 pl-2 align-top">
-                  <span className="flex items-center gap-1.5 font-semibold text-blue-600">
+                  <button
+                    type="button"
+                    onClick={() => handleModeHeaderTap('classic')}
+                    className="flex items-center gap-1.5 font-semibold text-blue-600"
+                  >
+                    <AppIcon className="h-5 w-5" mode="classic" />
                     Classic
                     <span className="rounded-full bg-blue-100 px-1.5 py-px font-medium text-[10px] text-blue-700">
                       default
                     </span>
-                  </span>
+                  </button>
                 </th>
                 <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pr-2 pl-2 align-top">
-                  <span className="font-semibold text-green-600">Advance</span>
+                  <button
+                    type="button"
+                    onClick={() => handleModeHeaderTap('advance')}
+                    className="flex items-center gap-1.5 font-semibold text-green-600"
+                  >
+                    <AppIcon className="h-5 w-5" mode="advance" badgeClassName="h-2.5 w-2.5" />
+                    Advance
+                  </button>
                 </th>
                 <th scope="colgroup" colSpan={2} className="border-gray-200 border-l py-1 pl-2 align-top">
-                  <span className="font-semibold text-purple-600">Pro</span>
+                  <button
+                    type="button"
+                    onClick={() => handleModeHeaderTap('pro')}
+                    className="flex items-center gap-1.5 font-semibold text-purple-600"
+                  >
+                    <AppIcon className="h-5 w-5" mode="pro" badgeClassName="h-2.5 w-2.5" />
+                    Pro
+                  </button>
                 </th>
               </tr>
               <tr className="border-gray-200 border-b">
@@ -333,7 +368,7 @@ function ScoringTab() {
   );
 }
 
-export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
+export function GameRulesPopup({ onClose, onSecretModeSwitch }: GameRulesPopupProps) {
   const [activeTab, setActiveTab] = useState<Tab>('Setup');
 
   useEffect(() => {
@@ -388,7 +423,7 @@ export function GameRulesPopup({ onClose }: GameRulesPopupProps) {
         <div className="p-4 text-sm" role="tabpanel" aria-label={activeTab}>
           {activeTab === 'Setup' && <SetupTab />}
           {activeTab === 'Gameplay' && <GameplayTab />}
-          {activeTab === 'Scoring' && <ScoringTab />}
+          {activeTab === 'Scoring' && <ScoringTab onSecretModeSwitch={onSecretModeSwitch} />}
         </div>
       </div>
     </div>

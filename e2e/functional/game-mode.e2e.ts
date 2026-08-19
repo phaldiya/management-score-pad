@@ -231,6 +231,73 @@ test.describe('Game Mode', () => {
     expect(await readActiveGameMode(page)).toBe('classic');
   });
 
+  test('hidden: 5 taps on the logo open the mode switch dialog mid-game', async ({ page }) => {
+    await startGame(page);
+    await playRound(page, BIDS, RESULTS);
+
+    const logo = page.getByRole('button', { name: 'Management Score Pad logo' });
+    for (let i = 0; i < 5; i++) {
+      await logo.click();
+    }
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toBeVisible();
+
+    // Switch Classic → Pro and confirm; completed round is re-scored (50/50/0 → 15/15/−5).
+    await page.getByRole('button', { name: 'Pro' }).click();
+    await page.getByRole('button', { name: 'Switch Mode' }).click();
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toHaveCount(0);
+
+    const cells = page.locator('tbody tr').first().locator('td');
+    await expect(cells.nth(1)).toContainText('15');
+    await expect(cells.nth(2)).toContainText('15');
+    await expect(cells.nth(3)).toContainText('-5');
+    await expect(page.getByTestId('pro-mode-badge').first()).toBeVisible();
+    expect(await readActiveGameMode(page)).toBe('pro');
+  });
+
+  test('hidden: logo taps do nothing on the setup page', async ({ page }) => {
+    const logo = page.getByRole('button', { name: 'Management Score Pad logo' });
+    for (let i = 0; i < 5; i++) {
+      await logo.click();
+    }
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toHaveCount(0);
+  });
+
+  test('hidden: Shift+M opens the mode switch dialog and Escape closes it', async ({ page }) => {
+    await startGame(page);
+
+    // Opening over another popup replaces it — popups never stack.
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await expect(page.getByRole('heading', { name: 'Game Rules' })).toBeVisible();
+    await page.keyboard.press('Shift+M');
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Game Rules' })).toHaveCount(0);
+
+    // Confirm is disabled while the current mode is selected.
+    await expect(page.getByRole('button', { name: 'Switch Mode' })).toBeDisabled();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toHaveCount(0);
+    expect(await readActiveGameMode(page)).toBe('classic');
+  });
+
+  test('hidden: triple-tapping a mode header in Game Rules pre-selects that mode', async ({ page }) => {
+    await startGame(page);
+    await playRound(page, BIDS, RESULTS);
+
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await page.getByRole('tab', { name: 'Scoring' }).click();
+    await page.getByRole('button', { name: 'Pro' }).click({ clickCount: 3 });
+
+    // Rules popup closes, switch dialog opens with Pro pre-selected — confirm directly.
+    await expect(page.getByRole('heading', { name: 'Switch Game Mode' })).toBeVisible();
+    await page.getByRole('button', { name: 'Switch Mode' }).click();
+
+    const cells = page.locator('tbody tr').first().locator('td');
+    await expect(cells.nth(1)).toContainText('15');
+    await expect(cells.nth(3)).toContainText('-5');
+    expect(await readActiveGameMode(page)).toBe('pro');
+  });
+
   test('a new game defaults to the last game mode', async ({ page }) => {
     await page.getByRole('button', { name: 'Advance' }).first().click();
     await startGame(page);

@@ -105,7 +105,13 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           ? { ...round, playerData: computeRoundScores(round.playerData, action.mode) }
           : round,
       );
-      return { ...state, gameMode: action.mode, rounds };
+      const newState = { ...state, gameMode: action.mode, rounds };
+      // Switching after the last play would leave the stored history entry with stale scores.
+      const completedCount = rounds.filter((r) => r.phase === 'completed').length;
+      if (state.totalGames > 0 && completedCount === state.totalGames) {
+        saveCompletedGame(newState);
+      }
+      return newState;
     }
 
     case 'UPDATE_BIDS': {

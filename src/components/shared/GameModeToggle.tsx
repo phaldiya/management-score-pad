@@ -2,7 +2,7 @@ import { useAppContext } from '../../context/AppContext.tsx';
 import type { GameMode } from '../../types/index.ts';
 import { Tooltip } from './Tooltip.tsx';
 
-const MODES: { value: GameMode; label: string; activeClass: string; rules: string[] }[] = [
+export const GAME_MODES: { value: GameMode; label: string; activeClass: string; rules: string[] }[] = [
   {
     value: 'classic',
     label: 'Classic',
@@ -25,12 +25,12 @@ const MODES: { value: GameMode; label: string; activeClass: string; rules: strin
 
 export function GameModeToggle({ className = '', showHint = false }: { className?: string; showHint?: boolean }) {
   const { state, dispatch } = useAppContext();
-  const activeMode = MODES.find((m) => m.value === state.gameMode) ?? MODES[0];
+  const activeMode = GAME_MODES.find((m) => m.value === state.gameMode) ?? GAME_MODES[0];
 
   const toggle = (
     <fieldset className={`inline-flex rounded-full border border-gray-300 bg-gray-100 p-0.5 ${className}`}>
       <legend className="sr-only">Game mode</legend>
-      {MODES.map((mode) => {
+      {GAME_MODES.map((mode) => {
         const active = state.gameMode === mode.value;
         return (
           <Tooltip key={mode.value} text={mode.rules.join(' · ')}>

@@ -1112,6 +1112,34 @@ describe('game mode', () => {
     expect(state.rounds[0].playerData.map((p) => p.score)).toEqual([30, 0, 0]);
   });
 
+  it('SET_GAME_MODE refreshes the history entry when the game is already complete', () => {
+    let state = createTestState({
+      gameId: 'g1',
+      gamePhase: 'playing',
+      players: testPlayers,
+      cardSequence: [17],
+      totalGames: 1,
+      currentRoundIndex: 0,
+      rounds: [inProgressRound()],
+    });
+    state = appReducer(state, {
+      type: 'COMPLETE_ROUND',
+      results: [
+        { playerId: 'p1', result: 3 },
+        { playerId: 'p2', result: 1 },
+        { playerId: 'p3', result: 3 },
+      ],
+    });
+    const readHistoryScores = () =>
+      JSON.parse(localStorage.getItem('management-score-pad-history') ?? '[]')[0]?.players.map(
+        (p: { score: number }) => p.score,
+      );
+    expect(readHistoryScores()).toEqual([30, 0, 0]);
+
+    state = appReducer(state, { type: 'SET_GAME_MODE', mode: 'pro' });
+    expect(readHistoryScores()).toEqual([13, -1, -2]);
+  });
+
   it('START_GAME keeps the chosen game mode', () => {
     const state = applyActions(createTestState({ gameMode: 'advance' }), [
       { type: 'SET_PLAYERS', players: testPlayers },

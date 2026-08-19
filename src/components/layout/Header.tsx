@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useAppContext } from '../../context/AppContext.tsx';
 import { printScoreboard } from '../../lib/exportPdf.ts';
 import { rememberAvatars } from '../../lib/storage.ts';
+import type { GameMode } from '../../types/index.ts';
 import GameHistoryPopup from '../game/GameHistoryPopup.tsx';
+import { GameModeSwitchPopup } from '../shared/GameModeSwitchPopup.tsx';
 import { GameRulesPopup } from '../shared/GameRulesPopup.tsx';
 import { AppIcon, BookIcon, CloseIcon, HistoryIcon, KeyboardIcon, ShareIcon } from '../shared/Icons.tsx';
 import { KeyboardShortcutsPopup } from '../shared/KeyboardShortcutsPopup.tsx';
@@ -19,18 +21,52 @@ export default function Header() {
   const [showRules, setShowRules] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showModeSwitch, setShowModeSwitch] = useState(false);
+  const [modeSwitchTarget, setModeSwitchTarget] = useState<GameMode | undefined>(undefined);
+  const logoTaps = useRef<number[]>([]);
 
   const hasRoundsInProgress = state.rounds.length > 0 && state.rounds.some((r) => r.phase !== 'completed');
   const hasCompletedRounds = state.rounds.some((r) => r.phase === 'completed');
   const gameInProgress = hasRoundsInProgress || hasCompletedRounds;
 
+  // Only one popup at a time — keyboard shortcuts work even while another popup is open.
+  const closeAllPopups = useCallback(() => {
+    setShowConfirm(false);
+    setShowShortcuts(false);
+    setShowRules(false);
+    setShowTransfer(false);
+    setShowHistory(false);
+    setShowModeSwitch(false);
+  }, []);
+
   const handleNewGame = useCallback(() => {
+    closeAllPopups();
     if (gameInProgress) {
       setShowConfirm(true);
     } else {
       dispatch({ type: 'RESET_GAME' });
     }
-  }, [gameInProgress, dispatch]);
+  }, [closeAllPopups, gameInProgress, dispatch]);
+
+  const openModeSwitch = useCallback(
+    (target?: GameMode) => {
+      closeAllPopups();
+      setModeSwitchTarget(target);
+      setShowModeSwitch(true);
+    },
+    [closeAllPopups],
+  );
+
+  // Hidden feature: 5 quick taps on the logo open the mode switch dialog mid-game.
+  const handleLogoTap = useCallback(() => {
+    if (state.gamePhase !== 'playing') return;
+    const now = Date.now();
+    logoTaps.current = [...logoTaps.current.filter((t) => now - t < 2000), now];
+    if (logoTaps.current.length >= 5) {
+      logoTaps.current = [];
+      openModeSwitch();
+    }
+  }, [state.gamePhase, openModeSwitch]);
 
   const handleRematchFromHistory = useCallback(
     (players: { name: string; avatar: string }[]) => {
@@ -47,6 +83,10 @@ export default function Header() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (showModeSwitch) {
+          setShowModeSwitch(false);
+          return;
+        }
         if (showHistory) {
           setShowHistory(false);
           return;
@@ -73,6 +113,7 @@ export default function Header() {
         const target = e.target as HTMLElement;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
         e.preventDefault();
+        closeAllPopups();
         setShowShortcuts(true);
         return;
       }
@@ -87,6 +128,7 @@ export default function Header() {
         const target = e.target as HTMLElement;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
         e.preventDefault();
+        closeAllPopups();
         setShowTransfer(true);
         return;
       }
@@ -96,6 +138,14 @@ export default function Header() {
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
         e.preventDefault();
         handleNewGame();
+        return;
+      }
+      // Shift+M for mode switch — hidden on purpose, not listed in the shortcuts popup
+      if (e.key === 'M' && e.shiftKey && !e.metaKey && !e.ctrlKey && state.gamePhase === 'playing') {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
+        e.preventDefault();
+        openModeSwitch();
       }
     };
     window.addEventListener('keydown', handler);
@@ -106,17 +156,22 @@ export default function Header() {
     showRules,
     showTransfer,
     showHistory,
+    showModeSwitch,
     state.gamePhase,
     state.players,
     state.rounds,
     handleNewGame,
+    closeAllPopups,
+    openModeSwitch,
   ]);
 
   return (
     <>
       <header className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
         <div className="flex items-center gap-2">
-          <AppIcon className="h-8 w-8" mode={state.gameMode} />
+          <button type="button" onClick={handleLogoTap} aria-label="Management Score Pad logo" className="flex">
+            <AppIcon className="h-8 w-8" mode={state.gameMode} />
+          </button>
           <h1 className="font-bold text-gray-900 text-lg">
             Management<span className="hidden sm:inline"> Score Pad</span>
           </h1>
@@ -180,8 +235,16 @@ export default function Header() {
         </div>
       </header>
 
-      {showRules && <GameRulesPopup onClose={() => setShowRules(false)} />}
+      {showRules && (
+        <GameRulesPopup
+          onClose={() => setShowRules(false)}
+          onSecretModeSwitch={state.gamePhase === 'playing' ? openModeSwitch : undefined}
+        />
+      )}
       {showShortcuts && <KeyboardShortcutsPopup onClose={() => setShowShortcuts(false)} />}
+      {showModeSwitch && (
+        <GameModeSwitchPopup initialMode={modeSwitchTarget} onClose={() => setShowModeSwitch(false)} />
+      )}
       {showTransfer && <TransferGamePopup onClose={() => setShowTransfer(false)} />}
       {showHistory && (
         <GameHistoryPopup
