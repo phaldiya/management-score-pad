@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/phaldiya/management-score-pad/compare/v1.15.0...v1.16.0) (2026-08-19)
+
+
+### Features
+
+* **game:** add hidden mid-game mode switch ([9f6c66a](https://github.com/phaldiya/management-score-pad/commit/9f6c66abd94ba03a871a4e91982a06e7a3116938))
+
 # [1.15.0](https://github.com/phaldiya/management-score-pad/compare/v1.14.0...v1.15.0) (2026-08-18)
 
 
