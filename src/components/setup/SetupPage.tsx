@@ -213,13 +213,14 @@ export default function SetupPage() {
                     </Tooltip>
                   )}
                 </div>
+                {/* ml-20 = grip (20px) + avatar button (44px) + two gap-2 (16px), aligning the error with the input */}
                 {duplicateIndices.has(index) && (
-                  <p id={`player-error-${index}`} className="mt-1 ml-12 text-red-600 text-xs" role="alert">
+                  <p id={`player-error-${index}`} className="mt-1 ml-20 text-red-600 text-xs" role="alert">
                     Duplicate player name
                   </p>
                 )}
                 {!duplicateIndices.has(index) && tooShortIndices.has(index) && (
-                  <p id={`player-error-${index}`} className="mt-1 ml-12 text-red-600 text-xs" role="alert">
+                  <p id={`player-error-${index}`} className="mt-1 ml-20 text-red-600 text-xs" role="alert">
                     Name must be at least 2 characters
                   </p>
                 )}
