@@ -191,6 +191,16 @@ test.describe('Game Rules', () => {
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('game-rules-scoring-tab.png');
   });
+
+  test('game rules share tab', async ({ page }) => {
+    await setupGame(page, ['Alice', 'Bob', 'Charlie']);
+    await page.getByRole('button', { name: 'Game rules' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('tab', { name: 'Share' }).click();
+    await expect(page.getByRole('img', { name: 'QR code to open Management Score Pad' })).toBeVisible();
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('game-rules-share-tab.png');
+  });
 });
 
 test.describe('Max Players & Layout', () => {

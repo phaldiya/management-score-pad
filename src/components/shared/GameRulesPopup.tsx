@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { isSuitRed } from '../../lib/gameLogic.ts';
+import { generateQrDataUrl } from '../../lib/transfer.ts';
 import type { GameMode } from '../../types/index.ts';
 import { AppIcon, CloseIcon, SuitIcon } from './Icons.tsx';
 
@@ -11,7 +12,7 @@ interface GameRulesPopupProps {
 
 const SUITS = ['spades', 'hearts', 'clubs', 'diamonds'] as const;
 
-const TABS = ['Setup', 'Gameplay', 'Scoring'] as const;
+const TABS = ['Setup', 'Gameplay', 'Scoring', 'Share'] as const;
 type Tab = (typeof TABS)[number];
 
 function TrumpRotationDiagram() {
@@ -368,6 +369,102 @@ function ScoringTab({ onSecretModeSwitch }: { onSecretModeSwitch?: (mode: GameMo
   );
 }
 
+function ShareTab() {
+  const appUrl = window.location.href.split('#')[0];
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    generateQrDataUrl(appUrl)
+      .then((qr) => {
+        if (!cancelled) setQrDataUrl(qr);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [appUrl]);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(appUrl);
+    } catch {
+      // Fallback: select text in a temporary input
+      const input = document.createElement('input');
+      input.value = appUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleShare() {
+    try {
+      await navigator.share({ title: 'Management Score Pad', url: appUrl });
+    } catch {
+      // User cancelled share or API error — no action needed
+    }
+  }
+
+  const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+  return (
+    <div className="space-y-4">
+      <section>
+        <h3 className="mb-1 font-semibold text-gray-900">Share the App</h3>
+        <p className="text-gray-600">
+          Enjoying the game? Let others scan the QR code to open Management Score Pad on their own device.
+        </p>
+      </section>
+
+      {loading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        </div>
+      )}
+
+      {!loading && qrDataUrl && (
+        <div className="flex justify-center">
+          <img src={qrDataUrl} alt="QR code to open Management Score Pad" className="h-56 w-56 rounded-lg" />
+        </div>
+      )}
+
+      {!loading && !qrDataUrl && (
+        <p className="py-4 text-center text-amber-600">Couldn't generate the QR code. Use the link below instead.</p>
+      )}
+
+      <div className="break-all rounded bg-gray-100 px-2 py-1.5 text-center text-gray-600 text-xs">{appUrl}</div>
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          className="flex-1 rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+          onClick={handleCopy}
+        >
+          {copied ? 'Copied!' : 'Copy Link'}
+        </button>
+        {canShare && (
+          <button
+            type="button"
+            className="flex-1 rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300"
+            onClick={handleShare}
+          >
+            Share
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function GameRulesPopup({ onClose, onSecretModeSwitch }: GameRulesPopupProps) {
   const [activeTab, setActiveTab] = useState<Tab>('Setup');
 
@@ -424,6 +521,7 @@ export function GameRulesPopup({ onClose, onSecretModeSwitch }: GameRulesPopupPr
           {activeTab === 'Setup' && <SetupTab />}
           {activeTab === 'Gameplay' && <GameplayTab />}
           {activeTab === 'Scoring' && <ScoringTab onSecretModeSwitch={onSecretModeSwitch} />}
+          {activeTab === 'Share' && <ShareTab />}
         </div>
       </div>
     </div>
