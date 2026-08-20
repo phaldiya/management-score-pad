@@ -1,3 +1,16 @@
+# [1.17.0](https://github.com/phaldiya/management-score-pad/compare/v1.16.0...v1.17.0) (2026-08-20)
+
+
+### Bug Fixes
+
+* **setup:** align player name errors under the input box ([f9423d7](https://github.com/phaldiya/management-score-pad/commit/f9423d784946c35c939ce0adc9d9742758672d52))
+
+
+### Features
+
+* **rules:** add app share QR code tab to game rules popup ([01a400a](https://github.com/phaldiya/management-score-pad/commit/01a400ae2011989ac0b64e17831b52be991dce81))
+* **setup:** enlarge app icon on tall mobile screens ([5264c35](https://github.com/phaldiya/management-score-pad/commit/5264c351b763f1d72f3e29dea34949e3872fc337))
+
 # [1.16.0](https://github.com/phaldiya/management-score-pad/compare/v1.15.0...v1.16.0) (2026-08-19)
 
 
