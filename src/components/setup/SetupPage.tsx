@@ -134,7 +134,11 @@ export default function SetupPage() {
         <div className="w-full max-w-md">
           <div className="mb-6 md:hidden">
             <div className="flex flex-col items-center gap-2 text-center">
-              <AppIcon className="h-20 w-20" mode={state.gameMode} badgeClassName="h-5 w-5" />
+              <AppIcon
+                className="h-20 w-20 [@media(min-height:700px)]:h-40 [@media(min-height:700px)]:w-40"
+                mode={state.gameMode}
+                badgeClassName="h-5 w-5 [@media(min-height:700px)]:h-6 [@media(min-height:700px)]:w-6"
+              />
               <GameModeToggle showHint />
               <h2 className="font-bold text-2xl text-gray-900">Management (Judgement)</h2>
             </div>
